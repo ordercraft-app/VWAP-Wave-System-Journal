@@ -1902,7 +1902,7 @@ function renderStatsDashboard() {
         options: { maintainAspectRatio: false, plugins: { legend: { position: 'bottom', labels: { color: '#888', usePointStyle: true, pointStyle: 'circle' } } } }
     });
 
-    // Top 5 Psychology
+    // Top 5 Psychology (Frequency)
     const psychGroup = {};
     trades.forEach(t => {
         (t.psychology || []).forEach(p => {
@@ -1911,12 +1911,10 @@ function renderStatsDashboard() {
         });
     });
     const psychStats = Object.keys(psychGroup).map(p => {
-        const stats = getWinRateData(psychGroup[p]);
-        return { psych: p, winRate: parseFloat(stats.winRate), total: stats.total };
+        return { psych: p, total: psychGroup[p].length };
     });
     psychStats.sort((a, b) => {
-        if (b.winRate !== a.winRate) return b.winRate - a.winRate; // Sort by win rate first
-        return b.total - a.total; // Tiebreaker by frequency
+        return b.total - a.total; // Sort strictly by frequency
     });
     const top5Psych = psychStats.slice(0, 5);
 
@@ -1925,9 +1923,9 @@ function renderStatsDashboard() {
         type: 'bar',
         data: {
             labels: top5Psych.map(s => s.psych),
-            datasets: [{ label: 'Win Rate %', data: top5Psych.map(s => s.winRate), backgroundColor: colors.accent, borderRadius: 4 }]
+            datasets: [{ label: 'Count', data: top5Psych.map(s => s.total), backgroundColor: colors.accent, borderRadius: 4 }]
         },
-        options: { maintainAspectRatio: false, indexAxis: 'y', scales: { x: { display: false, beginAtZero: true, max: 100 }, y: { display: true } }, plugins: { legend: { display: false } } }
+        options: { maintainAspectRatio: false, indexAxis: 'y', scales: { x: { display: false, beginAtZero: true }, y: { display: true } }, plugins: { legend: { display: false } } }
     });
 
     // Invalidation Top 5
