@@ -481,6 +481,12 @@ async function renderDashboard() {
                     <p style="color: var(--text-muted); font-size: 12px; margin-bottom: 12px; line-height: 1.4;">Give the app permission to read and write to the folder you just created.</p>
                     <button id="btn-initial-load" class="btn-primary" style="width: 100%;">Select Folder</button>
                 </div>
+
+                <div style="background: var(--bg-card); border: 1px solid var(--border-color); padding: 16px; border-radius: 8px; text-align: left; margin-top: 16px;">
+                    <div style="font-weight: 600; font-size: 13px; color: var(--text-main); margin-bottom: 4px;">Step 3: Install Desktop App (Optional)</div>
+                    <p style="color: var(--text-muted); font-size: 12px; margin-bottom: 12px; line-height: 1.4;">Click the Chrome menu (3 dots) top right ➔ <b>Cast, save and share</b> ➔ <b>Install page as app...</b> to use this as a standalone desktop app.</p>
+                    <img src="install-guide.png" alt="Install instructions" style="width: 100%; border-radius: 6px; border: 1px solid var(--border-color);">
+                </div>
             </div>`;
             
         document.getElementById('btn-download-template').addEventListener('click', () => {
