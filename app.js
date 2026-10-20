@@ -1586,8 +1586,8 @@ function renderSettingsUI() {
     settingsContainer.appendChild(renderSetupCombined(onSettingsChange));
     settingsContainer.appendChild(renderComplexSetting('Evidence', appData.settings.evidence, '2-level', onSettingsChange));
     settingsContainer.appendChild(renderComplexSetting('Invalidation', appData.settings.invalidation, '2-level', onSettingsChange));
-    settingsContainer.appendChild(renderSimpleSetting('Psychology', appData.settings.psychology, onSettingsChange));
     settingsContainer.appendChild(renderComplexSetting('Target', appData.settings.target, '3-level', onSettingsChange));
+    settingsContainer.appendChild(renderSimpleSetting('Psychology', appData.settings.psychology, onSettingsChange));
 }
 
 // --- Chart.js Settings & Stats Dashboard ---
