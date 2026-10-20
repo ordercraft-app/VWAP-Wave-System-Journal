@@ -1,0 +1,21 @@
+{
+  "name": "VWAP Wave System",
+  "short_name": "VWAP Journal",
+  "description": "A comprehensive trading journal for the VWAP Wave System.",
+  "start_url": "/index.html",
+  "display": "standalone",
+  "background_color": "#010102",
+  "theme_color": "#5e6ad2",
+  "icons": [
+    {
+      "src": "favicon.png",
+      "sizes": "192x192",
+      "type": "image/png"
+    },
+    {
+      "src": "appicon.png",
+      "sizes": "512x512",
+      "type": "image/png"
+    }
+  ]
+}

@@ -1,0 +1,298 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>VWAP Wave System - Journal</title>
+    <link rel="icon" type="image/png" href="favicon.png">
+    <link rel="stylesheet" href="styles.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+</head>
+<body>
+    <div class="app-container">
+        
+        <!-- Sidebar Navigation -->
+        <aside class="sidebar">
+            <div class="sidebar-top">
+                <img src="favicon.png" alt="Logo" class="sidebar-logo">
+            </div>
+            <nav class="sidebar-nav">
+                <button class="btn-icon active" id="btn-nav-dashboard" title="Dashboard">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="7" height="9"></rect><rect x="14" y="3" width="7" height="5"></rect><rect x="14" y="12" width="7" height="9"></rect><rect x="3" y="16" width="7" height="5"></rect></svg>
+                </button>
+                <button class="btn-icon" id="btn-nav-stats" title="My Stats">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 3v18h18"/><path d="M18 17V9"/><path d="M13 17V5"/><path d="M8 17v-3"/></svg>
+                </button>
+                <button class="btn-icon" id="btn-nav-settings" title="Settings">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"></circle><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"></path></svg>
+                </button>
+            </nav>
+        </aside>
+
+        <!-- Main Wrapper -->
+        <div class="main-wrapper">
+            <!-- Top Navigation Bar -->
+            <header class="app-header">
+                <div class="header-left">
+                    <h2 class="app-title">VWAP Wave System - Journal</h2>
+                    <input type="date" id="date-picker" class="linear-input" style="width: auto;">
+                </div>
+                <div class="header-right">
+                    <button class="btn-primary" id="btn-new-trade" style="white-space: nowrap;">Add Trade</button>
+                </div>
+            </header>
+
+            <!-- Main Content -->
+            <main class="main-content">
+                <!-- Dashboard View -->
+                <section id="view-dashboard" class="view active">
+                    
+                    <!-- Weekly Calendar Widget -->
+                    <div class="weekly-calendar-widget" id="weekly-calendar-widget">
+                        <button class="btn-icon cal-nav-btn" id="cal-prev-week">
+                            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 18 9 12 15 6"></polyline></svg>
+                        </button>
+                        <div class="cal-days-container" id="cal-days-container">
+                            <!-- Days injected via JS -->
+                        </div>
+                        <button class="btn-icon cal-nav-btn" id="cal-next-week">
+                            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"></polyline></svg>
+                        </button>
+                    </div>
+
+                    <div class="trades-list" id="trades-list">
+                        <!-- Trade cards or empty state injected here -->
+                    </div>
+                </section>
+
+                <!-- Settings View -->
+                <section id="view-settings" class="view">
+                    <header class="view-header" style="margin-bottom: 16px; display: flex; justify-content: space-between; align-items: center;">
+                        <div>
+                            <h1>Settings</h1>
+                            <p class="help-text" style="margin-top:4px;">Manage categories and dependencies. <i>(Changes are auto-saved)</i></p>
+                        </div>
+                    </header>
+                    
+                    <div class="info-banner">
+                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <circle cx="12" cy="12" r="10"></circle>
+                            <line x1="12" y1="16" x2="12" y2="12"></line>
+                            <line x1="12" y1="8" x2="12.01" y2="8"></line>
+                        </svg>
+                        <span><strong>Tip:</strong> Add a parameter by typing and pressing <strong>comma ( , )</strong> or <strong>Enter</strong>. You can easily drag & drop parameters and categories to reorder them!</span>
+                    </div>
+
+                    <div class="settings-content" id="settings-ui-container">
+                        <!-- UI injected here -->
+                    </div>
+                </section>
+
+                <!-- Stats View -->
+                <section id="view-stats" class="view">
+                                        <header class="view-header" style="margin-bottom: 16px; display: flex; justify-content: space-between; align-items: center;">
+                        <div>
+                            <h1>Stats</h1>
+                            <p class="help-text" style="margin-top:4px;">Visual overview of your trading performance.</p>
+                        </div>
+                    </header>
+
+                    <div class="stats-filters">
+                        <select id="filter-year" class="pill-select"></select>
+                        <select id="filter-month" class="pill-select"></select>
+                        <select id="filter-week" class="pill-select"></select>
+                        <select id="filter-day" class="pill-select"></select>
+                    </div>
+
+                    <!-- Top KPI Cards -->
+                    <div class="kpi-grid">
+                        <div class="stat-card kpi-card">
+                            <h3>Total Trades</h3>
+                            <div id="kpi-total" class="kpi-value">0</div>
+                        </div>
+                        <div class="stat-card kpi-card">
+                            <h3>Win Rate</h3>
+                            <div id="kpi-winrate" class="kpi-value">0%</div>
+                        </div>
+                        <div class="stat-card kpi-card">
+                            <h3>Profit Factor</h3>
+                            <div id="kpi-ratio" class="kpi-value">0.0</div>
+                        </div>
+                    </div>
+
+                    <div class="stats-grid">
+                        <!-- Charts -->
+                        <div class="stat-card">
+                            <h3 class="card-title">Overall Win/Loss Ratio</h3>
+                            <div class="chart-wrapper"><canvas id="winLossChart"></canvas></div>
+                        </div>
+                        <div class="stat-card">
+                            <h3 class="card-title">Directional Bias</h3>
+                            <div class="chart-wrapper"><canvas id="directionChart"></canvas></div>
+                        </div>
+                        <div class="stat-card">
+                            <h3 class="card-title">Performance by day</h3>
+                            <div class="chart-wrapper"><canvas id="dayOfWeekChart"></canvas></div>
+                        </div>
+                        <div class="stat-card">
+                            <h3 class="card-title">Top 5 setup effectiveness</h3>
+                            <div class="chart-wrapper"><canvas id="setupChart"></canvas></div>
+                        </div>
+                        <div class="stat-card">
+                            <h3 class="card-title">Top 5 invalidation losses</h3>
+                            <div class="chart-wrapper"><canvas id="invalidationChart"></canvas></div>
+                        </div>
+                        <div class="stat-card">
+                            <h3 class="card-title">Confluence Amount vs Win Rate</h3>
+                            <div class="chart-wrapper"><canvas id="confluenceChart"></canvas></div>
+                        </div>
+                        <div class="stat-card">
+                            <h3 class="card-title">Performance by symbol</h3>
+                            <div class="chart-wrapper"><canvas id="symbolChart"></canvas></div>
+                        </div>
+                        <div class="stat-card">
+                            <h3 class="card-title">Market Condition Analysis</h3>
+                            <div class="chart-wrapper"><canvas id="marketCondChart"></canvas></div>
+                        </div>
+                        <div class="stat-card chart-span-3">
+                            <h3 class="card-title">Location Effectiveness Heatmap</h3>
+                            <div class="chart-wrapper"><canvas id="locationChart"></canvas></div>
+                        </div>
+                    </div>
+                </section>
+            </main>
+        </div>
+    </div>
+
+    <!-- Trade Modal (Popup) -->
+    <div class="modal-overlay" id="trade-modal">
+        <div class="modal-content linear-modal">
+            <div class="modal-header">
+                <h2 id="modal-title">Add Trade</h2>
+                <button class="close-btn" id="btn-close-modal">&times;</button>
+            </div>
+            <div class="modal-body">
+                <form id="trade-form">
+                    <input type="hidden" id="trade-id">
+                    
+                    <!-- Date, Trade #, Result -->
+                    <div class="form-grid">
+                        <div class="form-group">
+                            <label>Date</label>
+                            <input type="date" id="t-date" required class="linear-input">
+                        </div>
+                        <div class="form-group">
+                            <label>Trade #</label>
+                            <input type="number" id="t-number" class="linear-input">
+                        </div>
+                        <div class="form-group">
+                            <label>Result</label>
+                            <select id="t-result" class="linear-input">
+                                <option value="WIN">WIN</option>
+                                <option value="LOST">LOST</option>
+                                <option value="B/E">B/E</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <!-- Symbol -->
+                    <div class="form-separator" style="margin-top: 8px;">Symbol</div>
+                    <div class="form-grid compact-grid single-col">
+                        <div class="form-group">
+                            <select id="t-symbol" class="linear-input"></select>
+                        </div>
+                    </div>
+
+                    <!-- Screenshot -->
+                    <div class="form-separator">Screenshot</div>
+                    <div class="form-grid compact-grid single-col">
+                        <div class="form-group">
+                            <input type="file" id="t-image-input" accept="image/*" style="display: none;">
+                            <div id="image-dropzone" class="dropzone">
+                                <span style="font-size: 13px; color: var(--text-muted);">Click, Drop, or Paste (Cmd+V) image here</span>
+                            </div>
+                            <div id="image-preview-container" class="image-preview-container" style="display: none;">
+                                <img id="image-preview" src="" alt="preview" title="Click to enlarge">
+                                <button id="btn-remove-image" type="button" class="btn-danger btn-sm">Remove</button>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Setup Parameters -->
+                    <div class="form-separator section-header">
+                        <span>Location</span>
+                        <button type="button" class="btn-secondary add-confluence-btn" id="btn-add-location">+ Add Confluence</button>
+                    </div>
+                    <div id="location-container" class="multi-container"></div>
+
+                    <div class="form-separator">Market Condition</div>
+                    <div class="form-grid compact-grid single-col">
+                        <div class="form-group">
+                            <select id="t-market-cond" class="linear-input"></select>
+                        </div>
+                    </div>
+
+                    <div class="form-separator">Setup</div>
+                    <div class="form-grid compact-grid two-col">
+                        <div class="form-group">
+                            <select id="t-setup" class="linear-input"></select>
+                        </div>
+                        <div class="form-group">
+                            <select id="t-direction" class="linear-input"></select>
+                        </div>
+                    </div>
+
+                    <div class="form-separator section-header">
+                        <span>Evidence</span>
+                        <button type="button" class="btn-secondary add-confluence-btn" id="btn-add-evidence">+ Add Confluence</button>
+                    </div>
+                    <div id="evidence-container" class="multi-container"></div>
+
+                    <div class="form-separator section-header">
+                        <span>Invalidation</span>
+                        <button type="button" class="btn-secondary add-confluence-btn" id="btn-add-invalidation">+ Add Confluence</button>
+                    </div>
+                    <div id="invalidation-container" class="multi-container"></div>
+
+                    <div class="form-separator">Target</div>
+                    <div class="form-grid compact-grid">
+                        <div class="form-group">
+                            <select id="t-target" class="linear-input"></select>
+                        </div>
+                        <div class="form-group">
+                            <select id="t-target-sub1" class="linear-input" disabled></select>
+                        </div>
+                        <div class="form-group">
+                            <select id="t-target-sub2" class="linear-input" disabled></select>
+                        </div>
+                    </div>
+                    
+                    <div class="form-separator">Psychology</div>
+                    <div class="form-grid compact-grid single-col">
+                        <div class="form-group">
+                            <textarea id="t-psychology" class="linear-input" rows="2" placeholder="Notes..."></textarea>
+                        </div>
+                    </div>
+
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button class="btn-danger" id="btn-delete-trade" style="display:none;">Delete</button>
+                <div class="footer-right">
+                    <button class="btn-secondary" id="btn-cancel-modal">Cancel</button>
+                    <button class="btn-primary" id="btn-save-trade">Save Trade</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Image Viewer Modal (Full Screen) -->
+    <div class="modal-overlay" id="image-viewer-modal" style="z-index: 200;">
+        <button class="close-btn viewer-close-btn" id="image-viewer-close">&times;</button>
+        <img id="enlarged-image" src="" alt="Enlarged view">
+    </div>
+
+    <script src="app.js"></script>
+</body>
+</html>
