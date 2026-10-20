@@ -797,14 +797,19 @@ async function renderDashboard() {
         }
     },
     "psychology": [
+        "Following the system",
+        "Confident",
+        "Disciplined",
+        "Flow State",
+        "Patient",
+        "Focused",
+        "Objective",
         "FOMO",
         "Revenge Trading",
         "Overconfident",
         "Hesitant / Fearful",
         "Impatient",
         "Tilted / Frustrated",
-        "Disciplined",
-        "Flow State",
         "Bored",
         "Anxious"
     ]
@@ -1861,8 +1866,8 @@ function renderStatsDashboard() {
         return { psych: p, winRate: parseFloat(stats.winRate), total: stats.total };
     });
     psychStats.sort((a, b) => {
-        if (b.total !== a.total) return b.total - a.total; // Sort by frequency first
-        return b.winRate - a.winRate; // Tiebreaker by winrate
+        if (b.winRate !== a.winRate) return b.winRate - a.winRate; // Sort by win rate first
+        return b.total - a.total; // Tiebreaker by frequency
     });
     const top5Psych = psychStats.slice(0, 5);
 

@@ -173,14 +173,19 @@
     }
   },
   "psychology": [
+    "Following the system",
+    "Confident",
+    "Disciplined",
+    "Flow State",
+    "Patient",
+    "Focused",
+    "Objective",
     "FOMO",
     "Revenge Trading",
     "Overconfident",
     "Hesitant / Fearful",
     "Impatient",
     "Tilted / Frustrated",
-    "Disciplined",
-    "Flow State",
     "Bored",
     "Anxious"
   ]
