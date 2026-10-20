@@ -587,13 +587,13 @@ async function renderDashboard() {
     if (!dirHandle) {
         tradesList.innerHTML = `
             <div class="empty-state" style="max-width: 440px; margin: 40px auto; padding: 32px; border: 1px solid var(--border-color); border-radius: 12px; background: var(--bg-panel); box-shadow: 0 12px 24px rgba(0,0,0,0.2);">
-                <h3 style="color: var(--text-main); margin-bottom: 12px; font-size: 18px; letter-spacing: -0.4px;">Welcome to VWAP Journal</h3>
+                <h3 style="color: var(--text-main); margin-bottom: 12px; font-size: 18px; letter-spacing: -0.4px;">Welcome to VWAP Wave System Journal</h3>
                 <p style="color: var(--text-muted); font-size: 13px; line-height: 1.5; margin-bottom: 24px;">To get started, you need to set up a local folder on your computer to store your trades and images securely.</p>
                 
                 <div style="background: var(--bg-card); border: 1px solid var(--border-color); padding: 16px; border-radius: 8px; margin-bottom: 16px; text-align: left;">
-                    <div style="font-weight: 600; font-size: 13px; color: var(--text-main); margin-bottom: 4px;">Step 1: Get Your Starter Files</div>
-                    <p style="color: var(--text-muted); font-size: 12px; margin-bottom: 12px; line-height: 1.4;">First, create an empty folder on your computer (e.g., 'VWAP Journal'). Then, click below to download your starter files and save them into that folder.</p>
-                    <button id="btn-download-template" class="btn-secondary" style="width: 100%;">Download Starter Files</button>
+                    <div style="font-weight: 600; font-size: 13px; color: var(--text-main); margin-bottom: 4px;">Step 1: Get Your Starter File</div>
+                    <p style="color: var(--text-muted); font-size: 12px; margin-bottom: 12px; line-height: 1.4;">First, create an empty folder on your computer (e.g., 'VWAP Journal'). Then, click below to download your starter file and save it into that folder.</p>
+                    <button id="btn-download-template" class="btn-secondary" style="width: 100%;">Download Starter file</button>
                 </div>
 
                 <div style="background: var(--bg-card); border: 1px solid var(--border-color); padding: 16px; border-radius: 8px; text-align: left;">
@@ -808,20 +808,6 @@ async function renderDashboard() {
             aSettings.click();
             document.body.removeChild(aSettings);
             URL.revokeObjectURL(urlSettings);
-            
-            // Short delay to allow first download to trigger
-            await new Promise(r => setTimeout(r, 500));
-
-            // Trigger download of empty vwap-journal.json
-            const blobTrades = new Blob([JSON.stringify([], null, 2)], { type: "application/json" });
-            const urlTrades = URL.createObjectURL(blobTrades);
-            const aTrades = document.createElement('a');
-            aTrades.href = urlTrades;
-            aTrades.download = 'vwap-journal.json';
-            document.body.appendChild(aTrades);
-            aTrades.click();
-            document.body.removeChild(aTrades);
-            URL.revokeObjectURL(urlTrades);
         });
 
         document.getElementById('btn-initial-load').addEventListener('click', async () => {
