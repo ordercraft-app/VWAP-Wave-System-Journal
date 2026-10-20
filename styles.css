@@ -552,3 +552,7 @@ span.flatpickr-weekday {
 .flatpickr-months .flatpickr-prev-month:hover svg, .flatpickr-months .flatpickr-next-month:hover svg {
     fill: var(--text-main) !important;
 }
+
+.flatpickr-months, .flatpickr-weekdays, span.flatpickr-weekday {
+    background: transparent !important;
+}
