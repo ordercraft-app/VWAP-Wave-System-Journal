@@ -1846,8 +1846,19 @@ function renderStatsDashboard() {
     // Bar Charts Helper
     function renderBarChart(chartId, attribute, horizontal = false, hideAxis = false) {
         const grouped = groupByAttribute(trades, attribute);
-        const labels = Object.keys(grouped);
-        const winRates = labels.map(label => getWinRateData(grouped[label]).winRate);
+        let stats = Object.keys(grouped).map(label => {
+            const wData = getWinRateData(grouped[label]);
+            return { label: label, winRate: parseFloat(wData.winRate), total: wData.total };
+        });
+        
+        // Sort highest win rate first
+        stats.sort((a, b) => {
+            if (b.winRate !== a.winRate) return b.winRate - a.winRate;
+            return b.total - a.total; // Tiebreaker on volume
+        });
+
+        const labels = stats.map(s => s.label);
+        const winRates = stats.map(s => s.winRate);
         
         const scales = horizontal 
             ? { x: { display: !hideAxis, beginAtZero: true, max: 100 }, y: { display: true } }
