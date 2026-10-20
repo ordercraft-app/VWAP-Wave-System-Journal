@@ -161,34 +161,64 @@ document.addEventListener('DOMContentLoaded', async () => {
 // --- Data Loading ---
 async function loadDataFromFile() {
     try {
-        const fileHandle = await dirHandle.getFileHandle('vwap-journal.json', { create: true });
-        const file = await fileHandle.getFile();
-        const contents = await file.text();
-        if(contents) {
-            appData = JSON.parse(contents);
-            // Settings compatibility
-            if (!appData.settings.symbol) appData.settings.symbol = ["NQ", "ES", "GC", "CL", "BTC"];
-            
-            // Migrate old trades to arrays
-            appData.trades = appData.trades.map(trade => {
-                if (trade.location !== undefined && !trade.locations) {
-                    trade.locations = [{primary: trade.location, sub1: trade.locSub1, sub2: trade.locSub2}];
-                    delete trade.location; delete trade.locSub1; delete trade.locSub2;
-                }
-                if (trade.evidence !== undefined && !trade.evidences) {
-                    trade.evidences = [{primary: trade.evidence, sub: trade.evidenceSub}];
-                    delete trade.evidence; delete trade.evidenceSub;
-                }
-                if (trade.invalidation !== undefined && !trade.invalidations) {
-                    trade.invalidations = [trade.invalidation];
-                    delete trade.invalidation;
-                }
-                return trade;
-            });
+        // Load settings first
+        try {
+            const settingsHandle = await dirHandle.getFileHandle('settings.json');
+            const settingsFile = await settingsHandle.getFile();
+            const settingsContents = await settingsFile.text();
+            if(settingsContents) {
+                appData.settings = JSON.parse(settingsContents);
+                if (!appData.settings.symbol) appData.settings.symbol = ["NQ", "ES", "GC", "CL", "BTC"];
+            }
+        } catch(e) {
+            // Settings file might not exist yet, that's fine, we use default appData.settings
+            console.log("No existing settings.json found, using defaults.");
         }
+
+        // Load trades
+        try {
+            const tradesHandle = await dirHandle.getFileHandle('vwap-journal.json', { create: true });
+            const tradesFile = await tradesHandle.getFile();
+            const tradesContents = await tradesFile.text();
+            if(tradesContents) {
+                const parsedTrades = JSON.parse(tradesContents);
+                // Handle migration from old format where trades and settings were in one file
+                if (parsedTrades.trades) {
+                   appData.trades = parsedTrades.trades;
+                   // Only migrate settings from old journal if we didn't just load a dedicated settings.json
+                   if(parsedTrades.settings && Object.keys(appData.settings.location.VWAP.sub1).length === 0) {
+                        appData.settings = parsedTrades.settings;
+                   }
+                } else if (Array.isArray(parsedTrades)) {
+                   appData.trades = parsedTrades;
+                }
+                
+                // Migrate old trades to arrays
+                appData.trades = appData.trades.map(trade => {
+                    if (trade.location !== undefined && !trade.locations) {
+                        trade.locations = [{primary: trade.location, sub1: trade.locSub1, sub2: trade.locSub2}];
+                        delete trade.location; delete trade.locSub1; delete trade.locSub2;
+                    }
+                    if (trade.evidence !== undefined && !trade.evidences) {
+                        trade.evidences = [{primary: trade.evidence, sub: trade.evidenceSub}];
+                        delete trade.evidence; delete trade.evidenceSub;
+                    }
+                    if (trade.invalidation !== undefined && !trade.invalidations) {
+                        trade.invalidations = [trade.invalidation];
+                        delete trade.invalidation;
+                    }
+                    return trade;
+                });
+            }
+        } catch (e) {
+            console.error("Error loading vwap-journal.json:", e);
+        }
+        
+        // Force save to ensure both files exist in the new format
+        await autoSave();
         renderDashboard();
     } catch (err) {
-        console.error("Load failed:", err);
+        console.error("Load process failed:", err);
     }
 }
 
@@ -232,10 +262,18 @@ async function autoSave() {
         if (!hasPermission) return;
         fileConnected = true;
         
-        const fileHandle = await dirHandle.getFileHandle('vwap-journal.json', { create: true });
-        const writable = await fileHandle.createWritable();
-        await writable.write(JSON.stringify(appData, null, 2));
-        await writable.close();
+        // Save Trades
+        const tradesHandle = await dirHandle.getFileHandle('vwap-journal.json', { create: true });
+        const tradesWritable = await tradesHandle.createWritable();
+        await tradesWritable.write(JSON.stringify(appData.trades, null, 2));
+        await tradesWritable.close();
+
+        // Save Settings
+        const settingsHandle = await dirHandle.getFileHandle('settings.json', { create: true });
+        const settingsWritable = await settingsHandle.createWritable();
+        await settingsWritable.write(JSON.stringify(appData.settings, null, 2));
+        await settingsWritable.close();
+        
     } catch (err) {
         console.error("Background save failed:", err);
     }
@@ -471,15 +509,15 @@ async function renderDashboard() {
                 <p style="color: var(--text-muted); font-size: 13px; line-height: 1.5; margin-bottom: 24px;">To get started, you need to set up a local folder on your computer to store your trades and images securely.</p>
                 
                 <div style="background: var(--bg-card); border: 1px solid var(--border-color); padding: 16px; border-radius: 8px; margin-bottom: 16px; text-align: left;">
-                    <div style="font-weight: 600; font-size: 13px; color: var(--text-main); margin-bottom: 4px;">Step 1: Download Starter Template</div>
-                    <p style="color: var(--text-muted); font-size: 12px; margin-bottom: 12px; line-height: 1.4;">Download the pre-configured settings. Create a new folder on your computer and save this file inside it.</p>
-                    <button id="btn-download-template" class="btn-secondary" style="width: 100%;">Download vwap-journal.json</button>
+                    <div style="font-weight: 600; font-size: 13px; color: var(--text-main); margin-bottom: 4px;">Step 1: Get Your Starter Files</div>
+                    <p style="color: var(--text-muted); font-size: 12px; margin-bottom: 12px; line-height: 1.4;">First, create an empty folder on your computer (e.g., 'VWAP Journal'). Then, click below to download your starter files and save them into that folder.</p>
+                    <button id="btn-download-template" class="btn-secondary" style="width: 100%;">Download Starter Files</button>
                 </div>
 
                 <div style="background: var(--bg-card); border: 1px solid var(--border-color); padding: 16px; border-radius: 8px; text-align: left;">
-                    <div style="font-weight: 600; font-size: 13px; color: var(--text-main); margin-bottom: 4px;">Step 2: Connect Folder</div>
-                    <p style="color: var(--text-muted); font-size: 12px; margin-bottom: 12px; line-height: 1.4;">Give the app permission to read and write to the folder you just created.</p>
-                    <button id="btn-initial-load" class="btn-primary" style="width: 100%;">Select Folder</button>
+                    <div style="font-weight: 600; font-size: 13px; color: var(--text-main); margin-bottom: 4px;">Step 2: Connect Your Folder</div>
+                    <p style="color: var(--text-muted); font-size: 12px; margin-bottom: 12px; line-height: 1.4;">Give the app secure access to the folder you just created so it can save your trades and settings locally.</p>
+                    <button id="btn-initial-load" class="btn-primary" style="width: 100%;">Connect Folder</button>
                 </div>
 
                 <div style="background: var(--bg-card); border: 1px solid var(--border-color); padding: 16px; border-radius: 8px; text-align: left; margin-top: 16px;">
@@ -489,14 +527,12 @@ async function renderDashboard() {
                 </div>
             </div>`;
             
-        document.getElementById('btn-download-template').addEventListener('click', () => {
-            const defaultTemplate = {
-              "trades": [],
-              "settings": {
+        document.getElementById('btn-download-template').addEventListener('click', async () => {
+            const defaultSettings = {
                 "symbol": ["NQ", "ES", "GC", "CL", "BTC"],
                 "location": {
                   "VWAP": { "sub1": ["Globex", "RTH", "Weekly", "Monthly"], "sub2": ["Upper band", "VWAP", "Lower band"] },
-                  "Volume profile": { "sub1": ["Globex", "RTH", "Composite"], "sub2": ["VAH", "POC", "VAL", "LVN"] },
+                  "Volume profile": { "sub1": ["Globex", "RTH", "Composite"], "sub2": ["VAH", "POC", "VAL", "LVN", "HVN"] },
                   "IB": { "sub1": ["Current", "Previous"], "sub2": ["High", "Mid", "Low", "High +50%", "High +100%", "High +200%", "Low -50%", "Low -100%", "Low -200%"] }
                 },
                 "marketCondition": ["Balance", "Imbalance"],
@@ -511,23 +547,37 @@ async function renderDashboard() {
                 "invalidation": ["Failed price discovery", "Acceptance beyond key level", "Failed return to value", "Failed Higher timeframe level", "Anemic Bounce", "Failed Delta divergence", "Stopped at stop loss"],
                 "target": {
                   "VWAP": { "sub1": ["Globex", "RTH", "Weekly", "Monthly"], "sub2": ["Upper band", "VWAP", "Lower band"] },
-                  "Volume profile": { "sub1": ["Globex", "RTH", "Composite"], "sub2": ["VAH", "POC", "VAL", "LVN", "Other side of value"] },
+                  "Volume profile": { "sub1": ["Globex", "RTH", "Composite"], "sub2": ["VAH", "POC", "VAL", "LVN", "HVN", "Other side of value"] },
                   "IB": { "sub1": ["Current", "Previous"], "sub2": ["High", "Mid", "Low", "High +50%", "High +100%", "High +200%", "Low -50%", "Low -100%", "Low -200%"] },
                   "Swing": { "sub1": ["HIgh", "Low"], "sub2": [] },
                   "RR": { "sub1": ["1/1", "1/2", "1/3", "1/4", "1/5"], "sub2": [] }
                 }
-              }
             };
             
-            const blob = new Blob([JSON.stringify(defaultTemplate, null, 2)], { type: "application/json" });
-            const url = URL.createObjectURL(blob);
-            const a = document.createElement('a');
-            a.href = url;
-            a.download = 'vwap-journal.json';
-            document.body.appendChild(a);
-            a.click();
-            document.body.removeChild(a);
-            URL.revokeObjectURL(url);
+            // Trigger download of settings.json
+            const blobSettings = new Blob([JSON.stringify(defaultSettings, null, 2)], { type: "application/json" });
+            const urlSettings = URL.createObjectURL(blobSettings);
+            const aSettings = document.createElement('a');
+            aSettings.href = urlSettings;
+            aSettings.download = 'settings.json';
+            document.body.appendChild(aSettings);
+            aSettings.click();
+            document.body.removeChild(aSettings);
+            URL.revokeObjectURL(urlSettings);
+            
+            // Short delay to allow first download to trigger
+            await new Promise(r => setTimeout(r, 500));
+
+            // Trigger download of empty vwap-journal.json
+            const blobTrades = new Blob([JSON.stringify([], null, 2)], { type: "application/json" });
+            const urlTrades = URL.createObjectURL(blobTrades);
+            const aTrades = document.createElement('a');
+            aTrades.href = urlTrades;
+            aTrades.download = 'vwap-journal.json';
+            document.body.appendChild(aTrades);
+            aTrades.click();
+            document.body.removeChild(aTrades);
+            URL.revokeObjectURL(urlTrades);
         });
 
         document.getElementById('btn-initial-load').addEventListener('click', async () => {

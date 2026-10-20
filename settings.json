@@ -1,0 +1,167 @@
+{
+  "symbol": [
+    "NQ",
+    "ES",
+    "GC",
+    "CL",
+    "BTC"
+  ],
+  "location": {
+    "VWAP": {
+      "sub1": [
+        "Globex",
+        "RTH",
+        "Weekly",
+        "Monthly"
+      ],
+      "sub2": [
+        "Upper band",
+        "VWAP",
+        "Lower band"
+      ]
+    },
+    "Volume profile": {
+      "sub1": [
+        "Globex",
+        "RTH",
+        "Composite"
+      ],
+      "sub2": [
+        "VAH",
+        "POC",
+        "VAL",
+        "LVN",
+        "HVN"
+      ]
+    },
+    "IB": {
+      "sub1": [
+        "Current",
+        "Previous"
+      ],
+      "sub2": [
+        "High",
+        "Mid",
+        "Low",
+        "High +50%",
+        "High +100%",
+        "High +200%",
+        "Low -50%",
+        "Low -100%",
+        "Low -200%"
+      ]
+    }
+  },
+  "marketCondition": [
+    "Balance",
+    "Imbalance"
+  ],
+  "setup": [
+    "Price Discovery Continuation",
+    "Fade value area extremes",
+    "Return to value",
+    "VWAP Bounce",
+    "Madonna",
+    "VWAP/POC Scalpes in balance",
+    "Late Entry Continuation",
+    "Inside HTF balance fades",
+    "IB Extension fades"
+  ],
+  "direction": [
+    "Long",
+    "Short"
+  ],
+  "evidence": {
+    "VWAP": [
+      "Respecting band",
+      "Respecting VWAP",
+      "Higher timeframe alignment"
+    ],
+    "Auction": [
+      "Value acceptance",
+      "Value rejection"
+    ],
+    "IB": [
+      "Breakout/Acceptance",
+      "Rejection"
+    ],
+    "Orderflow": [
+      "Delta acceleration",
+      "Order book absorption",
+      "Tape change"
+    ]
+  },
+  "invalidation": [
+    "Failed price discovery",
+    "Acceptance beyond key level",
+    "Failed return to value",
+    "Failed Higher timeframe level",
+    "Anemic Bounce",
+    "Failed Delta divergence",
+    "Stopped at stop loss"
+  ],
+  "target": {
+    "VWAP": {
+      "sub1": [
+        "Globex",
+        "RTH",
+        "Weekly",
+        "Monthly"
+      ],
+      "sub2": [
+        "Upper band",
+        "VWAP",
+        "Lower band"
+      ]
+    },
+    "Volume profile": {
+      "sub1": [
+        "Globex",
+        "RTH",
+        "Composite"
+      ],
+      "sub2": [
+        "VAH",
+        "POC",
+        "VAL",
+        "LVN",
+        "HVN",
+        "Other side of value"
+      ]
+    },
+    "IB": {
+      "sub1": [
+        "Current",
+        "Previous"
+      ],
+      "sub2": [
+        "High",
+        "Mid",
+        "Low",
+        "High +50%",
+        "High +100%",
+        "High +200%",
+        "Low -50%",
+        "Low -100%",
+        "Low -200%"
+      ]
+    },
+    "Swing": {
+      "sub1": [
+        "HIgh",
+        "Low"
+      ],
+      "sub2": []
+    },
+    "RR": {
+      "sub1": [
+        "1/1",
+        "1/2",
+        "1/3",
+        "1/4",
+        "1/5"
+      ],
+      "sub2": []
+    }
+  }
+}
