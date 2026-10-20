@@ -269,6 +269,27 @@
                                 <p>Because all data lives exclusively on your computer, backing up is extremely simple. Just copy your entire "VWAP Journal" folder (containing settings.json, vwap-journal.json, and your /img folder) to a USB drive, Google Drive, Dropbox, or iCloud.</p>
                             </div>
                         </div>
+
+                        <div class="faq-item">
+                            <div class="faq-question">
+                                <span>How do I completely reset my journal and start over?</span>
+                                <svg class="faq-icon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 12 15 18 9"></polyline></svg>
+                            </div>
+                            <div class="faq-answer">
+                                <p>If you want to start with a clean slate (removing all trades), simply go to your local folder on your computer. Delete the <strong><code>vwap-journal.json</code></strong> file and the <strong><code>img</code></strong> folder. Leave your <code>settings.json</code> intact. When you refresh the app, it will automatically generate a fresh, empty journal for you!</p>
+                            </div>
+                        </div>
+
+                        <div class="faq-item">
+                            <div class="faq-question">
+                                <span>I messed up my settings. How can I reset them to default?</span>
+                                <svg class="faq-icon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 12 15 18 9"></polyline></svg>
+                            </div>
+                            <div class="faq-answer">
+                                <p>No worries! First, delete the <strong><code>settings.json</code></strong> file from your local folder on your computer. Then, click the button below to download a fresh copy of the default settings. Move this new file into your folder and refresh the app.</p>
+                                <button id="btn-reset-settings" class="btn-secondary btn-sm" style="margin-top: 12px; margin-bottom: 8px;">Download Default Settings</button>
+                            </div>
+                        </div>
                     </div>
                 </section>
             </main>
