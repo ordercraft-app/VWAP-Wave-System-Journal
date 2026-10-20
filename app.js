@@ -1158,9 +1158,6 @@ btnCloseModal.addEventListener('click', closeModal);
 btnCancelModal.addEventListener('click', closeModal);
 
 async function openTradeModal(tradeId = null) {
-    // Reset scroll to top
-    document.querySelector('.modal-body').scrollTop = 0;
-    
     tradeForm.reset();
     document.getElementById('t-date').value = datePicker.value;
     
@@ -1229,6 +1226,12 @@ async function openTradeModal(tradeId = null) {
     }
 
     tradeModal.classList.add('active');
+    
+    // Reset scroll to top AFTER modal is visible
+    setTimeout(() => {
+        const modalBody = document.querySelector('.modal-body');
+        if (modalBody) modalBody.scrollTop = 0;
+    }, 10);
 }
 
 function closeModal() {
