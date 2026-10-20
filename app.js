@@ -1903,8 +1903,9 @@ function renderStatsDashboard() {
     
     // Direction Doughnut (wins)
     const dirGroup = groupByAttribute(trades, 'direction');
-    const dirLabels = Object.keys(dirGroup);
-    const dirWins = dirLabels.map(l => getWinRateData(dirGroup[l]).wins);
+    // Force specific order to ensure Long is on the left and gets the accent color
+    const dirLabels = ['Long', 'Short'];
+    const dirWins = dirLabels.map(l => dirGroup[l] ? getWinRateData(dirGroup[l]).wins : 0);
     
     destroyChart('directionChart');
     chartInstances['directionChart'] = new Chart(document.getElementById('directionChart'), {
@@ -2042,15 +2043,15 @@ function renderStatsDashboard() {
         data: {
             labels: sortedLocLabels,
             datasets: [
-                { label: 'Wins %', data: sortedLocWins, backgroundColor: colors.win },
-                { label: 'B/E %', data: sortedLocBE, backgroundColor: colors.be },
-                { label: 'Losses %', data: sortedLocLosses, backgroundColor: colors.loss }
+                { label: 'Wins', data: sortedLocWins, backgroundColor: colors.win },
+                { label: 'Losses', data: sortedLocLosses, backgroundColor: colors.loss },
+                { label: 'B/E', data: sortedLocBE, backgroundColor: colors.be }
             ]
         },
         options: { 
             maintainAspectRatio: false,
             indexAxis: 'y', 
-            scales: { x: { stacked: true, max: 100 }, y: { stacked: true } },
+            scales: { x: { stacked: true, max: 100, display: false }, y: { stacked: true } },
             plugins: { 
                 legend: { position: 'bottom', labels: { color: '#888', usePointStyle: true, pointStyle: 'circle' } },
                 tooltip: { callbacks: { label: function(context) { return context.dataset.label + ': ' + context.parsed.x + '%'; } } }
