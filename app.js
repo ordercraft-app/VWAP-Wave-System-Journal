@@ -2005,29 +2005,36 @@ function renderStatsDashboard() {
     trades.forEach(t => {
         (t.locations || []).forEach(loc => {
             const primary = loc.primary || 'Unknown';
-            if(!locStats[primary]) locStats[primary] = { win: 0, loss: 0 };
+            if(!locStats[primary]) locStats[primary] = { win: 0, loss: 0, be: 0 };
             if(t.result === 'WIN') locStats[primary].win++;
             if(t.result === 'LOST') locStats[primary].loss++;
+            if(t.result === 'B/E') locStats[primary].be++;
         });
     });
 
     let locArray = Object.keys(locStats).map(key => {
         const w = locStats[key].win;
         const l = locStats[key].loss;
-        const total = w + l;
-        const winRate = total > 0 ? (w / total) : 0;
-        return { label: key, win: w, loss: l, total: total, winRate: winRate };
+        const be = locStats[key].be;
+        const total = w + l + be;
+        
+        const winPct = total > 0 ? (w / total) * 100 : 0;
+        const lossPct = total > 0 ? (l / total) * 100 : 0;
+        const bePct = total > 0 ? (be / total) * 100 : 0;
+        
+        return { label: key, winPct: winPct, lossPct: lossPct, bePct: bePct, total: total };
     });
 
     // Sort by win rate (descending), then by total volume
     locArray.sort((a, b) => {
-        if (b.winRate !== a.winRate) return b.winRate - a.winRate;
+        if (b.winPct !== a.winPct) return b.winPct - a.winPct;
         return b.total - a.total;
     });
 
     const sortedLocLabels = locArray.map(item => item.label);
-    const sortedLocWins = locArray.map(item => item.win);
-    const sortedLocLosses = locArray.map(item => item.loss);
+    const sortedLocWins = locArray.map(item => parseFloat(item.winPct.toFixed(1)));
+    const sortedLocLosses = locArray.map(item => parseFloat(item.lossPct.toFixed(1)));
+    const sortedLocBE = locArray.map(item => parseFloat(item.bePct.toFixed(1)));
     
     destroyChart('locationChart');
     chartInstances['locationChart'] = new Chart(document.getElementById('locationChart'), {
@@ -2035,15 +2042,19 @@ function renderStatsDashboard() {
         data: {
             labels: sortedLocLabels,
             datasets: [
-                { label: 'Wins', data: sortedLocWins, backgroundColor: colors.win },
-                { label: 'Losses', data: sortedLocLosses, backgroundColor: colors.loss }
+                { label: 'Wins %', data: sortedLocWins, backgroundColor: colors.win },
+                { label: 'B/E %', data: sortedLocBE, backgroundColor: colors.be },
+                { label: 'Losses %', data: sortedLocLosses, backgroundColor: colors.loss }
             ]
         },
         options: { 
             maintainAspectRatio: false,
             indexAxis: 'y', 
-            scales: { x: { stacked: true }, y: { stacked: true } },
-            plugins: { legend: { position: 'bottom', labels: { color: '#888', usePointStyle: true, pointStyle: 'circle' } } }
+            scales: { x: { stacked: true, max: 100 }, y: { stacked: true } },
+            plugins: { 
+                legend: { position: 'bottom', labels: { color: '#888', usePointStyle: true, pointStyle: 'circle' } },
+                tooltip: { callbacks: { label: function(context) { return context.dataset.label + ': ' + context.parsed.x + '%'; } } }
+            }
         }
     });
 }
