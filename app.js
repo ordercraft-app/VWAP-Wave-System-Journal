@@ -2011,16 +2011,32 @@ function renderStatsDashboard() {
         });
     });
 
-    const locLabels = Object.keys(locStats);
+    let locArray = Object.keys(locStats).map(key => {
+        const w = locStats[key].win;
+        const l = locStats[key].loss;
+        const total = w + l;
+        const winRate = total > 0 ? (w / total) : 0;
+        return { label: key, win: w, loss: l, total: total, winRate: winRate };
+    });
+
+    // Sort by win rate (descending), then by total volume
+    locArray.sort((a, b) => {
+        if (b.winRate !== a.winRate) return b.winRate - a.winRate;
+        return b.total - a.total;
+    });
+
+    const sortedLocLabels = locArray.map(item => item.label);
+    const sortedLocWins = locArray.map(item => item.win);
+    const sortedLocLosses = locArray.map(item => item.loss);
     
     destroyChart('locationChart');
     chartInstances['locationChart'] = new Chart(document.getElementById('locationChart'), {
         type: 'bar',
         data: {
-            labels: locLabels,
+            labels: sortedLocLabels,
             datasets: [
-                { label: 'Wins', data: locLabels.map(l => locStats[l].win), backgroundColor: colors.win },
-                { label: 'Losses', data: locLabels.map(l => locStats[l].loss), backgroundColor: colors.loss }
+                { label: 'Wins', data: sortedLocWins, backgroundColor: colors.win },
+                { label: 'Losses', data: sortedLocLosses, backgroundColor: colors.loss }
             ]
         },
         options: { 
