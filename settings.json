@@ -91,15 +91,23 @@
       "Tape change"
     ]
   },
-  "invalidation": [
-    "Failed price discovery",
-    "Acceptance beyond key level",
-    "Failed return to value",
-    "Failed Higher timeframe level",
-    "Anemic Bounce",
-    "Failed Delta divergence",
-    "Stopped at stop loss"
-  ],
+  "invalidation": {
+    "Price Action": [
+      "Failed price discovery",
+      "Anemic Bounce"
+    ],
+    "Levels": [
+      "Acceptance beyond key level",
+      "Failed return to value",
+      "Failed Higher timeframe level"
+    ],
+    "Orderflow": [
+      "Failed Delta divergence"
+    ],
+    "Risk Management": [
+      "Stopped at stop loss"
+    ]
+  },
   "target": {
     "VWAP": {
       "sub1": [
@@ -163,5 +171,17 @@
       ],
       "sub2": []
     }
-  }
+  },
+  "psychology": [
+    "FOMO",
+    "Revenge Trading",
+    "Overconfident",
+    "Hesitant / Fearful",
+    "Impatient",
+    "Tilted / Frustrated",
+    "Disciplined",
+    "Flow State",
+    "Bored",
+    "Anxious"
+  ]
 }

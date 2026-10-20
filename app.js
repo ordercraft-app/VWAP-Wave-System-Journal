@@ -44,6 +44,74 @@ async function verifyPermission(dirHandle, readWrite = true) {
     return false;
 }
 
+
+let currentPsychology = [];
+const psychHeader = document.getElementById('psych-select-header');
+const psychDropdown = document.getElementById('psych-dropdown');
+const psychPillsContainer = document.getElementById('psych-selected-pills');
+
+function renderPsychDropdown() {
+    if (!psychDropdown) return;
+    psychDropdown.innerHTML = '';
+    const options = appData.settings.psychology || [];
+    options.forEach(opt => {
+        const item = document.createElement('div');
+        item.className = 'dropdown-item';
+        const isChecked = currentPsychology.includes(opt);
+        item.innerHTML = `
+            <input type="checkbox" ${isChecked ? 'checked' : ''} id="psych-${opt}">
+            <label for="psych-${opt}">${opt}</label>
+        `;
+        item.addEventListener('click', (e) => {
+            if (e.target.tagName !== 'INPUT') {
+                const cb = item.querySelector('input');
+                cb.checked = !cb.checked;
+            }
+            const cb = item.querySelector('input');
+            if (cb.checked) {
+                if (!currentPsychology.includes(opt)) currentPsychology.push(opt);
+            } else {
+                currentPsychology = currentPsychology.filter(p => p !== opt);
+            }
+            renderPsychPills();
+        });
+        psychDropdown.appendChild(item);
+    });
+}
+
+function renderPsychPills() {
+    if (!psychPillsContainer) return;
+    psychPillsContainer.innerHTML = '';
+    if (currentPsychology.length === 0) {
+        psychPillsContainer.innerHTML = '<span class="placeholder">Select psychology states...</span>';
+        return;
+    }
+    currentPsychology.forEach(p => {
+        const pill = document.createElement('div');
+        pill.className = 'psych-pill-tag';
+        pill.innerHTML = `<span>${p}</span><button type="button" class="remove-psych">&times;</button>`;
+        pill.querySelector('.remove-psych').addEventListener('click', (e) => {
+            e.stopPropagation();
+            currentPsychology = currentPsychology.filter(item => item !== p);
+            renderPsychPills();
+            renderPsychDropdown();
+        });
+        psychPillsContainer.appendChild(pill);
+    });
+}
+
+if (psychHeader) {
+    psychHeader.addEventListener('click', () => {
+        psychDropdown.classList.toggle('active');
+    });
+}
+
+document.addEventListener('click', (e) => {
+    if (psychDropdown && !e.target.closest('.custom-multi-select')) {
+        psychDropdown.classList.remove('active');
+    }
+});
+
 // --- App State ---
 let dirHandle = null;
 let fileConnected = false;
@@ -56,7 +124,8 @@ let appData = {
         setup: [],
         direction: [],
         evidence: {},
-        invalidation: [],
+        invalidation: {},
+        psychology: [],
         target: { "VWAP": { sub1: [], sub2: [] } }
     }
 };
@@ -193,7 +262,7 @@ async function loadDataFromFile() {
                    appData.trades = parsedTrades;
                 }
                 
-                // Migrate old trades to arrays
+                // Migrate old trades to arrays and new formats
                 appData.trades = appData.trades.map(trade => {
                     if (trade.location !== undefined && !trade.locations) {
                         trade.locations = [{primary: trade.location, sub1: trade.locSub1, sub2: trade.locSub2}];
@@ -203,10 +272,23 @@ async function loadDataFromFile() {
                         trade.evidences = [{primary: trade.evidence, sub: trade.evidenceSub}];
                         delete trade.evidence; delete trade.evidenceSub;
                     }
+                    
+                    // Invalidation Migration
                     if (trade.invalidation !== undefined && !trade.invalidations) {
-                        trade.invalidations = [trade.invalidation];
+                        trade.invalidations = [{primary: 'Legacy', sub: trade.invalidation}];
                         delete trade.invalidation;
+                    } else if (trade.invalidations && trade.invalidations.length > 0) {
+                        if (typeof trade.invalidations[0] === 'string') {
+                            trade.invalidations = trade.invalidations.map(inv => ({primary: 'Legacy', sub: inv}));
+                        }
                     }
+
+                    // Psychology to Notes Migration
+                    if (trade.psychology && typeof trade.psychology === 'string') {
+                        trade.notes = trade.psychology;
+                        trade.psychology = [];
+                    }
+                    
                     return trade;
                 });
             }
@@ -529,30 +611,192 @@ async function renderDashboard() {
             
         document.getElementById('btn-download-template').addEventListener('click', async () => {
             const defaultSettings = {
-                "symbol": ["NQ", "ES", "GC", "CL", "BTC"],
-                "location": {
-                  "VWAP": { "sub1": ["Globex", "RTH", "Weekly", "Monthly"], "sub2": ["Upper band", "VWAP", "Lower band"] },
-                  "Volume profile": { "sub1": ["Globex", "RTH", "Composite"], "sub2": ["VAH", "POC", "VAL", "LVN", "HVN"] },
-                  "IB": { "sub1": ["Current", "Previous"], "sub2": ["High", "Mid", "Low", "High +50%", "High +100%", "High +200%", "Low -50%", "Low -100%", "Low -200%"] }
-                },
-                "marketCondition": ["Balance", "Imbalance"],
-                "setup": ["Price Discovery Continuation", "Fade value area extremes", "Return to value", "VWAP Bounce", "Madonna", "VWAP/POC Scalpes in balance", "Late Entry Continuation", "Inside HTF balance fades", "IB Extension fades"],
-                "direction": ["Long", "Short"],
-                "evidence": {
-                  "VWAP": ["Respecting band", "Respecting VWAP", "Higher timeframe alignment"],
-                  "Auction": ["Value acceptance", "Value rejection"],
-                  "IB": ["Breakout/Acceptance", "Rejection"],
-                  "Orderflow": ["Delta acceleration", "Order book absorption", "Tape change"]
-                },
-                "invalidation": ["Failed price discovery", "Acceptance beyond key level", "Failed return to value", "Failed Higher timeframe level", "Anemic Bounce", "Failed Delta divergence", "Stopped at stop loss"],
-                "target": {
-                  "VWAP": { "sub1": ["Globex", "RTH", "Weekly", "Monthly"], "sub2": ["Upper band", "VWAP", "Lower band"] },
-                  "Volume profile": { "sub1": ["Globex", "RTH", "Composite"], "sub2": ["VAH", "POC", "VAL", "LVN", "HVN", "Other side of value"] },
-                  "IB": { "sub1": ["Current", "Previous"], "sub2": ["High", "Mid", "Low", "High +50%", "High +100%", "High +200%", "Low -50%", "Low -100%", "Low -200%"] },
-                  "Swing": { "sub1": ["HIgh", "Low"], "sub2": [] },
-                  "RR": { "sub1": ["1/1", "1/2", "1/3", "1/4", "1/5"], "sub2": [] }
-                }
-            };
+    "symbol": [
+        "NQ",
+        "ES",
+        "GC",
+        "CL",
+        "BTC"
+    ],
+    "location": {
+        "VWAP": {
+            "sub1": [
+                "Globex",
+                "RTH",
+                "Weekly",
+                "Monthly"
+            ],
+            "sub2": [
+                "Upper band",
+                "VWAP",
+                "Lower band"
+            ]
+        },
+        "Volume profile": {
+            "sub1": [
+                "Globex",
+                "RTH",
+                "Composite"
+            ],
+            "sub2": [
+                "VAH",
+                "POC",
+                "VAL",
+                "LVN",
+                "HVN"
+            ]
+        },
+        "IB": {
+            "sub1": [
+                "Current",
+                "Previous"
+            ],
+            "sub2": [
+                "High",
+                "Mid",
+                "Low",
+                "High +50%",
+                "High +100%",
+                "High +200%",
+                "Low -50%",
+                "Low -100%",
+                "Low -200%"
+            ]
+        }
+    },
+    "marketCondition": [
+        "Balance",
+        "Imbalance"
+    ],
+    "setup": [
+        "Price Discovery Continuation",
+        "Fade value area extremes",
+        "Return to value",
+        "VWAP Bounce",
+        "Madonna",
+        "VWAP/POC Scalpes in balance",
+        "Late Entry Continuation",
+        "Inside HTF balance fades",
+        "IB Extension fades"
+    ],
+    "direction": [
+        "Long",
+        "Short"
+    ],
+    "evidence": {
+        "VWAP": [
+            "Respecting band",
+            "Respecting VWAP",
+            "Higher timeframe alignment"
+        ],
+        "Auction": [
+            "Value acceptance",
+            "Value rejection"
+        ],
+        "IB": [
+            "Breakout/Acceptance",
+            "Rejection"
+        ],
+        "Orderflow": [
+            "Delta acceleration",
+            "Order book absorption",
+            "Tape change"
+        ]
+    },
+    "invalidation": {
+        "Price Action": [
+            "Failed price discovery",
+            "Anemic Bounce"
+        ],
+        "Levels": [
+            "Acceptance beyond key level",
+            "Failed return to value",
+            "Failed Higher timeframe level"
+        ],
+        "Orderflow": [
+            "Failed Delta divergence"
+        ],
+        "Risk Management": [
+            "Stopped at stop loss"
+        ]
+    },
+    "target": {
+        "VWAP": {
+            "sub1": [
+                "Globex",
+                "RTH",
+                "Weekly",
+                "Monthly"
+            ],
+            "sub2": [
+                "Upper band",
+                "VWAP",
+                "Lower band"
+            ]
+        },
+        "Volume profile": {
+            "sub1": [
+                "Globex",
+                "RTH",
+                "Composite"
+            ],
+            "sub2": [
+                "VAH",
+                "POC",
+                "VAL",
+                "LVN",
+                "HVN",
+                "Other side of value"
+            ]
+        },
+        "IB": {
+            "sub1": [
+                "Current",
+                "Previous"
+            ],
+            "sub2": [
+                "High",
+                "Mid",
+                "Low",
+                "High +50%",
+                "High +100%",
+                "High +200%",
+                "Low -50%",
+                "Low -100%",
+                "Low -200%"
+            ]
+        },
+        "Swing": {
+            "sub1": [
+                "HIgh",
+                "Low"
+            ],
+            "sub2": []
+        },
+        "RR": {
+            "sub1": [
+                "1/1",
+                "1/2",
+                "1/3",
+                "1/4",
+                "1/5"
+            ],
+            "sub2": []
+        }
+    },
+    "psychology": [
+        "FOMO",
+        "Revenge Trading",
+        "Overconfident",
+        "Hesitant / Fearful",
+        "Impatient",
+        "Tilted / Frustrated",
+        "Disciplined",
+        "Flow State",
+        "Bored",
+        "Anxious"
+    ]
+};
             
             // Trigger download of settings.json
             const blobSettings = new Blob([JSON.stringify(defaultSettings, null, 2)], { type: "application/json" });
@@ -661,11 +905,21 @@ async function renderDashboard() {
                         <span class="group-title">Target</span>
                         <div class="group-value">${formatHierarchy(trade.target, trade.targetSub1, trade.targetSub2)}</div>
                     </div>
-                    ${trade.psychology ? `
+                    ${trade.psychology && trade.psychology.length > 0 ? `
                     <div class="card-group psych-group">
                         <span class="group-title">Psychology</span>
                         <div class="group-value">
-                            <div class="group-primary" style="font-weight: 400; font-size: 13px;">${trade.psychology}</div>
+                            <div style="display: flex; flex-wrap: wrap; gap: 6px;">
+                                ${trade.psychology.map(p => `<span class="psych-pill-tag" style="padding-right: 8px;">${p}</span>`).join('')}
+                            </div>
+                        </div>
+                    </div>
+                    ` : ''}
+                    ${trade.notes ? `
+                    <div class="card-group psych-group">
+                        <span class="group-title">Notes</span>
+                        <div class="group-value">
+                            <div class="group-primary" style="font-weight: 400; font-size: 13px; white-space: pre-wrap; line-height: 1.5;">${trade.notes}</div>
                         </div>
                     </div>
                     ` : ''}
@@ -807,17 +1061,29 @@ function addEvidenceRow(data = {}) {
     updateRemoveButtonsState(evidenceContainer);
 }
 
-function addInvalidationRow(dataStr = null) {
+function addInvalidationRow(data = {}) {
     const row = document.createElement('div');
-    row.className = 'dynamic-row inv-row';
+    row.className = 'dynamic-row ev-row'; // Reuse ev-row grid layout for 2-level
     
     row.innerHTML = `
         <select class="linear-input inv-primary"></select>
+        <select class="linear-input inv-sub" disabled></select>
         <button type="button" class="btn-remove-row" title="Remove Confluence">&times;</button>
     `;
     
     const primarySel = row.querySelector('.inv-primary');
-    populateSelectEl(primarySel, appData.settings.invalidation, dataStr);
+    const subSel = row.querySelector('.inv-sub');
+    
+    populateSelectEl(primarySel, Object.keys(appData.settings.invalidation || {}), data.primary);
+    
+    const updateSubs = (currData) => {
+        const val = primarySel.value;
+        const config = (appData.settings.invalidation || {})[val] || [];
+        populateSelectEl(subSel, config, currData ? currData.sub : null);
+    };
+    
+    primarySel.addEventListener('change', () => updateSubs(null));
+    updateSubs(data);
     
     row.querySelector('.btn-remove-row').addEventListener('click', () => {
         if (invalidationContainer.children.length > 1) {
@@ -856,7 +1122,7 @@ async function openTradeModal(tradeId = null) {
         document.getElementById('t-date').value = trade.date;
         document.getElementById('t-number').value = trade.number;
         document.getElementById('t-result').value = trade.result;
-        document.getElementById('t-psychology').value = trade.psychology;
+        
         
         const locs = trade.locations && trade.locations.length > 0 ? trade.locations : [{}];
         locs.forEach(l => addLocationRow(l));
@@ -864,8 +1130,13 @@ async function openTradeModal(tradeId = null) {
         const evs = trade.evidences && trade.evidences.length > 0 ? trade.evidences : [{}];
         evs.forEach(e => addEvidenceRow(e));
         
-        const invs = trade.invalidations && trade.invalidations.length > 0 ? trade.invalidations : [null];
+        const invs = trade.invalidations && trade.invalidations.length > 0 ? trade.invalidations : [{}];
         invs.forEach(i => addInvalidationRow(i));
+        
+        currentPsychology = trade.psychology ? [...trade.psychology] : [];
+        renderPsychPills();
+        renderPsychDropdown();
+        document.getElementById('t-notes').value = trade.notes || '';
         
         if (trade.screenshot) {
             existingImageFilename = trade.screenshot;
@@ -888,6 +1159,11 @@ async function openTradeModal(tradeId = null) {
         addLocationRow();
         addEvidenceRow();
         addInvalidationRow();
+        
+        currentPsychology = [];
+        renderPsychPills();
+        renderPsychDropdown();
+        document.getElementById('t-notes').value = '';
         
         updateDependentDropdowns({});
     }
@@ -932,9 +1208,13 @@ btnSaveTrade.addEventListener('click', async (e) => {
         sub: row.querySelector('.ev-sub').value
     })).filter(e => e.primary);
 
-    const invalidations = Array.from(invalidationContainer.querySelectorAll('.inv-row'))
-        .map(row => row.querySelector('.inv-primary').value)
-        .filter(i => i);
+    const invalidations = Array.from(invalidationContainer.querySelectorAll('.ev-row'))
+        .map(row => {
+            const p = row.querySelector('.inv-primary');
+            const s = row.querySelector('.inv-sub');
+            if(p && s) return { primary: p.value, sub: s.value };
+            return null;
+        }).filter(i => i && i.primary);
 
     const tradeData = {
         id: tradeId,
@@ -951,7 +1231,8 @@ btnSaveTrade.addEventListener('click', async (e) => {
         target: document.getElementById('t-target').value,
         targetSub1: document.getElementById('t-target-sub1').value,
         targetSub2: document.getElementById('t-target-sub2').value,
-        psychology: document.getElementById('t-psychology').value,
+        psychology: [...currentPsychology],
+        notes: document.getElementById('t-notes').value,
         screenshot: finalImageName 
     };
 
@@ -1318,7 +1599,8 @@ function renderSettingsUI() {
     settingsContainer.appendChild(renderSimpleSetting('Market Condition', appData.settings.marketCondition, onSettingsChange));
     settingsContainer.appendChild(renderSetupCombined(onSettingsChange));
     settingsContainer.appendChild(renderComplexSetting('Evidence', appData.settings.evidence, '2-level', onSettingsChange));
-    settingsContainer.appendChild(renderSimpleSetting('Invalidation', appData.settings.invalidation, onSettingsChange));
+    settingsContainer.appendChild(renderComplexSetting('Invalidation', appData.settings.invalidation, '2-level', onSettingsChange));
+    settingsContainer.appendChild(renderSimpleSetting('Psychology', appData.settings.psychology, onSettingsChange));
     settingsContainer.appendChild(renderComplexSetting('Target', appData.settings.target, '3-level', onSettingsChange));
 }
 
@@ -1573,7 +1855,8 @@ function renderStatsDashboard() {
     let invCounts = {};
     lostTrades.forEach(t => {
         (t.invalidations || []).forEach(inv => {
-            invCounts[inv] = (invCounts[inv] || 0) + 1;
+            const invName = inv.sub ? inv.sub : (inv.primary || inv);
+            invCounts[invName] = (invCounts[invName] || 0) + 1;
         });
     });
     const sortedInvs = Object.entries(invCounts).sort((a, b) => b[1] - a[1]).slice(0, 5);

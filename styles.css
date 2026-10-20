@@ -460,3 +460,19 @@ select.linear-input {
     border-color: var(--accent);
     outline: none;
 }
+
+/* Multi-Select Custom UI */
+.custom-multi-select { position: relative; width: 100%; }
+.multi-select-header { display: flex; justify-content: space-between; align-items: center; cursor: pointer; min-height: 38px; padding: 4px 12px; }
+.selected-pills { display: flex; flex-wrap: wrap; gap: 6px; flex: 1; align-items: center; }
+.placeholder { color: var(--text-muted); font-size: 13px; }
+.chevron { width: 8px; height: 8px; border-right: 2px solid var(--text-muted); border-bottom: 2px solid var(--text-muted); transform: rotate(45deg); margin-left: 12px; }
+.multi-select-dropdown { position: absolute; top: 100%; left: 0; right: 0; background: var(--bg-panel); border: 1px solid var(--border-color); border-radius: 6px; margin-top: 4px; max-height: 200px; overflow-y: auto; display: none; z-index: 10; box-shadow: 0 4px 12px rgba(0,0,0,0.2); }
+.multi-select-dropdown.active { display: block; }
+.dropdown-item { padding: 8px 12px; display: flex; align-items: center; gap: 8px; cursor: pointer; font-size: 13px; color: var(--text-main); }
+.dropdown-item:hover { background: rgba(255,255,255,0.05); }
+.dropdown-item input[type="checkbox"] { cursor: pointer; }
+.dropdown-item label { margin-bottom: 0 !important; cursor: pointer; flex: 1; }
+.psych-pill-tag { background: rgba(94, 106, 210, 0.15); border: 1px solid rgba(94, 106, 210, 0.3); color: #E2E4E9; font-size: 11px; padding: 2px 6px 2px 8px; border-radius: 4px; display: flex; align-items: center; gap: 4px; }
+.remove-psych { background: none; border: none; color: var(--text-muted); font-size: 14px; line-height: 1; cursor: pointer; padding: 0; margin: 0; }
+.remove-psych:hover { color: var(--danger); }

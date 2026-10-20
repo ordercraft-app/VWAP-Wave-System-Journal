@@ -270,8 +270,23 @@
                     
                     <div class="form-separator">Psychology</div>
                     <div class="form-grid compact-grid single-col">
+                        <div class="form-group custom-multi-select">
+                            <div class="multi-select-header linear-input" id="psych-select-header">
+                                <div class="selected-pills" id="psych-selected-pills">
+                                    <span class="placeholder">Select psychology states...</span>
+                                </div>
+                                <span class="chevron"></span>
+                            </div>
+                            <div class="multi-select-dropdown" id="psych-dropdown">
+                                <!-- Checkboxes injected via JS -->
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="form-separator">Notes</div>
+                    <div class="form-grid compact-grid single-col">
                         <div class="form-group">
-                            <textarea id="t-psychology" class="linear-input" rows="2" placeholder="Notes..."></textarea>
+                            <textarea id="t-notes" class="linear-input" rows="2" placeholder="Trade notes..."></textarea>
                         </div>
                     </div>
 
