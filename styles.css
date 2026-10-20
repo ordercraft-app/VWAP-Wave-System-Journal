@@ -553,6 +553,6 @@ span.flatpickr-weekday {
     fill: var(--text-main) !important;
 }
 
-.flatpickr-months, .flatpickr-weekdays, span.flatpickr-weekday {
+.flatpickr-months, .flatpickr-weekdays, span.flatpickr-weekday, .flatpickr-month, .flatpickr-current-month, .flatpickr-months .flatpickr-month {
     background: transparent !important;
 }
