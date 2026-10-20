@@ -195,7 +195,20 @@ const invalidationContainer = document.getElementById('invalidation-container');
 document.addEventListener('DOMContentLoaded', async () => {
     const today = new Date();
     const todayStr = today.toLocaleDateString('en-CA'); 
-    datePicker.value = todayStr;
+    
+    window.fpDatePicker = flatpickr(datePicker, {
+        defaultDate: todayStr,
+        dateFormat: "Y-m-d",
+        disableMobile: true,
+        onChange: function(selectedDates, dateStr) {
+            alignWeekToDate(new Date(dateStr));
+            renderDashboard();
+        }
+    });
+    window.fpTDate = flatpickr(document.getElementById('t-date'), {
+        dateFormat: "Y-m-d",
+        disableMobile: true
+    });
     
     alignWeekToDate(today);
     setupNavigation();
@@ -283,11 +296,7 @@ document.addEventListener('DOMContentLoaded', async () => {
         renderDashboard();
     }
 
-    datePicker.addEventListener('change', (e) => {
-        const newDate = new Date(e.target.value);
-        alignWeekToDate(newDate);
-        renderDashboard();
-    });
+
 });
 
 // --- Data Loading ---
@@ -620,7 +629,7 @@ function renderWeeklyCalendar() {
         `;
         
         dayDiv.addEventListener('click', () => {
-            datePicker.value = dateStr;
+            window.fpDatePicker.setDate(dateStr);
             renderDashboard();
         });
         
@@ -1159,7 +1168,7 @@ btnCancelModal.addEventListener('click', closeModal);
 
 async function openTradeModal(tradeId = null) {
     tradeForm.reset();
-    document.getElementById('t-date').value = datePicker.value;
+    window.fpTDate.setDate(datePicker.value);
     
     pendingImageBlob = null;
     existingImageFilename = null;
@@ -1176,7 +1185,7 @@ async function openTradeModal(tradeId = null) {
         const trade = appData.trades.find(t => t.id === tradeId);
         
         document.getElementById('trade-id').value = trade.id;
-        document.getElementById('t-date').value = trade.date;
+        window.fpTDate.setDate(trade.date);
         document.getElementById('t-number').value = trade.number;
         document.getElementById('t-result').value = trade.result;
         
@@ -1307,7 +1316,7 @@ btnSaveTrade.addEventListener('click', async (e) => {
     }
 
     closeModal();
-    datePicker.value = tradeData.date;
+    window.fpDatePicker.setDate(tradeData.date);
     alignWeekToDate(new Date(tradeData.date));
     await renderDashboard();
     
