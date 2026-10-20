@@ -63,17 +63,22 @@ function renderPsychDropdown() {
             <label for="psych-${opt}">${opt}</label>
         `;
         item.addEventListener('click', (e) => {
-            if (e.target.tagName !== 'INPUT') {
+            // Prevent double-firing if they actually click the input directly
+            if (e.target.tagName !== 'INPUT' && e.target.tagName !== 'LABEL') {
                 const cb = item.querySelector('input');
                 cb.checked = !cb.checked;
             }
-            const cb = item.querySelector('input');
-            if (cb.checked) {
-                if (!currentPsychology.includes(opt)) currentPsychology.push(opt);
-            } else {
-                currentPsychology = currentPsychology.filter(p => p !== opt);
-            }
-            renderPsychPills();
+            
+            // Allow DOM to update checkbox state if label was clicked
+            setTimeout(() => {
+                const cb = item.querySelector('input');
+                if (cb.checked) {
+                    if (!currentPsychology.includes(opt)) currentPsychology.push(opt);
+                } else {
+                    currentPsychology = currentPsychology.filter(p => p !== opt);
+                }
+                renderPsychPills();
+            }, 0);
         });
         psychDropdown.appendChild(item);
     });
@@ -1153,6 +1158,9 @@ btnCloseModal.addEventListener('click', closeModal);
 btnCancelModal.addEventListener('click', closeModal);
 
 async function openTradeModal(tradeId = null) {
+    // Reset scroll to top
+    document.querySelector('.modal-body').scrollTop = 0;
+    
     tradeForm.reset();
     document.getElementById('t-date').value = datePicker.value;
     
