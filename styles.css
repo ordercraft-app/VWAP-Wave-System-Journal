@@ -476,3 +476,16 @@ select.linear-input {
 .psych-pill-tag { background: rgba(94, 106, 210, 0.15); border: 1px solid rgba(94, 106, 210, 0.3); color: #E2E4E9; font-size: 11px; padding: 2px 6px 2px 8px; border-radius: 4px; display: flex; align-items: center; gap: 4px; }
 .remove-psych { background: none; border: none; color: var(--text-muted); font-size: 14px; line-height: 1; cursor: pointer; padding: 0; margin: 0; }
 .remove-psych:hover { color: var(--danger); }
+
+/* FAQ / Help Section */
+.faq-container { display: flex; flex-direction: column; gap: 12px; margin-top: 24px; max-width: 800px; padding-bottom: 40px; }
+.faq-item { background: var(--bg-panel); border: 1px solid var(--border-color); border-radius: 8px; overflow: hidden; }
+.faq-question { padding: 16px 20px; display: flex; justify-content: space-between; align-items: center; cursor: pointer; font-weight: 600; font-size: 14px; user-select: none; transition: background-color 0.2s; }
+.faq-question:hover { background: rgba(255,255,255,0.02); }
+.faq-icon { transition: transform 0.3s; color: var(--text-muted); }
+.faq-item.open .faq-icon { transform: rotate(180deg); }
+.faq-answer { padding: 0 20px; max-height: 0; overflow: hidden; transition: max-height 0.3s ease-out, padding 0.3s ease; font-size: 13px; color: var(--text-muted); line-height: 1.6; }
+.faq-item.open .faq-answer { padding: 0 20px 16px 20px; max-height: 500px; }
+.faq-answer strong { color: var(--text-main); }
+.faq-answer ul { padding-left: 20px; margin-top: 8px; margin-bottom: 8px; }
+.faq-answer li { margin-bottom: 4px; }

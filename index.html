@@ -27,6 +27,9 @@
                 <button class="btn-icon" id="btn-nav-settings" title="Settings">
                     <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"></circle><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"></path></svg>
                 </button>
+                <button class="btn-icon" id="btn-nav-help" title="Help & FAQ">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"></circle><path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3"></path><line x1="12" y1="17" x2="12.01" y2="17"></line></svg>
+                </button>
             </nav>
         </aside>
 
@@ -144,6 +147,10 @@
                             <div class="chart-wrapper"><canvas id="invalidationChart"></canvas></div>
                         </div>
                         <div class="stat-card">
+                            <h3 class="card-title">Top 5 Psychology (Win Rate)</h3>
+                            <div class="chart-wrapper"><canvas id="psychologyChart"></canvas></div>
+                        </div>
+                        <div class="stat-card">
                             <h3 class="card-title">Confluence Amount vs Win Rate</h3>
                             <div class="chart-wrapper"><canvas id="confluenceChart"></canvas></div>
                         </div>
@@ -158,6 +165,109 @@
                         <div class="stat-card chart-span-3">
                             <h3 class="card-title">Location Effectiveness Heatmap</h3>
                             <div class="chart-wrapper"><canvas id="locationChart"></canvas></div>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- Help View -->
+                <section id="view-help" class="view">
+                    <header class="view-header" style="margin-bottom: 16px;">
+                        <h1>Help & FAQ</h1>
+                        <p class="help-text" style="margin-top:4px;">Everything you need to know about using the VWAP Wave System Journal.</p>
+                    </header>
+
+                    <div class="faq-container">
+                        <div class="faq-item">
+                            <div class="faq-question">
+                                <span>How does data storage work? Is my data safe?</span>
+                                <svg class="faq-icon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 12 15 18 9"></polyline></svg>
+                            </div>
+                            <div class="faq-answer">
+                                <p>Yes, your data is <strong>100% safe and private</strong>. This app runs entirely in your browser and does not use any cloud databases or external servers. All your trades, settings, and screenshots are saved directly to the local folder you selected on your own hard drive. Nobody else has access to it.</p>
+                            </div>
+                        </div>
+
+                        <div class="faq-item">
+                            <div class="faq-question">
+                                <span>Why do I keep getting the "Restore Connection" screen?</span>
+                                <svg class="faq-icon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 12 15 18 9"></polyline></svg>
+                            </div>
+                            <div class="faq-answer">
+                                <p>This is a strict security feature built into web browsers (like Google Chrome). Browsers don't allow websites to automatically read/write to your local folders in the background without your explicit permission. When you close the app or restart your browser, the permission resets. You simply need to click <strong>"Connect Folder"</strong> to grant access again.</p>
+                            </div>
+                        </div>
+
+                        <div class="faq-item">
+                            <div class="faq-question">
+                                <span>How do I customize the dropdown menus (Symbols, Setups, etc.)?</span>
+                                <svg class="faq-icon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 12 15 18 9"></polyline></svg>
+                            </div>
+                            <div class="faq-answer">
+                                <p>Go to the <strong>Settings</strong> tab in the sidebar.</p>
+                                <ul>
+                                    <li><strong>Add an item:</strong> Type in the input field of a category and press <code>Enter</code> or <code>Comma (,)</code>.</li>
+                                    <li><strong>Edit an item:</strong> Click on the text of any pill to edit it. Press Enter when done.</li>
+                                    <li><strong>Delete an item:</strong> Click the cross (&times;) on a pill.</li>
+                                    <li><strong>Reorder items:</strong> Click and hold a pill to drag it. You can also reorder entire categories by dragging the <code>⋮⋮</code> handle.</li>
+                                </ul>
+                                <p>All changes are saved instantly.</p>
+                            </div>
+                        </div>
+
+                        <div class="faq-item">
+                            <div class="faq-question">
+                                <span>How do I edit or delete an existing trade?</span>
+                                <svg class="faq-icon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 12 15 18 9"></polyline></svg>
+                            </div>
+                            <div class="faq-answer">
+                                <p>Navigate to the Dashboard and ensure the correct date is selected. Simply click on the trade card you want to edit. The modal will open with your data populated. Make your changes and hit <strong>Save Trade</strong>. To delete it entirely, click the red <strong>Delete</strong> button in the bottom left corner.</p>
+                            </div>
+                        </div>
+
+                        <div class="faq-item">
+                            <div class="faq-question">
+                                <span>How do I add screenshots to my trades?</span>
+                                <svg class="faq-icon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 12 15 18 9"></polyline></svg>
+                            </div>
+                            <div class="faq-answer">
+                                <p>When adding or editing a trade, you have three easy ways to add an image:</p>
+                                <ul>
+                                    <li>Click the dashed upload box to select an image file from your computer.</li>
+                                    <li>Drag and drop an image file directly into the dashed box.</li>
+                                    <li>Copy an image (e.g., using Snipping Tool / Lightshot) and simply press <code>Ctrl+V</code> (Windows) or <code>Cmd+V</code> (Mac) while the trade window is open.</li>
+                                </ul>
+                                <p>Images are automatically saved in the <code>/img</code> subfolder inside your main Journal folder.</p>
+                            </div>
+                        </div>
+
+                        <div class="faq-item">
+                            <div class="faq-question">
+                                <span>Troubleshooting: Why are my charts empty?</span>
+                                <svg class="faq-icon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 12 15 18 9"></polyline></svg>
+                            </div>
+                            <div class="faq-answer">
+                                <p>Go to the <strong>Stats</strong> page and check the filters at the top. The charts only show data for the selected Year, Month, Week, and Day. If you have no trades in that period, the charts will be empty. Change the filters back to "All Months" to see your overall performance.</p>
+                            </div>
+                        </div>
+
+                        <div class="faq-item">
+                            <div class="faq-question">
+                                <span>Can I use this app on my smartphone or tablet?</span>
+                                <svg class="faq-icon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 12 15 18 9"></polyline></svg>
+                            </div>
+                            <div class="faq-answer">
+                                <p>No. Because this application relies on the secure <strong>File System Access API</strong> to save files locally, it requires a desktop browser. Mobile browsers (like Safari on iOS and Chrome on Android) do not currently support this feature.</p>
+                            </div>
+                        </div>
+
+                        <div class="faq-item">
+                            <div class="faq-question">
+                                <span>How do I back up my journal?</span>
+                                <svg class="faq-icon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 12 15 18 9"></polyline></svg>
+                            </div>
+                            <div class="faq-answer">
+                                <p>Because all data lives exclusively on your computer, backing up is extremely simple. Just copy your entire "VWAP Journal" folder (containing settings.json, vwap-journal.json, and your /img folder) to a USB drive, Google Drive, Dropbox, or iCloud.</p>
+                            </div>
                         </div>
                     </div>
                 </section>

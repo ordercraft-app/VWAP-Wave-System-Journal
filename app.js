@@ -153,10 +153,12 @@ const tradeForm = document.getElementById('trade-form');
 const btnNavDashboard = document.getElementById('btn-nav-dashboard');
 const btnNavStats = document.getElementById('btn-nav-stats');
 const btnNavSettings = document.getElementById('btn-nav-settings');
+const btnNavHelp = document.getElementById('btn-nav-help');
 
 const viewDashboard = document.getElementById('view-dashboard');
 const viewSettings = document.getElementById('view-settings');
 const viewStats = document.getElementById('view-stats');
+const viewHelp = document.getElementById('view-help');
 const filterYear = document.getElementById('filter-year');
 const filterMonth = document.getElementById('filter-month');
 const filterWeek = document.getElementById('filter-week');
@@ -196,6 +198,13 @@ document.addEventListener('DOMContentLoaded', async () => {
     setupCalendarEvents();
     setupImageUploadEvents();
     setupImageViewer();
+    
+    document.querySelectorAll('.faq-question').forEach(question => {
+        question.addEventListener('click', () => {
+            const item = question.parentElement;
+            item.classList.toggle('open');
+        });
+    });
     
     document.getElementById('btn-add-location').addEventListener('click', () => addLocationRow());
     document.getElementById('btn-add-evidence').addEventListener('click', () => addEvidenceRow());
@@ -306,33 +315,36 @@ async function loadDataFromFile() {
 
 // --- Navigation ---
 function setActiveNav(activeBtn) {
-    [btnNavDashboard, btnNavStats, btnNavSettings].forEach(b => b.classList.remove('active'));
+    [btnNavDashboard, btnNavStats, btnNavSettings, btnNavHelp].forEach(b => b.classList.remove('active'));
     activeBtn.classList.add('active');
 }
 
 function setupNavigation() {
     btnNavSettings.addEventListener('click', () => {
-        viewDashboard.classList.remove('active');
-        viewStats.classList.remove('active');
+        [viewDashboard, viewStats, viewHelp].forEach(v => v.classList.remove('active'));
         viewSettings.classList.add('active');
         setActiveNav(btnNavSettings);
         renderSettingsUI();
     });
 
     btnNavStats.addEventListener('click', () => {
-        viewDashboard.classList.remove('active');
-        viewSettings.classList.remove('active');
+        [viewDashboard, viewSettings, viewHelp].forEach(v => v.classList.remove('active'));
         viewStats.classList.add('active');
         setActiveNav(btnNavStats);
         renderStatsDashboard();
     });
 
     btnNavDashboard.addEventListener('click', () => {
-        viewSettings.classList.remove('active');
-        viewStats.classList.remove('active');
+        [viewSettings, viewStats, viewHelp].forEach(v => v.classList.remove('active'));
         viewDashboard.classList.add('active');
         setActiveNav(btnNavDashboard);
         renderDashboard();
+    });
+    
+    btnNavHelp.addEventListener('click', () => {
+        [viewDashboard, viewStats, viewSettings].forEach(v => v.classList.remove('active'));
+        viewHelp.classList.add('active');
+        setActiveNav(btnNavHelp);
     });
 }
 
@@ -1834,6 +1846,34 @@ function renderStatsDashboard() {
         type: 'doughnut',
         data: { labels: dirLabels, datasets: [{ data: dirWins, backgroundColor: [colors.accent, '#4A5561'], borderWidth: 0 }] },
         options: { maintainAspectRatio: false, plugins: { legend: { position: 'bottom', labels: { color: '#888', usePointStyle: true, pointStyle: 'circle' } } } }
+    });
+
+    // Top 5 Psychology
+    const psychGroup = {};
+    trades.forEach(t => {
+        (t.psychology || []).forEach(p => {
+            if(!psychGroup[p]) psychGroup[p] = [];
+            psychGroup[p].push(t);
+        });
+    });
+    const psychStats = Object.keys(psychGroup).map(p => {
+        const stats = getWinRateData(psychGroup[p]);
+        return { psych: p, winRate: parseFloat(stats.winRate), total: stats.total };
+    });
+    psychStats.sort((a, b) => {
+        if (b.total !== a.total) return b.total - a.total; // Sort by frequency first
+        return b.winRate - a.winRate; // Tiebreaker by winrate
+    });
+    const top5Psych = psychStats.slice(0, 5);
+
+    destroyChart('psychologyChart');
+    chartInstances['psychologyChart'] = new Chart(document.getElementById('psychologyChart'), {
+        type: 'bar',
+        data: {
+            labels: top5Psych.map(s => s.psych),
+            datasets: [{ label: 'Win Rate %', data: top5Psych.map(s => s.winRate), backgroundColor: colors.accent, borderRadius: 4 }]
+        },
+        options: { maintainAspectRatio: false, indexAxis: 'y', scales: { x: { display: false, beginAtZero: true, max: 100 }, y: { display: true } }, plugins: { legend: { display: false } } }
     });
 
     // Invalidation Top 5
