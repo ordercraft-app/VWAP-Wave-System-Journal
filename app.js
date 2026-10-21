@@ -1917,7 +1917,7 @@ function renderStatsDashboard() {
         return true;
     });
 
-    const colors = { win: '#51dc26', loss: '#ee354e', be: '#2b2c30', accent: '#386af5' };
+    const colors = { win: '#bde352', loss: '#ee354e', be: '#2b2c30', accent: '#386af5' };
 
     Chart.defaults.scale.grid.display = false;
     Chart.defaults.scale.grid.drawBorder = false;
@@ -1936,7 +1936,7 @@ function renderStatsDashboard() {
             labels: ['Wins', 'Losses', 'B/E'],
             datasets: [{ data: [overallStats.wins, overallStats.losses, overallStats.be], backgroundColor: [colors.win, colors.loss, colors.be], borderWidth: 0 }]
         },
-        options: { maintainAspectRatio: false, cutout: '80%', plugins: { legend: { position: 'bottom', labels: { color: '#888', usePointStyle: true, pointStyle: 'circle' } } } }
+        options: { maintainAspectRatio: false, cutout: '80%', layout: { padding: { bottom: 16 } }, plugins: { legend: { position: 'bottom', labels: { color: '#888', usePointStyle: true, pointStyle: 'circle', padding: 20 } } } }
     });
 
     // Bar Charts Helper
@@ -1965,7 +1965,7 @@ function renderStatsDashboard() {
             type: 'bar',
             data: {
                 labels: labels,
-                datasets: [{ label: 'Win Rate %', data: winRates, backgroundColor: colors.accent, borderRadius: 4 }]
+                datasets: [{ label: 'Win Rate %', data: winRates, backgroundColor: colors.accent, borderRadius: 6, borderSkipped: false }]
             },
             options: { maintainAspectRatio: false, indexAxis: horizontal ? 'y' : 'x', scales: scales, plugins: { legend: { display: false } } }
         });
@@ -1990,7 +1990,7 @@ function renderStatsDashboard() {
         type: 'bar',
         data: {
             labels: top5Setups.map(s => s.setup),
-            datasets: [{ label: 'Win Rate %', data: top5Setups.map(s => s.winRate), backgroundColor: colors.accent, borderRadius: 4 }]
+            datasets: [{ label: 'Win Rate %', data: top5Setups.map(s => s.winRate), backgroundColor: colors.accent, borderRadius: 6, borderSkipped: false }]
         },
         options: { maintainAspectRatio: false, indexAxis: 'y', scales: { x: { display: false, beginAtZero: true, max: 100 }, y: { display: true } }, plugins: { legend: { display: false } } }
     });
@@ -2007,7 +2007,7 @@ function renderStatsDashboard() {
     chartInstances['directionChart'] = new Chart(document.getElementById('directionChart'), {
         type: 'doughnut',
         data: { labels: dirLabels, datasets: [{ data: dirWins, backgroundColor: [colors.accent, '#2b2c30'], borderWidth: 0 }] },
-        options: { maintainAspectRatio: false, cutout: '80%', plugins: { legend: { position: 'bottom', labels: { color: '#888', usePointStyle: true, pointStyle: 'circle' } } } }
+        options: { maintainAspectRatio: false, cutout: '80%', layout: { padding: { bottom: 16 } }, plugins: { legend: { position: 'bottom', labels: { color: '#888', usePointStyle: true, pointStyle: 'circle', padding: 20 } } } }
     });
 
         // Top 5 Psychology (Frequency)
@@ -2033,7 +2033,7 @@ function renderStatsDashboard() {
             type: 'bar',
             data: {
                 labels: top5Psych.map(s => s.psych),
-                datasets: [{ label: 'Count', data: top5Psych.map(s => s.total), backgroundColor: colors.accent, borderRadius: 4 }]
+                datasets: [{ label: 'Count', data: top5Psych.map(s => s.total), backgroundColor: colors.accent, borderRadius: 6, borderSkipped: false }]
             },
             options: { maintainAspectRatio: false, indexAxis: 'y', scales: { x: { display: false, beginAtZero: true }, y: { display: true } }, plugins: { legend: { display: false } } }
         });
@@ -2061,7 +2061,7 @@ function renderStatsDashboard() {
             type: 'bar',
             data: {
                 labels: sortedInvs.map(i => i[0]),
-                datasets: [{ label: 'Loss Count', data: sortedInvs.map(i => i[1]), backgroundColor: colors.loss, borderRadius: 4 }]
+                datasets: [{ label: 'Loss Count', data: sortedInvs.map(i => i[1]), backgroundColor: colors.loss, borderRadius: 6, borderSkipped: false }]
             },
             options: { maintainAspectRatio: false, indexAxis: 'y', scales: { x: { display: false }, y: { display: true } }, plugins: { legend: { display: false } } }
         });
@@ -2105,7 +2105,7 @@ function renderStatsDashboard() {
         type: 'bar',
         data: {
             labels: Object.keys(confGroups),
-            datasets: [{ label: 'Win Rate %', data: Object.keys(confGroups).map(k => getWinRateData(confGroups[k]).winRate), backgroundColor: colors.win, borderRadius: 4 }]
+            datasets: [{ label: 'Win Rate %', data: Object.keys(confGroups).map(k => getWinRateData(confGroups[k]).winRate), backgroundColor: colors.win, borderRadius: 6, borderSkipped: false }]
         },
         options: { maintainAspectRatio: false, scales: { y: { display: false, beginAtZero: true, max: 100 } }, plugins: { legend: { display: false } } }
     });
@@ -2152,9 +2152,9 @@ function renderStatsDashboard() {
         data: {
             labels: sortedLocLabels,
             datasets: [
-                { label: 'Wins', data: sortedLocWins, backgroundColor: colors.win, borderRadius: 4 },
-                { label: 'Losses', data: sortedLocLosses, backgroundColor: colors.loss, borderRadius: 4 },
-                { label: 'B/E', data: sortedLocBE, backgroundColor: colors.be, borderRadius: 4 }
+                { label: 'Wins', data: sortedLocWins, backgroundColor: colors.win, borderRadius: 6, borderSkipped: false },
+                { label: 'Losses', data: sortedLocLosses, backgroundColor: colors.loss, borderRadius: 6, borderSkipped: false },
+                { label: 'B/E', data: sortedLocBE, backgroundColor: colors.be, borderRadius: 6, borderSkipped: false }
             ]
         },
         options: { 
