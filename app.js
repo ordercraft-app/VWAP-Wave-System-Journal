@@ -1269,6 +1269,12 @@ function closeModal() {
     tradeModal.classList.remove('active');
 }
 
+tradeModal.addEventListener('mousedown', (e) => {
+    if (e.target === tradeModal) {
+        closeModal();
+    }
+});
+
 btnSaveTrade.addEventListener('click', async (e) => {
     e.preventDefault();
     if(!document.getElementById('t-date').value) return alert('Date is required');
