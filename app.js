@@ -2037,25 +2037,32 @@ function renderStatsDashboard() {
     });
 
     // Invalidation Top 5
-    const lostTrades = trades.filter(t => t.result === 'LOST');
-    let invCounts = {};
-    lostTrades.forEach(t => {
-        (t.invalidations || []).forEach(inv => {
-            const invName = inv.sub ? inv.sub : (inv.primary || inv);
-            invCounts[invName] = (invCounts[invName] || 0) + 1;
+    const statCardInv = document.getElementById('stat-card-invalidation');
+    if (appData.settings.features.invalidation) {
+        if(statCardInv) statCardInv.style.display = 'flex';
+        const lostTrades = trades.filter(t => t.result === 'LOST');
+        let invCounts = {};
+        lostTrades.forEach(t => {
+            (t.invalidations || []).forEach(inv => {
+                const invName = inv.sub ? inv.sub : (inv.primary || inv);
+                invCounts[invName] = (invCounts[invName] || 0) + 1;
+            });
         });
-    });
-    const sortedInvs = Object.entries(invCounts).sort((a, b) => b[1] - a[1]).slice(0, 5);
-    
-    destroyChart('invalidationChart');
-    chartInstances['invalidationChart'] = new Chart(document.getElementById('invalidationChart'), {
-        type: 'bar',
-        data: {
-            labels: sortedInvs.map(i => i[0]),
-            datasets: [{ label: 'Loss Count', data: sortedInvs.map(i => i[1]), backgroundColor: colors.loss, borderRadius: 4 }]
-        },
-        options: { maintainAspectRatio: false, indexAxis: 'y', scales: { x: { display: false }, y: { display: true } }, plugins: { legend: { display: false } } }
-    });
+        const sortedInvs = Object.entries(invCounts).sort((a, b) => b[1] - a[1]).slice(0, 5);
+        
+        destroyChart('invalidationChart');
+        chartInstances['invalidationChart'] = new Chart(document.getElementById('invalidationChart'), {
+            type: 'bar',
+            data: {
+                labels: sortedInvs.map(i => i[0]),
+                datasets: [{ label: 'Loss Count', data: sortedInvs.map(i => i[1]), backgroundColor: colors.loss, borderRadius: 4 }]
+            },
+            options: { maintainAspectRatio: false, indexAxis: 'y', scales: { x: { display: false }, y: { display: true } }, plugins: { legend: { display: false } } }
+        });
+    } else {
+        if(statCardInv) statCardInv.style.display = 'none';
+        destroyChart('invalidationChart');
+    }
 
     // Day of Week
     const daysMap = { 0: 'Sun', 1: 'Mon', 2: 'Tue', 3: 'Wed', 4: 'Thu', 5: 'Fri', 6: 'Sat' };
