@@ -3,6 +3,7 @@
 let dirHandle = null;
 let fileConnected = false;
 let isFormDirty = false;
+let currentSettingsTab = 'journal';
 let appData = {
     trades: [],
     settings: {

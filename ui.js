@@ -1290,17 +1290,86 @@ function renderSimpleSetting(title, dataArray, onChange, toggleKey = null) {
 function renderSettingsUI() {
     settingsContainer.innerHTML = '';
     
-    const onSettingsChange = async () => {
-        await autoSave();
-    };
+    if (!appData.settings.chartVisibility) {
+        appData.settings.chartVisibility = {
+            growth: true, winLoss: true, directionalBias: true, dayOfWeek: true,
+            setup: true, invalidation: true, psychology: true, confluence: true,
+            symbol: true, marketCond: true, location: true
+        };
+    }
 
-    settingsContainer.appendChild(renderSimpleSetting('Symbol', appData.settings.symbol, onSettingsChange));
-    settingsContainer.appendChild(renderComplexSetting('Location', appData.settings.location, '3-level', onSettingsChange));
-    settingsContainer.appendChild(renderSimpleSetting('Market Condition', appData.settings.marketCondition, onSettingsChange));
-    settingsContainer.appendChild(renderSetupCombined(onSettingsChange));
-    settingsContainer.appendChild(renderComplexSetting('Evidence', appData.settings.evidence, '2-level', onSettingsChange, 'evidence'));
-    settingsContainer.appendChild(renderComplexSetting('Invalidation', appData.settings.invalidation, '2-level', onSettingsChange, 'invalidation'));
-    settingsContainer.appendChild(renderComplexSetting('Target', appData.settings.target, '3-level', onSettingsChange, 'target'));
-    settingsContainer.appendChild(renderSimpleSetting('Psychology', appData.settings.psychology, onSettingsChange, 'psychology'));
+    const tabsDiv = document.createElement('div');
+    tabsDiv.className = 'settings-tabs';
+    
+    const tabJournal = document.createElement('button');
+    tabJournal.className = `settings-tab-btn ${currentSettingsTab === 'journal' ? 'active' : ''}`;
+    tabJournal.textContent = 'Journal';
+    tabJournal.onclick = () => { currentSettingsTab = 'journal'; renderSettingsUI(); };
+    
+    const tabChart = document.createElement('button');
+    tabChart.className = `settings-tab-btn ${currentSettingsTab === 'chart' ? 'active' : ''}`;
+    tabChart.textContent = 'Chart';
+    tabChart.onclick = () => { currentSettingsTab = 'chart'; renderSettingsUI(); };
+    
+    tabsDiv.appendChild(tabJournal);
+    tabsDiv.appendChild(tabChart);
+    settingsContainer.appendChild(tabsDiv);
+    
+    const onSettingsChange = async () => { await autoSave(); };
+
+    if (currentSettingsTab === 'journal') {
+        const banner = document.createElement('div');
+        banner.className = 'info-banner';
+        banner.innerHTML = `<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"></circle><line x1="12" y1="16" x2="12" y2="12"></line><line x1="12" y1="8" x2="12.01" y2="8"></line></svg><span><strong>Tip:</strong> Add a parameter by typing and pressing <strong>comma ( , )</strong> or <strong>Enter</strong>. You can easily drag & drop parameters and categories to reorder them!</span>`;
+        settingsContainer.appendChild(banner);
+
+        settingsContainer.appendChild(renderSimpleSetting('Symbol', appData.settings.symbol, onSettingsChange));
+        settingsContainer.appendChild(renderComplexSetting('Location', appData.settings.location, '3-level', onSettingsChange));
+        settingsContainer.appendChild(renderSimpleSetting('Market Condition', appData.settings.marketCondition, onSettingsChange));
+        settingsContainer.appendChild(renderSetupCombined(onSettingsChange));
+        settingsContainer.appendChild(renderComplexSetting('Evidence', appData.settings.evidence, '2-level', onSettingsChange, 'evidence'));
+        settingsContainer.appendChild(renderComplexSetting('Invalidation', appData.settings.invalidation, '2-level', onSettingsChange, 'invalidation'));
+        settingsContainer.appendChild(renderComplexSetting('Target', appData.settings.target, '3-level', onSettingsChange, 'target'));
+        settingsContainer.appendChild(renderSimpleSetting('Psychology', appData.settings.psychology, onSettingsChange, 'psychology'));
+    } else {
+        const chartsConfig = [
+            { key: 'growth', label: 'Execution Growth' },
+            { key: 'winLoss', label: 'Overall Win/Loss Ratio' },
+            { key: 'directionalBias', label: 'Directional Bias' },
+            { key: 'dayOfWeek', label: 'Performance by Day' },
+            { key: 'setup', label: 'Top 5 Setup Effectiveness' },
+            { key: 'invalidation', label: 'Top 5 Invalidation Losses', depends: 'invalidation' },
+            { key: 'psychology', label: 'Top 5 Psychology', depends: 'psychology' },
+            { key: 'confluence', label: 'Confluence Amount vs Win Rate' },
+            { key: 'symbol', label: 'Performance by Symbol' },
+            { key: 'marketCond', label: 'Market Condition Analysis' },
+            { key: 'location', label: 'Location Effectiveness Heatmap' }
+        ];
+        
+        chartsConfig.forEach(c => {
+            if (c.depends && !appData.settings.features[c.depends]) return; 
+            
+            const row = document.createElement('div');
+            row.className = 'chart-toggle-row';
+            
+            const label = document.createElement('span');
+            label.className = 'chart-toggle-label';
+            label.textContent = c.label;
+            
+            const btn = document.createElement('button');
+            const isEnabled = appData.settings.chartVisibility[c.key] !== false; 
+            btn.className = isEnabled ? 'btn-secondary btn-sm' : 'btn-primary btn-sm';
+            btn.textContent = isEnabled ? 'Disable' : 'Enable';
+            btn.onclick = () => {
+                appData.settings.chartVisibility[c.key] = !isEnabled;
+                onSettingsChange();
+                renderSettingsUI();
+            };
+            
+            row.appendChild(label);
+            row.appendChild(btn);
+            settingsContainer.appendChild(row);
+        });
+    }
 }
 
