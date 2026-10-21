@@ -1917,7 +1917,7 @@ function renderStatsDashboard() {
         return true;
     });
 
-    const colors = { win: '#3EBC74', loss: '#E05252', be: '#888888', accent: '#5E6AD2' };
+    const colors = { win: '#bde352', loss: '#ee354e', be: '#888888', accent: '#386af5' };
 
     Chart.defaults.scale.grid.display = false;
     Chart.defaults.scale.grid.drawBorder = false;
@@ -2071,7 +2071,7 @@ function renderStatsDashboard() {
     destroyChart('dayOfWeekChart');
     chartInstances['dayOfWeekChart'] = new Chart(document.getElementById('dayOfWeekChart'), {
         type: 'line',
-        data: { labels: dayLabels, datasets: [{ label: 'Win Rate %', data: dayWinRates, borderColor: colors.accent, tension: 0.3, fill: true, backgroundColor: 'rgba(94, 106, 210, 0.1)' }] },
+        data: { labels: dayLabels, datasets: [{ label: 'Win Rate %', data: dayWinRates, borderColor: colors.accent, tension: 0.3, fill: true, backgroundColor: 'rgba(56, 106, 245, 0.1)' }] },
         options: { maintainAspectRatio: false, scales: { y: { display: false, beginAtZero: true, max: 100 } }, plugins: { legend: { display: false } } }
     });
 
