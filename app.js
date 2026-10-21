@@ -1936,7 +1936,7 @@ function renderStatsDashboard() {
             labels: ['Wins', 'Losses', 'B/E'],
             datasets: [{ data: [overallStats.wins, overallStats.losses, overallStats.be], backgroundColor: [colors.win, colors.loss, colors.be], borderWidth: 0 }]
         },
-        options: { maintainAspectRatio: false, plugins: { legend: { position: 'bottom', labels: { color: '#888', usePointStyle: true, pointStyle: 'circle' } } } }
+        options: { maintainAspectRatio: false, cutout: '80%', plugins: { legend: { position: 'bottom', labels: { color: '#888', usePointStyle: true, pointStyle: 'circle' } } } }
     });
 
     // Bar Charts Helper
@@ -2007,7 +2007,7 @@ function renderStatsDashboard() {
     chartInstances['directionChart'] = new Chart(document.getElementById('directionChart'), {
         type: 'doughnut',
         data: { labels: dirLabels, datasets: [{ data: dirWins, backgroundColor: [colors.accent, '#2b2c30'], borderWidth: 0 }] },
-        options: { maintainAspectRatio: false, plugins: { legend: { position: 'bottom', labels: { color: '#888', usePointStyle: true, pointStyle: 'circle' } } } }
+        options: { maintainAspectRatio: false, cutout: '80%', plugins: { legend: { position: 'bottom', labels: { color: '#888', usePointStyle: true, pointStyle: 'circle' } } } }
     });
 
         // Top 5 Psychology (Frequency)
