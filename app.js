@@ -1917,7 +1917,7 @@ function renderStatsDashboard() {
         return true;
     });
 
-    const colors = { win: '#bde352', loss: '#ee354e', be: '#2b2c30', accent: '#386af5' };
+    const colors = { win: '#51dc26', loss: '#ee354e', be: '#2b2c30', accent: '#386af5' };
 
     Chart.defaults.scale.grid.display = false;
     Chart.defaults.scale.grid.drawBorder = false;
