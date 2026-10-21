@@ -582,3 +582,9 @@ span.flatpickr-weekday {
 .flatpickr-months, .flatpickr-weekdays, span.flatpickr-weekday, .flatpickr-month, .flatpickr-current-month, .flatpickr-months .flatpickr-month {
     background: transparent !important;
 }
+
+/* Custom Scrollbars */
+::-webkit-scrollbar { width: 8px; height: 8px; }
+::-webkit-scrollbar-track { background: var(--bg-main); }
+::-webkit-scrollbar-thumb { background: #2D2E33; border-radius: 4px; }
+::-webkit-scrollbar-thumb:hover { background: #3B434C; }
