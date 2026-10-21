@@ -145,11 +145,11 @@
                             <h3 class="card-title">Top 5 setup effectiveness</h3>
                             <div class="chart-wrapper"><canvas id="setupChart"></canvas></div>
                         </div>
-                        <div class="stat-card">
+                        <div class="stat-card" id="stat-card-invalidation">
                             <h3 class="card-title">Top 5 invalidation losses</h3>
                             <div class="chart-wrapper"><canvas id="invalidationChart"></canvas></div>
                         </div>
-                        <div class="stat-card">
+                        <div class="stat-card" id="stat-card-psychology">
                             <h3 class="card-title">Top 5 Psychology</h3>
                             <div class="chart-wrapper"><canvas id="psychologyChart"></canvas></div>
                         </div>
@@ -353,7 +353,7 @@
                         </div>
                     </div>
 
-                    <!-- Setup Parameters -->
+                                        <!-- Setup Parameters -->
                     <div class="form-separator section-header">
                         <span>Location</span>
                         <button type="button" class="btn-secondary add-confluence-btn" id="btn-add-location">+ Add Confluence</button>
@@ -377,42 +377,50 @@
                         </div>
                     </div>
 
-                    <div class="form-separator section-header">
-                        <span>Evidence</span>
-                        <button type="button" class="btn-secondary add-confluence-btn" id="btn-add-evidence">+ Add Confluence</button>
-                    </div>
-                    <div id="evidence-container" class="multi-container"></div>
-
-                    <div class="form-separator section-header">
-                        <span>Invalidation</span>
-                        <button type="button" class="btn-secondary add-confluence-btn" id="btn-add-invalidation">+ Add Confluence</button>
-                    </div>
-                    <div id="invalidation-container" class="multi-container"></div>
-
-                    <div class="form-separator">Target</div>
-                    <div class="form-grid compact-grid">
-                        <div class="form-group">
-                            <select id="t-target" class="linear-input"></select>
+                    <div id="section-evidence">
+                        <div class="form-separator section-header">
+                            <span>Evidence</span>
+                            <button type="button" class="btn-secondary add-confluence-btn" id="btn-add-evidence">+ Add Confluence</button>
                         </div>
-                        <div class="form-group">
-                            <select id="t-target-sub1" class="linear-input" disabled></select>
+                        <div id="evidence-container" class="multi-container"></div>
+                    </div>
+
+                    <div id="section-invalidation">
+                        <div class="form-separator section-header">
+                            <span>Invalidation</span>
+                            <button type="button" class="btn-secondary add-confluence-btn" id="btn-add-invalidation">+ Add Confluence</button>
                         </div>
-                        <div class="form-group">
-                            <select id="t-target-sub2" class="linear-input" disabled></select>
+                        <div id="invalidation-container" class="multi-container"></div>
+                    </div>
+
+                    <div id="section-target">
+                        <div class="form-separator">Target</div>
+                        <div class="form-grid compact-grid">
+                            <div class="form-group">
+                                <select id="t-target" class="linear-input"></select>
+                            </div>
+                            <div class="form-group">
+                                <select id="t-target-sub1" class="linear-input" disabled></select>
+                            </div>
+                            <div class="form-group">
+                                <select id="t-target-sub2" class="linear-input" disabled></select>
+                            </div>
                         </div>
                     </div>
                     
-                    <div class="form-separator">Psychology</div>
-                    <div class="form-grid compact-grid single-col">
-                        <div class="form-group custom-multi-select">
-                            <div class="multi-select-header linear-input" id="psych-select-header">
-                                <div class="selected-pills" id="psych-selected-pills">
-                                    <span class="placeholder">Select psychology states...</span>
+                    <div id="section-psychology">
+                        <div class="form-separator">Psychology</div>
+                        <div class="form-grid compact-grid single-col">
+                            <div class="form-group custom-multi-select">
+                                <div class="multi-select-header linear-input" id="psych-select-header">
+                                    <div class="selected-pills" id="psych-selected-pills">
+                                        <span class="placeholder">Select psychology states...</span>
+                                    </div>
+                                    <span class="chevron"></span>
                                 </div>
-                                <span class="chevron"></span>
-                            </div>
-                            <div class="multi-select-dropdown" id="psych-dropdown">
-                                <!-- Checkboxes injected via JS -->
+                                <div class="multi-select-dropdown" id="psych-dropdown">
+                                    <!-- Checkboxes injected via JS -->
+                                </div>
                             </div>
                         </div>
                     </div>

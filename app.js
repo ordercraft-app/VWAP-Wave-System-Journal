@@ -131,7 +131,8 @@ let appData = {
         evidence: {},
         invalidation: {},
         psychology: [],
-        target: { "VWAP": { sub1: [], sub2: [] } }
+        target: { "VWAP": { sub1: [], sub2: [] } },
+        features: { evidence: true, invalidation: true, target: true, psychology: true }
     }
 };
 
@@ -234,7 +235,8 @@ document.addEventListener('DOMContentLoaded', async () => {
                   "Volume profile": { "sub1": ["Globex", "RTH", "Composite"], "sub2": ["VAH", "POC", "VAL", "LVN", "HVN"] },
                   "IB": { "sub1": ["Current", "Previous"], "sub2": ["High", "Mid", "Low", "High +50%", "High +100%", "High +200%", "Low -50%", "Low -100%", "Low -200%"] }
                 },
-                "marketCondition": ["Balance", "Imbalance"],
+                "features": { "evidence": true, "invalidation": true, "target": true, "psychology": true },
+    "marketCondition": ["Balance", "Imbalance"],
                 "setup": ["Price Discovery Continuation", "Fade value area extremes", "Return to value", "VWAP Bounce", "Madonna", "VWAP/POC Scalpes in balance", "Late Entry Continuation", "Inside HTF balance fades", "IB Extension fades"],
                 "direction": ["Long", "Short"],
                 "evidence": {
@@ -353,6 +355,16 @@ async function loadDataFromFile() {
                         if (typeof trade.invalidations[0] === 'string') {
                             trade.invalidations = trade.invalidations.map(inv => ({primary: 'Legacy', sub: inv}));
                         }
+                    }
+
+                    // Features Migration
+                    if (!appData.settings.features) {
+                        appData.settings.features = {
+                            evidence: true,
+                            invalidation: true,
+                            target: true,
+                            psychology: true
+                        };
                     }
 
                     // Psychology to Notes Migration
@@ -739,6 +751,7 @@ async function renderDashboard() {
             ]
         }
     },
+    "features": { "evidence": true, "invalidation": true, "target": true, "psychology": true },
     "marketCondition": [
         "Balance",
         "Imbalance"
@@ -959,19 +972,22 @@ async function renderDashboard() {
                         <span class="group-title">Setup</span>
                         <div class="group-value">${formatHierarchy(trade.setup, trade.direction)}</div>
                     </div>
+                    ${appData.settings.features.evidence ? `
                     <div class="card-group">
                         <span class="group-title">Evidence</span>
                         <div class="group-value">${formatMultiHierarchy(trade.evidences)}</div>
-                    </div>
+                    </div>` : ''}
+                    ${appData.settings.features.invalidation ? `
                     <div class="card-group">
                         <span class="group-title">Invalidation</span>
                         <div class="group-value">${formatMultiHierarchy(trade.invalidations)}</div>
-                    </div>
+                    </div>` : ''}
+                    ${appData.settings.features.target ? `
                     <div class="card-group">
                         <span class="group-title">Target</span>
                         <div class="group-value">${formatHierarchy(trade.target, trade.targetSub1, trade.targetSub2)}</div>
-                    </div>
-                    ${trade.psychology && trade.psychology.length > 0 ? `
+                    </div>` : ''}
+                    ${(appData.settings.features.psychology && trade.psychology && trade.psychology.length > 0) ? `
                     <div class="card-group psych-group">
                         <span class="group-title">Psychology</span>
                         <div class="group-value">
@@ -1234,6 +1250,12 @@ async function openTradeModal(tradeId = null) {
         updateDependentDropdowns({});
     }
 
+    if(!appData.settings.features) appData.settings.features = {evidence:true, invalidation:true, target:true, psychology:true};
+    document.getElementById('section-evidence').style.display = appData.settings.features.evidence ? 'block' : 'none';
+    document.getElementById('section-invalidation').style.display = appData.settings.features.invalidation ? 'block' : 'none';
+    document.getElementById('section-target').style.display = appData.settings.features.target ? 'block' : 'none';
+    document.getElementById('section-psychology').style.display = appData.settings.features.psychology ? 'block' : 'none';
+
     tradeModal.classList.add('active');
     
     // Reset scroll to top AFTER modal is visible
@@ -1490,16 +1512,42 @@ function renderSetupCombined(onChange) {
     return container;
 }
 
-function renderComplexSetting(title, configObj, type, onChange) {
+function renderComplexSetting(title, configObj, type, onChange, toggleKey = null) {
     const container = document.createElement('div');
     container.className = 'setting-category-card';
     
+    const headerWrapper = document.createElement('div');
+    headerWrapper.style.display = 'flex';
+    headerWrapper.style.justifyContent = 'space-between';
+    headerWrapper.style.alignItems = 'center';
+    headerWrapper.style.marginBottom = '16px';
+
     const header = document.createElement('h3');
     header.textContent = title;
     header.className = 'setting-cat-title';
-    container.appendChild(header);
-    
+    header.style.marginBottom = '0';
+    headerWrapper.appendChild(header);
+
     const itemsWrapper = document.createElement('div');
+
+    if (toggleKey) {
+        if (!appData.settings.features) appData.settings.features = {};
+        if (appData.settings.features[toggleKey] === undefined) appData.settings.features[toggleKey] = true;
+        
+        const isEnabled = appData.settings.features[toggleKey];
+        const toggleBtn = document.createElement('button');
+        toggleBtn.className = isEnabled ? 'btn-secondary btn-sm' : 'btn-primary btn-sm';
+        toggleBtn.textContent = isEnabled ? 'Disable' : 'Enable';
+        toggleBtn.onclick = () => {
+            appData.settings.features[toggleKey] = !appData.settings.features[toggleKey];
+            onChange();
+            renderSettingsUI();
+        };
+        headerWrapper.appendChild(toggleBtn);
+        if (!isEnabled) itemsWrapper.style.display = 'none';
+    }
+
+    container.appendChild(headerWrapper);
     itemsWrapper.className = 'setting-items-wrapper';
     container.appendChild(itemsWrapper);
     
@@ -1646,16 +1694,44 @@ function renderComplexSetting(title, configObj, type, onChange) {
     return container;
 }
 
-function renderSimpleSetting(title, dataArray, onChange) {
+function renderSimpleSetting(title, dataArray, onChange, toggleKey = null) {
     const container = document.createElement('div');
     container.className = 'setting-category-card';
     
+    const headerWrapper = document.createElement('div');
+    headerWrapper.style.display = 'flex';
+    headerWrapper.style.justifyContent = 'space-between';
+    headerWrapper.style.alignItems = 'center';
+    headerWrapper.style.marginBottom = '16px';
+
     const header = document.createElement('h3');
     header.textContent = title;
     header.className = 'setting-cat-title';
-    container.appendChild(header);
+    header.style.marginBottom = '0';
+    headerWrapper.appendChild(header);
     
-    container.appendChild(createPillBox(dataArray, onChange));
+    container.appendChild(headerWrapper);
+
+    const pillBox = createPillBox(dataArray, onChange);
+
+    if (toggleKey) {
+        if (!appData.settings.features) appData.settings.features = {};
+        if (appData.settings.features[toggleKey] === undefined) appData.settings.features[toggleKey] = true;
+
+        const isEnabled = appData.settings.features[toggleKey];
+        const toggleBtn = document.createElement('button');
+        toggleBtn.className = isEnabled ? 'btn-secondary btn-sm' : 'btn-primary btn-sm';
+        toggleBtn.textContent = isEnabled ? 'Disable' : 'Enable';
+        toggleBtn.onclick = () => {
+            appData.settings.features[toggleKey] = !appData.settings.features[toggleKey];
+            onChange();
+            renderSettingsUI();
+        };
+        headerWrapper.appendChild(toggleBtn);
+        if (!isEnabled) pillBox.style.display = 'none';
+    }
+
+    container.appendChild(pillBox);
     return container;
 }
 
@@ -1670,10 +1746,10 @@ function renderSettingsUI() {
     settingsContainer.appendChild(renderComplexSetting('Location', appData.settings.location, '3-level', onSettingsChange));
     settingsContainer.appendChild(renderSimpleSetting('Market Condition', appData.settings.marketCondition, onSettingsChange));
     settingsContainer.appendChild(renderSetupCombined(onSettingsChange));
-    settingsContainer.appendChild(renderComplexSetting('Evidence', appData.settings.evidence, '2-level', onSettingsChange));
-    settingsContainer.appendChild(renderComplexSetting('Invalidation', appData.settings.invalidation, '2-level', onSettingsChange));
-    settingsContainer.appendChild(renderComplexSetting('Target', appData.settings.target, '3-level', onSettingsChange));
-    settingsContainer.appendChild(renderSimpleSetting('Psychology', appData.settings.psychology, onSettingsChange));
+    settingsContainer.appendChild(renderComplexSetting('Evidence', appData.settings.evidence, '2-level', onSettingsChange, 'evidence'));
+    settingsContainer.appendChild(renderComplexSetting('Invalidation', appData.settings.invalidation, '2-level', onSettingsChange, 'invalidation'));
+    settingsContainer.appendChild(renderComplexSetting('Target', appData.settings.target, '3-level', onSettingsChange, 'target'));
+    settingsContainer.appendChild(renderSimpleSetting('Psychology', appData.settings.psychology, onSettingsChange, 'psychology'));
 }
 
 // --- Chart.js Settings & Stats Dashboard ---
