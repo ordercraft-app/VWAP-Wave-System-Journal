@@ -1917,7 +1917,7 @@ function renderStatsDashboard() {
         return true;
     });
 
-    const colors = { win: '#bde352', loss: '#ee354e', be: '#888888', accent: '#386af5' };
+    const colors = { win: '#51dc26', loss: '#ee354e', be: '#2b2c30', accent: '#386af5' };
 
     Chart.defaults.scale.grid.display = false;
     Chart.defaults.scale.grid.drawBorder = false;
@@ -2139,9 +2139,9 @@ function renderStatsDashboard() {
         data: {
             labels: sortedLocLabels,
             datasets: [
-                { label: 'Wins', data: sortedLocWins, backgroundColor: colors.win },
-                { label: 'Losses', data: sortedLocLosses, backgroundColor: colors.loss },
-                { label: 'B/E', data: sortedLocBE, backgroundColor: colors.be }
+                { label: 'Wins', data: sortedLocWins, backgroundColor: colors.win, borderRadius: 4 },
+                { label: 'Losses', data: sortedLocLosses, backgroundColor: colors.loss, borderRadius: 4 },
+                { label: 'B/E', data: sortedLocBE, backgroundColor: colors.be, borderRadius: 4 }
             ]
         },
         options: { 
