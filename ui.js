@@ -1346,6 +1346,12 @@ function renderSettingsUI() {
             { key: 'location', label: 'Location Effectiveness Heatmap' }
         ];
         
+        // Wrap inside a container with an 8px gap
+        const chartsWrapper = document.createElement('div');
+        chartsWrapper.style.display = 'flex';
+        chartsWrapper.style.flexDirection = 'column';
+        chartsWrapper.style.gap = '8px';
+
         chartsConfig.forEach(c => {
             if (c.depends && !appData.settings.features[c.depends]) return; 
             
@@ -1368,8 +1374,10 @@ function renderSettingsUI() {
             
             row.appendChild(label);
             row.appendChild(btn);
-            settingsContainer.appendChild(row);
+            chartsWrapper.appendChild(row);
         });
+        
+        settingsContainer.appendChild(chartsWrapper);
     }
 }
 
