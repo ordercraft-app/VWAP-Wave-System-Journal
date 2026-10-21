@@ -1942,7 +1942,7 @@ function renderStatsDashboard() {
     });
 
     // Bar Charts Helper
-    function renderBarChart(chartId, attribute, horizontal = false, hideAxis = false) {
+    function renderBarChart(chartId, attribute, horizontal = false, hideAxis = false, maxItems = null) {
         const grouped = groupByAttribute(trades, attribute);
         let stats = Object.keys(grouped).map(label => {
             const wData = getWinRateData(grouped[label]);
@@ -1967,13 +1967,13 @@ function renderStatsDashboard() {
             type: 'bar',
             data: {
                 labels: labels,
-                datasets: [{ label: 'Win Rate %', data: winRates, backgroundColor: colors.accent, borderRadius: 10, borderSkipped: false }]
+                datasets: [{ label: 'Win Rate %', data: winRates, backgroundColor: colors.accent, borderRadius: {topLeft: 12, topRight: 12, bottomLeft: 12, bottomRight: 12}, borderSkipped: false }]
             },
             options: { clip: false, maintainAspectRatio: false, indexAxis: horizontal ? 'y' : 'x', scales: scales, plugins: { legend: { display: false } } }
         });
     }
 
-    renderBarChart('symbolChart', 'symbol', false, true);
+    renderBarChart('symbolChart', 'symbol', false, true, 5);
     
     // Setup Effectiveness (Top 5)
     const setupGroup = groupByAttribute(trades, 'setup');
@@ -1992,7 +1992,7 @@ function renderStatsDashboard() {
         type: 'bar',
         data: {
             labels: top5Setups.map(s => s.setup),
-            datasets: [{ label: 'Win Rate %', data: top5Setups.map(s => s.winRate), backgroundColor: colors.accent, borderRadius: 10, borderSkipped: false }]
+            datasets: [{ label: 'Win Rate %', data: top5Setups.map(s => s.winRate), backgroundColor: colors.accent, borderRadius: {topLeft: 12, topRight: 12, bottomLeft: 12, bottomRight: 12}, borderSkipped: false }]
         },
         options: { clip: false, maintainAspectRatio: false, indexAxis: 'y', scales: { x: { display: false, beginAtZero: true, max: 100 }, y: { display: true } }, plugins: { legend: { display: false } } }
     });
@@ -2035,7 +2035,7 @@ function renderStatsDashboard() {
             type: 'bar',
             data: {
                 labels: top5Psych.map(s => s.psych),
-                datasets: [{ label: 'Count', data: top5Psych.map(s => s.total), backgroundColor: colors.accent, borderRadius: 10, borderSkipped: false }]
+                datasets: [{ label: 'Count', data: top5Psych.map(s => s.total), backgroundColor: colors.accent, borderRadius: {topLeft: 12, topRight: 12, bottomLeft: 12, bottomRight: 12}, borderSkipped: false }]
             },
             options: { clip: false, maintainAspectRatio: false, indexAxis: 'y', scales: { x: { display: false, beginAtZero: true }, y: { display: true } }, plugins: { legend: { display: false } } }
         });
@@ -2063,7 +2063,7 @@ function renderStatsDashboard() {
             type: 'bar',
             data: {
                 labels: sortedInvs.map(i => i[0]),
-                datasets: [{ label: 'Loss Count', data: sortedInvs.map(i => i[1]), backgroundColor: colors.loss, borderRadius: 10, borderSkipped: false }]
+                datasets: [{ label: 'Loss Count', data: sortedInvs.map(i => i[1]), backgroundColor: colors.loss, borderRadius: {topLeft: 12, topRight: 12, bottomLeft: 12, bottomRight: 12}, borderSkipped: false }]
             },
             options: { clip: false, maintainAspectRatio: false, indexAxis: 'y', scales: { x: { display: false }, y: { display: true } }, plugins: { legend: { display: false } } }
         });
@@ -2107,7 +2107,7 @@ function renderStatsDashboard() {
         type: 'bar',
         data: {
             labels: Object.keys(confGroups),
-            datasets: [{ label: 'Win Rate %', data: Object.keys(confGroups).map(k => getWinRateData(confGroups[k]).winRate), backgroundColor: colors.win, borderRadius: 10, borderSkipped: false }]
+            datasets: [{ label: 'Win Rate %', data: Object.keys(confGroups).map(k => getWinRateData(confGroups[k]).winRate), backgroundColor: colors.win, borderRadius: {topLeft: 12, topRight: 12, bottomLeft: 12, bottomRight: 12}, borderSkipped: false }]
         },
         options: { maintainAspectRatio: false, scales: { y: { display: false, beginAtZero: true, max: 100 } }, plugins: { legend: { display: false } } }
     });
@@ -2154,9 +2154,9 @@ function renderStatsDashboard() {
         data: {
             labels: sortedLocLabels,
             datasets: [
-                { label: 'Wins', data: sortedLocWins, backgroundColor: colors.win, borderRadius: 10, borderSkipped: false },
-                { label: 'Losses', data: sortedLocLosses, backgroundColor: colors.loss, borderRadius: 10, borderSkipped: false },
-                { label: 'B/E', data: sortedLocBE, backgroundColor: colors.be, borderRadius: 10, borderSkipped: false }
+                { label: 'Wins', data: sortedLocWins, backgroundColor: colors.win, borderRadius: {topLeft: 12, topRight: 12, bottomLeft: 12, bottomRight: 12}, borderSkipped: false, borderWidth: 3, borderColor: '#141517' },
+                { label: 'Losses', data: sortedLocLosses, backgroundColor: colors.loss, borderRadius: {topLeft: 12, topRight: 12, bottomLeft: 12, bottomRight: 12}, borderSkipped: false, borderWidth: 3, borderColor: '#141517' },
+                { label: 'B/E', data: sortedLocBE, backgroundColor: colors.be, borderRadius: {topLeft: 12, topRight: 12, bottomLeft: 12, bottomRight: 12}, borderSkipped: false, borderWidth: 3, borderColor: '#141517' }
             ]
         },
         options: { 
