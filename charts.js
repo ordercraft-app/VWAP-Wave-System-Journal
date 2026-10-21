@@ -222,7 +222,7 @@ function renderStatsDashboard() {
                     below: 'rgba(238, 53, 78, 0.15)'
                 },
                 borderWidth: 2,
-                tension: 0.1,
+                tension: 0.4,
                 pointRadius: 0,
                 pointHitRadius: 0,
                 pointHoverRadius: 0,
