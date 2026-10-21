@@ -2010,23 +2010,37 @@ function renderStatsDashboard() {
         options: { maintainAspectRatio: false, plugins: { legend: { position: 'bottom', labels: { color: '#888', usePointStyle: true, pointStyle: 'circle' } } } }
     });
 
-    // Top 5 Psychology (Frequency)
-    const psychGroup = {};
-    trades.forEach(t => {
-        (t.psychology || []).forEach(p => {
-            if(!psychGroup[p]) psychGroup[p] = [];
-            psychGroup[p].push(t);
+        // Top 5 Psychology (Frequency)
+    const statCardPsych = document.getElementById('stat-card-psychology');
+    if (appData.settings.features.psychology) {
+        if(statCardPsych) statCardPsych.style.display = 'flex';
+        const psychGroup = {};
+        trades.forEach(t => {
+            (t.psychology || []).forEach(p => {
+                if(!psychGroup[p]) psychGroup[p] = [];
+                psychGroup[p].push(t);
+            });
         });
-    });
-    const psychStats = Object.keys(psychGroup).map(p => {
-        return { psych: p, total: psychGroup[p].length };
-    });
-    psychStats.sort((a, b) => {
-        return b.total - a.total; // Sort strictly by frequency
-    });
-    const top5Psych = psychStats.slice(0, 5);
-
-    destroyChart('psychologyChart');
+        const psychStats = Object.keys(psychGroup).map(p => {
+            return { psych: p, total: psychGroup[p].length };
+        });
+        psychStats.sort((a, b) => {
+            return b.total - a.total; // Sort strictly by frequency
+        });
+        const top5Psych = psychStats.slice(0, 5);
+        destroyChart('psychologyChart');
+        chartInstances['psychologyChart'] = new Chart(document.getElementById('psychologyChart'), {
+            type: 'bar',
+            data: {
+                labels: top5Psych.map(s => s.psych),
+                datasets: [{ label: 'Count', data: top5Psych.map(s => s.total), backgroundColor: colors.accent, borderRadius: 4 }]
+            },
+            options: { maintainAspectRatio: false, indexAxis: 'y', scales: { x: { display: false, beginAtZero: true }, y: { display: true } }, plugins: { legend: { display: false } } }
+        });
+    } else {
+        if(statCardPsych) statCardPsych.style.display = 'none';
+        destroyChart('psychologyChart');
+    }
     chartInstances['psychologyChart'] = new Chart(document.getElementById('psychologyChart'), {
         type: 'bar',
         data: {
