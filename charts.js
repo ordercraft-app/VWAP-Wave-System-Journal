@@ -213,13 +213,19 @@ function renderStatsDashboard() {
                 label: 'Growth',
                 data: growthData,
                 borderColor: colors.accent,
-                backgroundColor: 'rgba(56, 106, 245, 0.1)',
+                segment: {
+                    borderColor: ctx => ctx.p1.parsed.y < 0 ? colors.loss : colors.accent
+                },
+                fill: {
+                    target: 'origin',
+                    above: 'rgba(56, 106, 245, 0.1)',
+                    below: 'rgba(238, 53, 78, 0.15)'
+                },
                 borderWidth: 2,
-                fill: true,
                 tension: 0.1,
-                pointRadius: 0, // hide dots for a clean line
-                pointHitRadius: 10,
-                pointHoverRadius: 4,
+                pointRadius: 0,
+                pointHitRadius: 0,
+                pointHoverRadius: 0,
             }]
         },
         options: { 
@@ -229,25 +235,17 @@ function renderStatsDashboard() {
                 intersect: false,
             },
             scales: { 
-                x: { display: false }, // Completely hide bottom scale
+                x: { display: false },
                 y: { 
                     display: true,
                     border: { display: false },
-                    grid: { color: (ctx) => ctx.tick.value === 0 ? 'rgba(255,255,255,0.1)' : 'transparent' } // Subtle zero line
+                    ticks: { display: false },
+                    grid: { color: (ctx) => ctx.tick.value === 0 ? 'rgba(255,255,255,0.1)' : 'transparent' }
                 } 
             }, 
             plugins: { 
                 legend: { display: false },
-                tooltip: {
-                    callbacks: {
-                        title: (context) => {
-                            const idx = context[0].dataIndex;
-                            if (idx === 0) return 'Starting Point';
-                            return `Date: ${tooltipsInfo[idx].date} | Result: ${tooltipsInfo[idx].result}`;
-                        },
-                        label: (context) => `Score: ${context.raw}`
-                    }
-                }
+                tooltip: { enabled: false }
             } 
         }
     });
