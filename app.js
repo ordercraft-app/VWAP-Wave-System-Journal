@@ -1756,7 +1756,7 @@ function renderSettingsUI() {
 let chartInstances = {};
 
 Chart.defaults.color = '#888888';
-Chart.defaults.font.family = 'Inter';
+Chart.defaults.font.family = 'Aspekta';
 Chart.defaults.scale.grid.color = '#2D2E33';
 
 function getWinRateData(tradesArray) {
@@ -2006,7 +2006,7 @@ function renderStatsDashboard() {
     destroyChart('directionChart');
     chartInstances['directionChart'] = new Chart(document.getElementById('directionChart'), {
         type: 'doughnut',
-        data: { labels: dirLabels, datasets: [{ data: dirWins, backgroundColor: [colors.accent, '#4A5561'], borderWidth: 0 }] },
+        data: { labels: dirLabels, datasets: [{ data: dirWins, backgroundColor: [colors.accent, '#2b2c30'], borderWidth: 0 }] },
         options: { maintainAspectRatio: false, plugins: { legend: { position: 'bottom', labels: { color: '#888', usePointStyle: true, pointStyle: 'circle' } } } }
     });
 

@@ -1,20 +1,45 @@
+@font-face {
+    font-family: 'Aspekta';
+    src: url('./fonts/Aspekta-300.woff2') format('woff2');
+    font-weight: 300;
+    font-style: normal;
+}
+@font-face {
+    font-family: 'Aspekta';
+    src: url('./fonts/Aspekta-400.woff2') format('woff2');
+    font-weight: 400;
+    font-style: normal;
+}
+@font-face {
+    font-family: 'Aspekta';
+    src: url('./fonts/Aspekta-500.woff2') format('woff2');
+    font-weight: 500;
+    font-style: normal;
+}
+@font-face {
+    font-family: 'Aspekta';
+    src: url('./fonts/Aspekta-600.woff2') format('woff2');
+    font-weight: 600;
+    font-style: normal;
+}
+
 /* Linear Inspired Theme */
 :root {
-    --bg-main: #0E0F11;
-    --bg-panel: #1A1B1E;
-    --bg-input: #232428;
+    --bg-main: #0a0b0d;
+    --bg-panel: #141517;
+    --bg-input: #1d1e21;
     --border-color: #2D2E33;
     --text-main: #EEEEEE;
     --text-muted: #888888;
-    --accent: #5E6AD2;
-    --accent-hover: #6E79D6;
-    --danger: #E05252;
-    --success: #3EBC74;
+    --accent: #386af5;
+    --accent-hover: #4071f7;
+    --danger: #ee354e;
+    --success: #bde352;
     --warning: #F5A623;
     
     /* Calendar widget specific */
-    --cal-bg-default: #232428;
-    --cal-bg-active: #313338;
+    --cal-bg-default: #1d1e21;
+    --cal-bg-active: #2b2c30;
     --cal-text-dim: #6E727A;
 }
 
@@ -25,7 +50,7 @@
 }
 
 body {
-    font-family: 'Inter', system-ui, -apple-system, sans-serif;
+    font-family: 'Aspekta', system-ui, -apple-system, sans-serif;
     background-color: var(--bg-main);
     color: var(--text-main);
     height: 100vh;
@@ -70,7 +95,7 @@ body {
 .sidebar-nav .btn-icon {
     width: 40px;
     height: 40px;
-    border-radius: 8px;
+    border-radius:  100px;
 }
 
 .sidebar-nav .btn-icon.active {
@@ -123,7 +148,7 @@ body {
 .view { display: none; flex-direction: column; height: 100%; padding: 32px 48px; overflow-y: auto; }
 .view.active { display: flex; }
 
-button { font-family: inherit; font-size: 13px; cursor: pointer; border-radius: 6px; padding: 8px 16px; font-weight: 500; transition: all 0.2s; white-space: nowrap; }
+button { font-family: inherit; font-size: 13px; cursor: pointer; border-radius:  100px; padding: 8px 16px; font-weight: 500; transition: all 0.2s; white-space: nowrap; }
 .btn-secondary { background-color: var(--bg-input); border: 1px solid var(--border-color); color: var(--text-main); }
 .btn-secondary:hover { background-color: #2A2B30; }
 .btn-primary { background-color: var(--accent); border: 1px solid var(--accent); color: white; }
@@ -140,7 +165,7 @@ button { font-family: inherit; font-size: 13px; cursor: pointer; border-radius: 
     align-items: center;
     justify-content: center;
     padding: 8px;
-    border-radius: 6px;
+    border-radius:  100px;
     cursor: pointer;
     transition: all 0.2s;
     min-width: 36px;
@@ -218,7 +243,7 @@ select.linear-input {
     border: 1px solid transparent;
 }
 .cal-day:hover { background-color: var(--cal-bg-active); }
-.cal-day.active { background-color: #3B434C; border-color: #4A5561; }
+.cal-day.active { background-color: #3B434C; border-color: #2b2c30; }
 .cal-day-name { font-size: 11px; font-weight: 500; color: var(--cal-text-dim); margin-bottom: 6px; text-transform: capitalize; }
 .cal-day.active .cal-day-name { color: #E2E4E9; }
 .cal-day-num { font-size: 18px; font-weight: 500; color: var(--text-main); }
@@ -252,7 +277,7 @@ select.linear-input {
     flex-direction: row;
     gap: 20px;
 }
-.trade-card:hover { border-color: #4A5561; }
+.trade-card:hover { border-color: #2b2c30; }
 
 .card-image-area { flex: 0 0 220px; display: flex; align-items: stretch; }
 .trade-screenshot-thumb {
