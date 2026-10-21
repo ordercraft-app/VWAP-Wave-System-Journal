@@ -128,8 +128,23 @@ body {
 }
 
 .app-title {
-    font-size: 15px;
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+}
+.title-brand {
+    font-size: 10px;
     font-weight: 600;
+    text-transform: uppercase;
+    color: var(--text-muted);
+    letter-spacing: 0.5px;
+    line-height: 1;
+}
+.title-main {
+    font-size: 16px;
+    font-weight: 600;
+    color: var(--text-main);
+    line-height: 1;
 }
 
 .header-right {
