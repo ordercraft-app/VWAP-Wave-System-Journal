@@ -2041,14 +2041,6 @@ function renderStatsDashboard() {
         if(statCardPsych) statCardPsych.style.display = 'none';
         destroyChart('psychologyChart');
     }
-    chartInstances['psychologyChart'] = new Chart(document.getElementById('psychologyChart'), {
-        type: 'bar',
-        data: {
-            labels: top5Psych.map(s => s.psych),
-            datasets: [{ label: 'Count', data: top5Psych.map(s => s.total), backgroundColor: colors.accent, borderRadius: 4 }]
-        },
-        options: { maintainAspectRatio: false, indexAxis: 'y', scales: { x: { display: false, beginAtZero: true }, y: { display: true } }, plugins: { legend: { display: false } } }
-    });
 
     // Invalidation Top 5
     const statCardInv = document.getElementById('stat-card-invalidation');
