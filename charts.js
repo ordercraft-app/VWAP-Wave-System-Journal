@@ -177,6 +177,81 @@ function renderStatsDashboard() {
     document.getElementById('kpi-winrate').innerText = `${overallStats.winRate}%`;
     document.getElementById('kpi-ratio').innerText = overallStats.losses > 0 ? (overallStats.wins / overallStats.losses).toFixed(2) : overallStats.wins;
 
+    
+    // Growth Chart (Cumulative)
+    let currentScore = 0;
+    let growthData = [];
+    let tooltipsInfo = [];
+    
+    // Sort trades chronologically for the curve
+    let sortedTrades = [...trades].sort((a, b) => {
+        const dateDiff = new Date(a.date) - new Date(b.date);
+        if (dateDiff !== 0) return dateDiff;
+        return (a.number || 0) - (b.number || 0);
+    });
+
+    // Starting point
+    let growthLabels = ['Start'];
+    growthData.push(0);
+    tooltipsInfo.push({ date: '-', result: '-', setup: '-' });
+
+    sortedTrades.forEach(t => {
+        if (t.result === 'WIN') currentScore += 1;
+        else if (t.result === 'LOST') currentScore -= 1;
+        
+        growthLabels.push(t.date);
+        growthData.push(currentScore);
+        tooltipsInfo.push({ date: t.date, result: t.result, setup: t.setup });
+    });
+
+    destroyChart('growthChart');
+    chartInstances['growthChart'] = new Chart(document.getElementById('growthChart'), {
+        type: 'line',
+        data: {
+            labels: growthLabels,
+            datasets: [{
+                label: 'Growth',
+                data: growthData,
+                borderColor: colors.accent,
+                backgroundColor: 'rgba(56, 106, 245, 0.1)',
+                borderWidth: 2,
+                fill: true,
+                tension: 0.1,
+                pointRadius: 0, // hide dots for a clean line
+                pointHitRadius: 10,
+                pointHoverRadius: 4,
+            }]
+        },
+        options: { 
+            maintainAspectRatio: false,
+            interaction: {
+                mode: 'index',
+                intersect: false,
+            },
+            scales: { 
+                x: { display: false }, // Completely hide bottom scale
+                y: { 
+                    display: true,
+                    border: { display: false },
+                    grid: { color: (ctx) => ctx.tick.value === 0 ? 'rgba(255,255,255,0.1)' : 'transparent' } // Subtle zero line
+                } 
+            }, 
+            plugins: { 
+                legend: { display: false },
+                tooltip: {
+                    callbacks: {
+                        title: (context) => {
+                            const idx = context[0].dataIndex;
+                            if (idx === 0) return 'Starting Point';
+                            return `Date: ${tooltipsInfo[idx].date} | Result: ${tooltipsInfo[idx].result}`;
+                        },
+                        label: (context) => `Score: ${context.raw}`
+                    }
+                }
+            } 
+        }
+    });
+
     // Overall Win/Loss Doughnut
     destroyChart('winLossChart');
     chartInstances['winLossChart'] = new Chart(document.getElementById('winLossChart'), {
