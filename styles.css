@@ -721,3 +721,7 @@ span.flatpickr-weekday {
 .hotkey-table th { background-color: var(--bg-input); color: var(--text-main); font-weight: 600; }
 .hotkey-table .table-section-title { font-weight: 600; background: var(--bg-hover); padding-top: 8px; padding-bottom: 8px; color: var(--text-main); }
 .hotkey-table code { background-color: var(--bg-input); padding: 2px 6px; border-radius: 4px; color: var(--text-main); border: 1px solid var(--border-color); font-size: 11px; white-space: nowrap; }
+
+[data-theme="light"] .cal-day.active {
+    border-color: transparent;
+}
