@@ -32,6 +32,9 @@ let imageRemoved = false;
 
 const datePicker = document.getElementById('date-picker');
 const tradesList = document.getElementById('trades-list');
+const dashboardToolbar = document.getElementById('dashboard-toolbar');
+const btnViewCard = document.getElementById('btn-view-card');
+const btnViewTable = document.getElementById('btn-view-table');
 const btnNewTrade = document.getElementById('btn-new-trade');
 const tradeModal = document.getElementById('trade-modal');
 const btnCloseModal = document.getElementById('btn-close-modal');

@@ -189,6 +189,7 @@ async function renderDashboard() {
     renderWeeklyCalendar();
     revokeObjectUrls();
     tradesList.innerHTML = '';
+    if(dashboardToolbar) dashboardToolbar.style.display = 'none';
     
     if (dirHandle && !fileConnected) {
         tradesList.innerHTML = `
@@ -484,68 +485,100 @@ async function renderDashboard() {
             </div>`;
         }
 
-        card.innerHTML = `
-            ${imageHtml}
-            <div class="card-content-area">
-                <div class="card-header">
-                    <div class="card-trade-id">
-                        ${trade.number || '-'}
-                        ${trade.symbol ? `<span class="symbol-tag">${trade.symbol}</span>` : ''}
-                    </div>
+        if (isTableView) {
+            const row = document.createElement('div');
+            row.className = 'trade-row';
+            
+            let rowImageHtml = imageUrl 
+                ? `<img src="${imageUrl}" class="row-thumb" onclick="openImageViewer('${imageUrl}'); event.stopPropagation();">`
+                : `<div class="row-no-thumb"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect><circle cx="8.5" cy="8.5" r="1.5"></circle><polyline points="21 15 16 10 5 21"></polyline></svg></div>`;
+            
+            let primaryLoc = trade.locations && trade.locations[0] && trade.locations[0].primary ? trade.locations[0].primary : '-';
+            let subLoc = trade.locations && trade.locations[0] && trade.locations[0].sub1 ? trade.locations[0].sub1 : '';
+            
+            row.innerHTML = `
+                ${rowImageHtml}
+                <div class="row-col row-col-id">
+                    <span class="row-primary">#${trade.number || '-'}</span>
+                    <span class="symbol-tag" style="margin-left:0; width: fit-content; margin-top: 2px;">${trade.symbol || '-'}</span>
+                </div>
+                <div class="row-col row-col-setup">
+                    <span class="row-primary" title="${trade.setup || '-'}">${trade.setup || '-'}</span>
+                    <span class="row-secondary" title="${trade.direction || '-'} ${trade.marketCondition ? '| ' + trade.marketCondition : ''}">${trade.direction || '-'} ${trade.marketCondition ? '| ' + trade.marketCondition : ''}</span>
+                </div>
+                <div class="row-col row-col-loc">
+                    <span class="row-primary">Location</span>
+                    <span class="row-secondary" title="${primaryLoc}${subLoc ? ' - ' + subLoc : ''}">${primaryLoc}${subLoc ? ' - ' + subLoc : ''}</span>
+                </div>
+                <div class="row-col row-col-res">
                     <span class="badge ${resultClass}">${trade.result || '-'}</span>
                 </div>
-                <div class="card-body">
-                    <div class="card-group">
-                        <span class="group-title">Location</span>
-                        <div class="group-value">${formatMultiHierarchy(trade.locations)}</div>
+            `;
+            row.addEventListener('click', () => openTradeModal(trade.id));
+            tableContainer.appendChild(row);
+        } else {
+            card.innerHTML = `
+                ${imageHtml}
+                <div class="card-content-area">
+                    <div class="card-header">
+                        <div class="card-trade-id">
+                            ${trade.number || '-'}
+                            ${trade.symbol ? `<span class="symbol-tag">${trade.symbol}</span>` : ''}
+                        </div>
+                        <span class="badge ${resultClass}">${trade.result || '-'}</span>
                     </div>
-                    <div class="card-group">
-                        <span class="group-title">Market Condition</span>
-                        <div class="group-value">${formatHierarchy(trade.marketCondition)}</div>
-                    </div>
-                    <div class="card-group">
-                        <span class="group-title">Setup</span>
-                        <div class="group-value">${formatHierarchy(trade.setup, trade.direction)}</div>
-                    </div>
-                    ${appData.settings.features.evidence ? `
-                    <div class="card-group">
-                        <span class="group-title">Evidence</span>
-                        <div class="group-value">${formatMultiHierarchy(trade.evidences)}</div>
-                    </div>` : ''}
-                    ${appData.settings.features.invalidation ? `
-                    <div class="card-group">
-                        <span class="group-title">Invalidation</span>
-                        <div class="group-value">${formatMultiHierarchy(trade.invalidations)}</div>
-                    </div>` : ''}
-                    ${appData.settings.features.target ? `
-                    <div class="card-group">
-                        <span class="group-title">Target</span>
-                        <div class="group-value">${formatHierarchy(trade.target, trade.targetSub1, trade.targetSub2)}</div>
-                    </div>` : ''}
-                    ${(appData.settings.features.psychology && trade.psychology && trade.psychology.length > 0) ? `
-                    <div class="card-group psych-group">
-                        <span class="group-title">Psychology</span>
-                        <div class="group-value">
-                            <div style="display: flex; flex-wrap: wrap; gap: 6px;">
-                                ${trade.psychology.map(p => `<span class="psych-pill-tag" style="padding-right: 8px;">${p}</span>`).join('')}
+                    <div class="card-body">
+                        <div class="card-group">
+                            <span class="group-title">Location</span>
+                            <div class="group-value">${formatMultiHierarchy(trade.locations)}</div>
+                        </div>
+                        <div class="card-group">
+                            <span class="group-title">Market Condition</span>
+                            <div class="group-value">${formatHierarchy(trade.marketCondition)}</div>
+                        </div>
+                        <div class="card-group">
+                            <span class="group-title">Setup</span>
+                            <div class="group-value">${formatHierarchy(trade.setup, trade.direction)}</div>
+                        </div>
+                        ${appData.settings.features.evidence ? `
+                        <div class="card-group">
+                            <span class="group-title">Evidence</span>
+                            <div class="group-value">${formatMultiHierarchy(trade.evidences)}</div>
+                        </div>` : ''}
+                        ${appData.settings.features.invalidation ? `
+                        <div class="card-group">
+                            <span class="group-title">Invalidation</span>
+                            <div class="group-value">${formatMultiHierarchy(trade.invalidations)}</div>
+                        </div>` : ''}
+                        ${appData.settings.features.target ? `
+                        <div class="card-group">
+                            <span class="group-title">Target</span>
+                            <div class="group-value">${formatHierarchy(trade.target, trade.targetSub1, trade.targetSub2)}</div>
+                        </div>` : ''}
+                        ${(appData.settings.features.psychology && trade.psychology && trade.psychology.length > 0) ? `
+                        <div class="card-group psych-group">
+                            <span class="group-title">Psychology</span>
+                            <div class="group-value">
+                                <div style="display: flex; flex-wrap: wrap; gap: 6px;">
+                                    ${trade.psychology.map(p => `<span class="psych-pill-tag" style="padding-right: 8px;">${p}</span>`).join('')}
+                                </div>
                             </div>
                         </div>
-                    </div>
-                    ` : ''}
-                    ${trade.notes ? `
-                    <div class="card-group psych-group">
-                        <span class="group-title">Notes</span>
-                        <div class="group-value">
-                            <div class="group-primary" style="font-weight: 400; font-size: 13px; white-space: pre-wrap; line-height: 1.5;">${trade.notes}</div>
+                        ` : ''}
+                        ${trade.notes ? `
+                        <div class="card-group psych-group">
+                            <span class="group-title">Notes</span>
+                            <div class="group-value">
+                                <div class="group-primary" style="font-weight: 400; font-size: 13px; white-space: pre-wrap; line-height: 1.5;">${trade.notes}</div>
+                            </div>
                         </div>
+                        ` : ''}
                     </div>
-                    ` : ''}
                 </div>
-            </div>
-        `;
-        
-        card.addEventListener('click', () => openTradeModal(trade.id));
-        tradesList.appendChild(card);
+            `;
+            card.addEventListener('click', () => openTradeModal(trade.id));
+            tradesList.appendChild(card);
+        }
     }
 }
 
