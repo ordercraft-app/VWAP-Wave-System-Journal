@@ -124,7 +124,7 @@ body {
 .header-left {
     display: flex;
     align-items: center;
-    gap: 24px;
+    gap: 16px;
 }
 
 .app-title {
@@ -632,3 +632,9 @@ span.flatpickr-weekday {
 .row-col-res { width: 80px; flex-shrink: 0; display: flex; justify-content: flex-end; }
 .row-primary { font-size: 13px; font-weight: 600; color: var(--text-main); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
 .row-secondary { font-size: 11px; color: var(--text-muted); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+
+.header-divider {
+    width: 1px;
+    height: 32px;
+    background-color: var(--border-color);
+}
