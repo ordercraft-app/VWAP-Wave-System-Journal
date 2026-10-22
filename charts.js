@@ -221,8 +221,12 @@ function renderStatsDashboard() {
             tooltipsInfo.push({ date: t.date, result: t.result, setup: t.setup });
         });
 
-        destroyChart('growthChart');
-        chartInstances['growthChart'] = new Chart(document.getElementById('growthChart'), {
+        if (chartInstances['growthChart']) {
+            chartInstances['growthChart'].data.labels = growthLabels;
+            chartInstances['growthChart'].data.datasets[0].data = growthData;
+            chartInstances['growthChart'].update();
+        } else {
+            chartInstances['growthChart'] = new Chart(document.getElementById('growthChart'), {
             type: 'line',
             data: {
                 labels: growthLabels,
@@ -248,8 +252,11 @@ function renderStatsDashboard() {
 
     // 2. Win/Loss
     handleChartRender('winLossChart', 'winLoss', () => {
-        destroyChart('winLossChart');
-        chartInstances['winLossChart'] = new Chart(document.getElementById('winLossChart'), {
+        if (chartInstances['winLossChart']) {
+            chartInstances['winLossChart'].data.datasets[0].data = [overallStats.wins, overallStats.losses, overallStats.be];
+            chartInstances['winLossChart'].update();
+        } else {
+            chartInstances['winLossChart'] = new Chart(document.getElementById('winLossChart'), {
             type: 'doughnut',
             data: {
                 labels: ['Wins', 'Losses', 'B/E'],
@@ -283,8 +290,13 @@ function renderStatsDashboard() {
             ? { x: { display: !hideAxis, beginAtZero: true, max: 100, border: { display: false }, grid: { display: false } }, y: { display: true, border: { display: false }, grid: { display: false } } }
             : { y: { display: !hideAxis, beginAtZero: true, max: 100, border: { display: false }, grid: { display: false } }, x: { display: true, border: { display: false }, grid: { display: false } } };
 
-        destroyChart(chartId);
-        chartInstances[chartId] = new Chart(document.getElementById(chartId), {
+        if (chartInstances[chartId]) {
+            chartInstances[chartId].data.labels = labels;
+            chartInstances[chartId].data.datasets[0].data = winRates;
+            chartInstances[chartId].options.scales = scales;
+            chartInstances[chartId].update();
+        } else {
+            chartInstances[chartId] = new Chart(document.getElementById(chartId), {
             type: 'bar',
             data: {
                 labels: labels,
@@ -328,8 +340,11 @@ function renderStatsDashboard() {
         const dirGroup = groupByAttribute(trades, 'direction');
         const dirLabels = ['Long', 'Short'];
         const dirWins = dirLabels.map(l => dirGroup[l] ? getWinRateData(dirGroup[l]).wins : 0);
-        destroyChart('directionChart');
-        chartInstances['directionChart'] = new Chart(document.getElementById('directionChart'), {
+        if (chartInstances['directionChart']) {
+            chartInstances['directionChart'].data.datasets[0].data = dirWins;
+            chartInstances['directionChart'].update();
+        } else {
+            chartInstances['directionChart'] = new Chart(document.getElementById('directionChart'), {
             type: 'doughnut',
             data: { labels: dirLabels, datasets: [{ data: dirWins, backgroundColor: [colors.accent, colors.short], borderWidth: 0 }] },
             options: { maintainAspectRatio: false, cutout: '80%', layout: { padding: { top: 30, left: 30, right: 30, bottom: 10 } }, plugins: { legend: { position: 'bottom', labels: { color: '#888', usePointStyle: true, pointStyle: 'circle', padding: 16 } } } }
@@ -343,8 +358,12 @@ function renderStatsDashboard() {
         const psychStats = Object.keys(psychGroup).map(p => ({ psych: p, total: psychGroup[p].length }));
         psychStats.sort((a, b) => b.total - a.total);
         const top5Psych = psychStats.slice(0, 5);
-        destroyChart('psychologyChart');
-        chartInstances['psychologyChart'] = new Chart(document.getElementById('psychologyChart'), {
+        if (chartInstances['psychologyChart']) {
+            chartInstances['psychologyChart'].data.labels = top5Psych.map(s => s.psych);
+            chartInstances['psychologyChart'].data.datasets[0].data = top5Psych.map(s => s.total);
+            chartInstances['psychologyChart'].update();
+        } else {
+            chartInstances['psychologyChart'] = new Chart(document.getElementById('psychologyChart'), {
             type: 'bar',
             data: {
                 labels: top5Psych.map(s => s.psych),
@@ -360,8 +379,12 @@ function renderStatsDashboard() {
         let invCounts = {};
         lostTrades.forEach(t => { (t.invalidations || []).forEach(inv => { const invName = inv.sub ? inv.sub : (inv.primary || inv); invCounts[invName] = (invCounts[invName] || 0) + 1; }); });
         const sortedInvs = Object.entries(invCounts).sort((a, b) => b[1] - a[1]).slice(0, 5);
-        destroyChart('invalidationChart');
-        chartInstances['invalidationChart'] = new Chart(document.getElementById('invalidationChart'), {
+        if (chartInstances['invalidationChart']) {
+            chartInstances['invalidationChart'].data.labels = sortedInvs.map(i => i[0]);
+            chartInstances['invalidationChart'].data.datasets[0].data = sortedInvs.map(i => i[1]);
+            chartInstances['invalidationChart'].update();
+        } else {
+            chartInstances['invalidationChart'] = new Chart(document.getElementById('invalidationChart'), {
             type: 'bar',
             data: {
                 labels: sortedInvs.map(i => i[0]),
@@ -378,8 +401,11 @@ function renderStatsDashboard() {
         trades.forEach(t => { const day = daysMap[new Date(t.date).getDay()]; if(dayGroups[day]) dayGroups[day].push(t); });
         const dayLabels = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'];
         const dayWinRates = dayLabels.map(d => dayGroups[d].length > 0 ? getWinRateData(dayGroups[d]).winRate : 0);
-        destroyChart('dayOfWeekChart');
-        chartInstances['dayOfWeekChart'] = new Chart(document.getElementById('dayOfWeekChart'), {
+        if (chartInstances['dayOfWeekChart']) {
+            chartInstances['dayOfWeekChart'].data.datasets[0].data = dayWinRates;
+            chartInstances['dayOfWeekChart'].update();
+        } else {
+            chartInstances['dayOfWeekChart'] = new Chart(document.getElementById('dayOfWeekChart'), {
             type: 'line',
             data: { labels: dayLabels, datasets: [{ label: 'Win Rate %', data: dayWinRates, borderColor: colors.accent, tension: 0.3, fill: true, backgroundColor: 'rgba(56, 106, 245, 0.1)' }] },
             options: { maintainAspectRatio: false, scales: { y: { display: false, beginAtZero: true, max: 100, border: { display: false }, grid: { display: false } } }, plugins: { legend: { display: false } } }
@@ -397,8 +423,12 @@ function renderStatsDashboard() {
                 else if(count >= 3) confGroups['3+'].push(t);
             }
         });
-        destroyChart('confluenceChart');
-        chartInstances['confluenceChart'] = new Chart(document.getElementById('confluenceChart'), {
+        if (chartInstances['confluenceChart']) {
+            chartInstances['confluenceChart'].data.labels = Object.keys(confGroups);
+            chartInstances['confluenceChart'].data.datasets[0].data = Object.keys(confGroups).map(k => getWinRateData(confGroups[k]).winRate);
+            chartInstances['confluenceChart'].update();
+        } else {
+            chartInstances['confluenceChart'] = new Chart(document.getElementById('confluenceChart'), {
             type: 'bar',
             data: {
                 labels: Object.keys(confGroups),
@@ -439,8 +469,14 @@ function renderStatsDashboard() {
         const sortedLocLosses = locArray.map(item => parseFloat(item.lossPct.toFixed(1)));
         const sortedLocBE = locArray.map(item => parseFloat(item.bePct.toFixed(1)));
         
-        destroyChart('locationChart');
-        chartInstances['locationChart'] = new Chart(document.getElementById('locationChart'), {
+        if (chartInstances['locationChart']) {
+            chartInstances['locationChart'].data.labels = sortedLocLabels;
+            chartInstances['locationChart'].data.datasets[0].data = sortedLocWins;
+            chartInstances['locationChart'].data.datasets[1].data = sortedLocLosses;
+            chartInstances['locationChart'].data.datasets[2].data = sortedLocBE;
+            chartInstances['locationChart'].update();
+        } else {
+            chartInstances['locationChart'] = new Chart(document.getElementById('locationChart'), {
             type: 'bar',
             data: {
                 labels: sortedLocLabels,

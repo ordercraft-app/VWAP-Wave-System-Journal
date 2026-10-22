@@ -24,6 +24,36 @@ document.addEventListener('DOMContentLoaded', async () => {
     setupImageUploadEvents();
         setupImageViewer();
     setupThemeToggle();
+    tradesList.addEventListener('click', (e) => {
+        const imgTarget = e.target.closest('.trade-img-trigger');
+        if (imgTarget) {
+            e.stopPropagation();
+            openImageViewer(imgTarget.dataset.imgUrl);
+            return;
+        }
+        
+        const chevronWrapper = e.target.closest('.row-chevron-wrapper');
+        if (chevronWrapper) {
+            e.stopPropagation();
+            const row = chevronWrapper.closest('.trade-row');
+            const expanded = row.querySelector('.expanded-content');
+            const chevron = row.querySelector('.row-chevron');
+            if (expanded.style.display === 'none') {
+                expanded.style.display = 'block';
+                chevron.style.transform = 'rotate(90deg)';
+            } else {
+                expanded.style.display = 'none';
+                chevron.style.transform = 'rotate(0deg)';
+            }
+            return;
+        }
+        
+        const tradeCard = e.target.closest('.trade-card, .trade-row');
+        if (tradeCard) {
+            const tradeId = tradeCard.dataset.tradeId;
+            if (tradeId) openTradeModal(tradeId);
+        }
+    });
     
     const btnToday = document.getElementById('btn-today');
     if (btnToday) {

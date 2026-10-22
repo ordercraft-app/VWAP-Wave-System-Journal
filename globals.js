@@ -89,3 +89,14 @@ const locationContainer = document.getElementById('location-container');
 const evidenceContainer = document.getElementById('evidence-container');
 const invalidationContainer = document.getElementById('invalidation-container');
 
+
+// --- Security & UI Utils ---
+function escapeHTML(str) {
+    if (str === null || str === undefined) return '';
+    return String(str)
+        .replace(/&/g, '&amp;')
+        .replace(/</g, '&lt;')
+        .replace(/>/g, '&gt;')
+        .replace(/"/g, '&quot;')
+        .replace(/'/g, '&#39;');
+}
