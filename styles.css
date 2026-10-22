@@ -711,3 +711,10 @@ span.flatpickr-weekday {
 @keyframes fadeOut { to { opacity: 0; transform: translateY(10px); } }
 
 .row-chevron-wrapper:hover { background-color: var(--group-border) !important; }
+
+/* Hotkey Table */
+.hotkey-table { width: 100%; border-collapse: collapse; margin-top: 12px; margin-bottom: 12px; font-size: 13px; }
+.hotkey-table th, .hotkey-table td { border: 1px solid var(--border-color); padding: 8px 12px; text-align: left; }
+.hotkey-table th { background-color: var(--bg-input); color: var(--text-main); font-weight: 600; }
+.hotkey-table .table-section-title { font-weight: 600; background: var(--bg-hover); padding-top: 8px; padding-bottom: 8px; color: var(--text-main); }
+.hotkey-table code { background-color: var(--bg-input); padding: 2px 6px; border-radius: 4px; color: var(--text-main); border: 1px solid var(--border-color); font-size: 11px; white-space: nowrap; }

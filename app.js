@@ -55,7 +55,89 @@ document.addEventListener('DOMContentLoaded', async () => {
         }
     });
     
-    const btnToday = document.getElementById('btn-today');
+
+    // --- Hotkeys ---
+    document.addEventListener('keydown', (e) => {
+        const isInputFocused = ['INPUT', 'TEXTAREA', 'SELECT'].includes(document.activeElement.tagName) || document.activeElement.isContentEditable;
+        const isModalOpen = document.getElementById('trade-modal').classList.contains('active');
+        const isDashboardOpen = document.getElementById('view-dashboard').classList.contains('active');
+
+        // Alt/Option combinations
+        if (e.altKey) {
+            if (e.code === 'KeyN') {
+                e.preventDefault();
+                if (!isModalOpen) document.getElementById('btn-new-trade').click();
+                return;
+            }
+            if (e.code === 'KeyM') {
+                e.preventDefault();
+                document.getElementById('btn-theme-toggle').click();
+                return;
+            }
+
+            if (isModalOpen) {
+                if (e.code === 'KeyS') {
+                    e.preventDefault();
+                    document.getElementById('btn-save-trade').click();
+                    return;
+                }
+                if (e.code === 'KeyC') {
+                    e.preventDefault();
+                    document.getElementById('btn-cancel-modal').click();
+                    return;
+                }
+                if (e.code === 'Backspace' || e.key === 'Backspace') {
+                    e.preventDefault();
+                    const btnDel = document.getElementById('btn-delete-trade');
+                    if (btnDel && btnDel.style.display !== 'none') btnDel.click();
+                    return;
+                }
+            } else if (isDashboardOpen) {
+                if (e.code === 'KeyT') {
+                    e.preventDefault();
+                    const btnToday = document.getElementById('btn-today');
+                    if (btnToday) btnToday.click();
+                    return;
+                }
+            }
+        }
+
+        // Non-Alt shortcuts (Dashboard Navigation)
+        if (!e.altKey && isDashboardOpen && !isModalOpen && !isInputFocused) {
+            if (e.code === 'ArrowRight') {
+                e.preventDefault();
+                if (e.shiftKey) {
+                    document.getElementById('cal-next-week').click();
+                } else {
+                    const picker = document.getElementById('date-picker');
+                    let d = new Date(picker.value);
+                    d.setDate(d.getDate() + 1);
+                    const dStr = d.toLocaleDateString('en-CA');
+                    window.fpDatePicker.setDate(dStr);
+                    alignWeekToDate(d);
+                    renderDashboard();
+                }
+                return;
+            }
+            if (e.code === 'ArrowLeft') {
+                e.preventDefault();
+                if (e.shiftKey) {
+                    document.getElementById('cal-prev-week').click();
+                } else {
+                    const picker = document.getElementById('date-picker');
+                    let d = new Date(picker.value);
+                    d.setDate(d.getDate() - 1);
+                    const dStr = d.toLocaleDateString('en-CA');
+                    window.fpDatePicker.setDate(dStr);
+                    alignWeekToDate(d);
+                    renderDashboard();
+                }
+                return;
+            }
+        }
+    });
+
+    const btnToday =  document.getElementById('btn-today');
     if (btnToday) {
         btnToday.addEventListener('click', () => {
             const tStr = new Date().toLocaleDateString('en-CA');
