@@ -467,6 +467,21 @@ async function renderDashboard() {
         return;
     }
 
+    if(dashboardToolbar) dashboardToolbar.style.display = 'flex';
+    if(!appData.settings.viewMode) appData.settings.viewMode = 'card';
+    btnViewCard.classList.toggle('active', appData.settings.viewMode === 'card');
+    btnViewTable.classList.toggle('active', appData.settings.viewMode === 'table');
+    
+    const isTableView = appData.settings.viewMode === 'table';
+    let tableWrapper, tableContainer;
+    if(isTableView) {
+        tableWrapper = document.createElement('div');
+        tableWrapper.className = 'table-responsive-wrapper';
+        tableContainer = document.createElement('div');
+        tableContainer.className = 'trades-table';
+        tableWrapper.appendChild(tableContainer);
+    }
+
     for (const trade of tradesForDate) {
         const resultClass = trade.result ? trade.result.toLowerCase().replace('/', '') : '';
         const card = document.createElement('div');
