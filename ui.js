@@ -595,6 +595,10 @@ async function renderDashboard() {
             tradesList.appendChild(card);
         }
     }
+    
+    if (isTableView && tableWrapper) {
+        tradesList.appendChild(tableWrapper);
+    }
 }
 
 // --- Trade Modal Dynamic Dropdowns (Elements instead of IDs) ---
