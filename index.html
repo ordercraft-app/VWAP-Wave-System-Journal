@@ -46,8 +46,8 @@
                         <span class="title-main">Journal</span>
                     </div>
                     <div class="header-divider"></div>
-                    <button class="btn-secondary btn-sm" id="btn-today" style="margin-right: 8px;">Today</button>
                     <input type="date" id="date-picker" class="linear-input" style="width: auto;">
+                    <button class="btn-secondary" id="btn-today">Today</button>
                 </div>
                 <div class="header-right">
                     <button class="btn-primary" id="btn-new-trade" style="white-space: nowrap;">Add Trade</button>
@@ -463,11 +463,11 @@
                 </form>
             </div>
             <div class="modal-footer">
-                <button class="btn-danger" id="btn-delete-trade" style="display:none;">Delete</button>
-                <div class="footer-right">
-                    <button class="btn-secondary" id="btn-cancel-modal">Cancel</button>
+                <div style="display: flex; gap: 12px;">
                     <button class="btn-primary" id="btn-save-trade">Save Trade</button>
+                    <button class="btn-secondary" id="btn-cancel-modal">Cancel</button>
                 </div>
+                <button class="btn-danger" id="btn-delete-trade" style="display:none;">Delete</button>
             </div>
         </div>
     </div>

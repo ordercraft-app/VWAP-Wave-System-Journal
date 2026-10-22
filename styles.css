@@ -355,7 +355,7 @@ select.linear-input {
 .close-btn { background: none; border: none; color: var(--text-muted); font-size: 20px; padding: 0; }
 .close-btn:hover { color: var(--text-main); }
 .modal-body { padding: 24px; overflow-y: auto; flex: 1; }
-.modal-footer { padding: 20px 24px; border-top: 1px solid var(--border-color); display: flex; justify-content: space-between; align-items: center; background-color: var(--bg-panel); }
+.modal-footer { padding: 20px 24px; border-top: 1px solid var(--border-color); display: flex; justify-content: space-between; align-items: center; background-color: var(--bg-main); }
 .footer-right { display: flex; gap: 12px; margin-left: auto; }
 .form-grid { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 12px; margin-bottom: 16px; }
 .form-grid.single-col { grid-template-columns: 1fr; }
