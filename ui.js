@@ -101,8 +101,8 @@ function hideDropzone() {
 
 function formatHierarchy(primary, sub1, sub2) {
     if (!primary) return '<div class="group-primary">-</div>';
-    const subs = [sub1, sub2].filter(Boolean).join(' - ');
-    let html = `<div class="group-primary">${primary}</div>`;
+    const subs = [sub1, sub2].filter(Boolean).map(escapeHTML).join(' - ');
+    let html = `<div class="group-primary">${escapeHTML(primary)}</div>`;
     if (subs) html += `<div class="group-secondary">${subs}</div>`;
     return html;
 }
@@ -482,10 +482,13 @@ async function renderDashboard() {
         tableWrapper.appendChild(tableContainer);
     }
 
+    const fragment = document.createDocumentFragment();
+
     for (const trade of tradesForDate) {
-        const resultClass = trade.result ? trade.result.toLowerCase().replace('/', '') : '';
+        const resultClass = trade.result ? escapeHTML(trade.result).toLowerCase().replace('/', '') : '';
         const card = document.createElement('div');
         card.className = 'trade-card';
+        card.dataset.tradeId = trade.id;
         
         let imageUrl = null;
         if (trade.screenshot) {
@@ -496,41 +499,42 @@ async function renderDashboard() {
         if (imageUrl) {
             imageHtml = `
             <div class="card-image-area">
-                <img src="${imageUrl}" class="trade-screenshot-thumb" alt="Screenshot" onclick="openImageViewer('${imageUrl}'); event.stopPropagation();">
+                <img src="${imageUrl}" class="trade-screenshot-thumb trade-img-trigger" data-img-url="${imageUrl}" alt="Screenshot">
             </div>`;
         }
+
+        let primaryLoc = trade.locations && trade.locations[0] && trade.locations[0].primary ? escapeHTML(trade.locations[0].primary) : '-';
+        let subLoc1 = trade.locations && trade.locations[0] && trade.locations[0].sub1 ? escapeHTML(trade.locations[0].sub1) : '';
+        let subLoc2 = trade.locations && trade.locations[0] && trade.locations[0].sub2 ? escapeHTML(trade.locations[0].sub2) : '';
+        let subLoc = [subLoc1, subLoc2].filter(Boolean).join(' - ');
 
         if (isTableView) {
             const row = document.createElement('div');
             row.className = 'trade-row';
+            row.dataset.tradeId = trade.id;
             
             let rowImageHtml = imageUrl 
-                ? `<img src="${imageUrl}" class="row-thumb" onclick="openImageViewer('${imageUrl}'); event.stopPropagation();">`
+                ? `<img src="${imageUrl}" class="row-thumb trade-img-trigger" data-img-url="${imageUrl}">`
                 : `<div class="row-no-thumb"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect><circle cx="8.5" cy="8.5" r="1.5"></circle><polyline points="21 15 16 10 5 21"></polyline></svg></div>`;
-            
-            let primaryLoc = trade.locations && trade.locations[0] && trade.locations[0].primary ? trade.locations[0].primary : '-';
-            let subLoc1 = trade.locations && trade.locations[0] && trade.locations[0].sub1 ? trade.locations[0].sub1 : '';
-            let subLoc2 = trade.locations && trade.locations[0] && trade.locations[0].sub2 ? trade.locations[0].sub2 : '';
-            let subLoc = [subLoc1, subLoc2].filter(Boolean).join(' - ');
             
             row.innerHTML = `
                 <div class="row-main" style="display: flex; align-items: center; gap: 16px; width: 100%;">
                     <div class="row-chevron-wrapper" style="padding: 4px 8px; margin-left: -8px; border-radius: 4px; cursor: pointer; display: flex; align-items: center; justify-content: center;" title="Expand details"><svg class="row-chevron" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="transition: transform 0.2s; color: var(--text-muted);"><polyline points="9 18 15 12 9 6"></polyline></svg></div>
                     ${rowImageHtml}
                     <div class="row-col row-col-id" style="flex-direction: row; align-items: center; gap: 8px;">
-                        <span class="row-primary">${trade.number || '-'}</span>
-                        ${trade.symbol ? `<span class="symbol-tag" style="margin:0;">${trade.symbol}</span>` : ''}
+                        <span class="row-primary">${escapeHTML(trade.number || '-')}</span>
+                        ${trade.symbol ? `<span class="symbol-tag" style="margin:0;">${escapeHTML(trade.symbol)}</span>` : ''}
                     </div>
                     <div class="row-col row-col-setup">
-                        <span class="row-primary" title="${trade.setup || '-'}">${trade.setup || '-'}</span>
-                        <span class="row-secondary" title="${trade.direction || '-'} ${trade.marketCondition ? '| ' + trade.marketCondition : ''}">${trade.direction || '-'} ${trade.marketCondition ? '| ' + trade.marketCondition : ''}</span>
+                        <span class="row-primary" title="${escapeHTML(trade.setup || '-')}">${escapeHTML(trade.setup || '-')}</span>
+                        <span class="row-secondary" title="${escapeHTML(trade.direction || '-')} ${trade.marketCondition ? '| ' + escapeHTML(trade.marketCondition) : ''}">${escapeHTML(trade.direction || '-')} ${trade.marketCondition ? '| ' + escapeHTML(trade.marketCondition) : ''}</span>
                     </div>
                     <div class="row-col row-col-loc">
                         <span class="row-primary">${primaryLoc}</span>
                         <span class="row-secondary" title="${subLoc}">${subLoc}</span>
                     </div>
                     <div class="row-col-res" style="margin-left: auto; display: flex; align-items: center;">
-                        <span class="badge ${resultClass}">${trade.result || '-'}</span>
+                        <span class="badge ${resultClass}">${escapeHTML(trade.result || '-')}</span>
                     </div>
                 </div>
                 <div class="expanded-content" style="display: none; width: 100%; margin-top: 16px; padding-top: 16px; border-top: 1px solid var(--border-color);">
@@ -541,11 +545,11 @@ async function renderDashboard() {
                         </div>
                         <div class="card-group">
                             <span class="group-title">Market Condition</span>
-                            <div class="group-value">${formatHierarchy(trade.marketCondition)}</div>
+                            <div class="group-value">${formatHierarchy(escapeHTML(trade.marketCondition))}</div>
                         </div>
                         <div class="card-group">
                             <span class="group-title">Setup</span>
-                            <div class="group-value">${formatHierarchy(trade.setup, trade.direction)}</div>
+                            <div class="group-value">${formatHierarchy(escapeHTML(trade.setup), escapeHTML(trade.direction))}</div>
                         </div>
                         ${appData.settings.features.evidence ? `
                         <div class="card-group">
@@ -560,14 +564,14 @@ async function renderDashboard() {
                         ${appData.settings.features.target ? `
                         <div class="card-group">
                             <span class="group-title">Target</span>
-                            <div class="group-value">${formatHierarchy(trade.target, trade.targetSub1, trade.targetSub2)}</div>
+                            <div class="group-value">${formatHierarchy(escapeHTML(trade.target), escapeHTML(trade.targetSub1), escapeHTML(trade.targetSub2))}</div>
                         </div>` : ''}
                         ${(appData.settings.features.psychology && trade.psychology && trade.psychology.length > 0) ? `
                         <div class="card-group psych-group">
                             <span class="group-title">Psychology</span>
                             <div class="group-value">
                                 <div style="display: flex; flex-wrap: wrap; gap: 6px;">
-                                    ${trade.psychology.map(p => `<span class="psych-pill-tag" style="padding-right: 8px;">${p}</span>`).join('')}
+                                    ${trade.psychology.map(p => `<span class="psych-pill-tag" style="padding-right: 8px;">${escapeHTML(p)}</span>`).join('')}
                                 </div>
                             </div>
                         </div>
@@ -576,39 +580,13 @@ async function renderDashboard() {
                         <div class="card-group psych-group">
                             <span class="group-title">Notes</span>
                             <div class="group-value">
-                                <div class="group-primary" style="font-weight: 400; font-size: 13px; white-space: pre-wrap; line-height: 1.5;">${trade.notes}</div>
+                                <div class="group-primary" style="font-weight: 400; font-size: 13px; white-space: pre-wrap; line-height: 1.5;">${escapeHTML(trade.notes)}</div>
                             </div>
                         </div>
                         ` : ''}
-
                     </div>
                 </div>
             `;
-            
-            // Clicking anywhere on the row opens the modal
-            row.addEventListener('click', () => {
-                openTradeModal(trade.id);
-            });
-            
-            // Clicking specifically on the chevron wrapper expands/collapses the row
-            const chevronWrapper = row.querySelector('.row-chevron-wrapper');
-            chevronWrapper.addEventListener('click', (e) => {
-                e.stopPropagation(); // Stop the row click event
-                const expanded = row.querySelector('.expanded-content');
-                const chevron = row.querySelector('.row-chevron');
-                if (expanded.style.display === 'none') {
-                    expanded.style.display = 'block';
-                    chevron.style.transform = 'rotate(90deg)';
-                } else {
-                    expanded.style.display = 'none';
-                    chevron.style.transform = 'rotate(0deg)';
-                }
-            });
-            
-            // Hover effect just for the chevron area
-            chevronWrapper.addEventListener('mouseenter', () => chevronWrapper.style.backgroundColor = 'var(--group-border)');
-            chevronWrapper.addEventListener('mouseleave', () => chevronWrapper.style.backgroundColor = 'transparent');
-            
             tableContainer.appendChild(row);
         } else {
             card.innerHTML = `
@@ -616,10 +594,10 @@ async function renderDashboard() {
                 <div class="card-content-area">
                     <div class="card-header">
                         <div class="card-trade-id">
-                            ${trade.number || '-'}
-                            ${trade.symbol ? `<span class="symbol-tag">${trade.symbol}</span>` : ''}
+                            ${escapeHTML(trade.number || '-')}
+                            ${trade.symbol ? `<span class="symbol-tag">${escapeHTML(trade.symbol)}</span>` : ''}
                         </div>
-                        <span class="badge ${resultClass}">${trade.result || '-'}</span>
+                        <span class="badge ${resultClass}">${escapeHTML(trade.result || '-')}</span>
                     </div>
                     <div class="card-body">
                         <div class="card-group">
@@ -628,11 +606,11 @@ async function renderDashboard() {
                         </div>
                         <div class="card-group">
                             <span class="group-title">Market Condition</span>
-                            <div class="group-value">${formatHierarchy(trade.marketCondition)}</div>
+                            <div class="group-value">${formatHierarchy(escapeHTML(trade.marketCondition))}</div>
                         </div>
                         <div class="card-group">
                             <span class="group-title">Setup</span>
-                            <div class="group-value">${formatHierarchy(trade.setup, trade.direction)}</div>
+                            <div class="group-value">${formatHierarchy(escapeHTML(trade.setup), escapeHTML(trade.direction))}</div>
                         </div>
                         ${appData.settings.features.evidence ? `
                         <div class="card-group">
@@ -647,14 +625,14 @@ async function renderDashboard() {
                         ${appData.settings.features.target ? `
                         <div class="card-group">
                             <span class="group-title">Target</span>
-                            <div class="group-value">${formatHierarchy(trade.target, trade.targetSub1, trade.targetSub2)}</div>
+                            <div class="group-value">${formatHierarchy(escapeHTML(trade.target), escapeHTML(trade.targetSub1), escapeHTML(trade.targetSub2))}</div>
                         </div>` : ''}
                         ${(appData.settings.features.psychology && trade.psychology && trade.psychology.length > 0) ? `
                         <div class="card-group psych-group">
                             <span class="group-title">Psychology</span>
                             <div class="group-value">
                                 <div style="display: flex; flex-wrap: wrap; gap: 6px;">
-                                    ${trade.psychology.map(p => `<span class="psych-pill-tag" style="padding-right: 8px;">${p}</span>`).join('')}
+                                    ${trade.psychology.map(p => `<span class="psych-pill-tag" style="padding-right: 8px;">${escapeHTML(p)}</span>`).join('')}
                                 </div>
                             </div>
                         </div>
@@ -663,21 +641,23 @@ async function renderDashboard() {
                         <div class="card-group psych-group">
                             <span class="group-title">Notes</span>
                             <div class="group-value">
-                                <div class="group-primary" style="font-weight: 400; font-size: 13px; white-space: pre-wrap; line-height: 1.5;">${trade.notes}</div>
+                                <div class="group-primary" style="font-weight: 400; font-size: 13px; white-space: pre-wrap; line-height: 1.5;">${escapeHTML(trade.notes)}</div>
                             </div>
                         </div>
                         ` : ''}
                     </div>
                 </div>
             `;
-            card.addEventListener('click', () => openTradeModal(trade.id));
-            tradesList.appendChild(card);
+            fragment.appendChild(card);
         }
     }
     
     if (isTableView && tableWrapper) {
-        tradesList.appendChild(tableWrapper);
+        fragment.appendChild(tableWrapper);
     }
+    
+    tradesList.appendChild(fragment);
+
 }
 
 // --- Trade Modal Dynamic Dropdowns (Elements instead of IDs) ---
