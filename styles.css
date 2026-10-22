@@ -35,6 +35,8 @@
     --accent-hover: #4071f7;
     --danger: #ee354e;
     --success: #51dc26;
+    --color-win: #51dc26;
+    --bg-win: rgba(81, 220, 38, 0.15);
     --warning: #F5A623;
     
     /* Calendar widget specific */
@@ -87,6 +89,9 @@
     --invert-icon: invert(0);
     --scrollbar-thumb: #C1C8D1;
     --scrollbar-hover: #A0A5B5;
+    --success: #44BD1E;
+    --color-win: #44BD1E;
+    --bg-win: rgba(68, 189, 30, 0.15);
 }
 
 * {
@@ -378,7 +383,7 @@ select.linear-input {
 .group-secondary { font-size: 12px; color: var(--text-main); line-height: 1.4; }
 .empty-state { text-align: center; padding: 64px 20px; color: var(--text-muted); background-color: var(--bg-panel); border-radius: 8px; border: 1px dashed var(--border-color); }
 .badge { padding: 4px 8px; border-radius: 4px; font-size: 11px; font-weight: 600; text-align: center; }
-.badge.win { background: rgba(81, 220, 38, 0.15) !important; color: #51dc26 !important; }
+.badge.win { background: var(--bg-win) !important; color: var(--color-win) !important; }
 .badge.lost { background: rgba(238, 53, 78, 0.15) !important; color: #ee354e !important; }
 .badge.be { background: rgba(136, 136, 136, 0.15); color: var(--text-muted); }
 

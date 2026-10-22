@@ -157,10 +157,11 @@ function renderStatsDashboard() {
     const gridZeroColor = isLight ? 'rgba(0,0,0,0.1)' : 'rgba(255,255,255,0.1)';
     const beColor = isLight ? '#C1C8D1' : '#2b2c30';
     const heatmapBorder = isLight ? '#FFFFFF' : '#141517';
+    const winColor = isLight ? '#44BD1E' : '#51dc26';
 
     Chart.defaults.color = chartTextColor;
     Chart.defaults.scale.grid.color = chartGridColor;
-    const colors = { win: '#51dc26', loss: '#ee354e', be: beColor, accent: '#386af5' };
+    const colors = { win: winColor, loss: '#ee354e', be: beColor, accent: '#386af5' };
 
 
     Chart.defaults.scale.grid.display = false;
