@@ -215,51 +215,42 @@ function renderStatsDashboard() {
             tooltipsInfo.push({ date: t.date, result: t.result, setup: t.setup });
         });
 
-        if (chartInstances['growthChart']) {
-            chartInstances['growthChart'].data.labels = growthLabels;
-            chartInstances['growthChart'].data.datasets[0].data = growthData;
-            chartInstances['growthChart'].update();
-        } else {
-            chartInstances['growthChart'] = new Chart(document.getElementById('growthChart'), {
-                type: 'line',
-                data: {
-                    labels: growthLabels,
-                    datasets: [{
-                        label: 'Growth',
-                        data: growthData,
-                        borderColor: colors.accent,
-                        segment: { borderColor: ctx => ctx.p1.parsed.y < 0 ? colors.loss : colors.accent },
-                        fill: { target: 'origin', above: 'rgba(56, 106, 245, 0.1)', below: 'rgba(238, 53, 78, 0.15)' },
-                        borderWidth: 2, tension: 0.4, pointRadius: 0, pointHitRadius: 0, pointHoverRadius: 0,
-                    }]
-                },
-                options: { 
-                    maintainAspectRatio: false, interaction: { mode: 'index', intersect: false, },
-                    scales: { 
-                        x: { display: false },
-                        y: { display: true, border: { display: false }, ticks: { display: false }, grid: { display: false } } 
-                    }, 
-                    plugins: { legend: { display: false }, tooltip: { enabled: false } } 
-                }
-            });
-        }
+        destroyChart('growthChart');
+        chartInstances['growthChart'] = new Chart(document.getElementById('growthChart'), {
+            type: 'line',
+            data: {
+                labels: growthLabels,
+                datasets: [{
+                    label: 'Growth',
+                    data: growthData,
+                    borderColor: colors.accent,
+                    segment: { borderColor: ctx => ctx.p1.parsed.y < 0 ? colors.loss : colors.accent },
+                    fill: { target: 'origin', above: 'rgba(56, 106, 245, 0.1)', below: 'rgba(238, 53, 78, 0.15)' },
+                    borderWidth: 2, tension: 0.4, pointRadius: 0, pointHitRadius: 0, pointHoverRadius: 0,
+                }]
+            },
+            options: { 
+                maintainAspectRatio: false, interaction: { mode: 'index', intersect: false, },
+                scales: { 
+                    x: { display: false },
+                    y: { display: true, border: { display: false }, ticks: { display: false }, grid: { display: false } } 
+                }, 
+                plugins: { legend: { display: false }, tooltip: { enabled: false } } 
+            }
+        });
     });
 
     // 2. Win/Loss
     handleChartRender('winLossChart', 'winLoss', () => {
-        if (chartInstances['winLossChart']) {
-            chartInstances['winLossChart'].data.datasets[0].data = [overallStats.wins, overallStats.losses, overallStats.be];
-            chartInstances['winLossChart'].update();
-        } else {
-            chartInstances['winLossChart'] = new Chart(document.getElementById('winLossChart'), {
-                type: 'doughnut',
-                data: {
-                    labels: ['Wins', 'Losses', 'B/E'],
-                    datasets: [{ data: [overallStats.wins, overallStats.losses, overallStats.be], backgroundColor: [colors.win, colors.loss, colors.be], borderWidth: 0 }]
-                },
-                options: { maintainAspectRatio: false, cutout: '80%', layout: { padding: { top: 30, left: 30, right: 30, bottom: 10 } }, plugins: { legend: { position: 'bottom', labels: { color: '#888', usePointStyle: true, pointStyle: 'circle', padding: 16 } } } }
-            });
-        }
+        destroyChart('winLossChart');
+        chartInstances['winLossChart'] = new Chart(document.getElementById('winLossChart'), {
+            type: 'doughnut',
+            data: {
+                labels: ['Wins', 'Losses', 'B/E'],
+                datasets: [{ data: [overallStats.wins, overallStats.losses, overallStats.be], backgroundColor: [colors.win, colors.loss, colors.be], borderWidth: 0 }]
+            },
+            options: { maintainAspectRatio: false, cutout: '80%', layout: { padding: { top: 30, left: 30, right: 30, bottom: 10 } }, plugins: { legend: { position: 'bottom', labels: { color: '#888', usePointStyle: true, pointStyle: 'circle', padding: 16 } } } }
+        });
     });
 
     // Bar Charts Helper
@@ -286,21 +277,15 @@ function renderStatsDashboard() {
             ? { x: { display: !hideAxis, beginAtZero: true, max: 100, border: { display: false }, grid: { display: false } }, y: { display: true, border: { display: false }, grid: { display: false } } }
             : { y: { display: !hideAxis, beginAtZero: true, max: 100, border: { display: false }, grid: { display: false } }, x: { display: true, border: { display: false }, grid: { display: false } } };
 
-        if (chartInstances[chartId]) {
-            chartInstances[chartId].data.labels = labels;
-            chartInstances[chartId].data.datasets[0].data = winRates;
-            chartInstances[chartId].options.scales = scales;
-            chartInstances[chartId].update();
-        } else {
-            chartInstances[chartId] = new Chart(document.getElementById(chartId), {
-                type: 'bar',
-                data: {
-                    labels: labels,
-                    datasets: [{ label: 'Win Rate %', data: winRates, backgroundColor: colors.accent, borderRadius: {topLeft: 12, topRight: 12, bottomLeft: 12, bottomRight: 12}, borderSkipped: false }]
-                },
-                options: { clip: false, maintainAspectRatio: false, indexAxis: horizontal ? 'y' : 'x', scales: scales, plugins: { legend: { display: false } } }
-            });
-        }
+        destroyChart(chartId);
+        chartInstances[chartId] = new Chart(document.getElementById(chartId), {
+            type: 'bar',
+            data: {
+                labels: labels,
+                datasets: [{ label: 'Win Rate %', data: winRates, backgroundColor: colors.accent, borderRadius: {topLeft: 12, topRight: 12, bottomLeft: 12, bottomRight: 12}, borderSkipped: false }]
+            },
+            options: { clip: false, maintainAspectRatio: false, indexAxis: horizontal ? 'y' : 'x', scales: scales, plugins: { legend: { display: false } } }
+        });
     }
 
     // 3. Symbol
@@ -319,20 +304,15 @@ function renderStatsDashboard() {
         });
         const top5Setups = setupStats.slice(0, 5);
         
-        if (chartInstances['setupChart']) {
-            chartInstances['setupChart'].data.labels = top5Setups.map(s => s.setup);
-            chartInstances['setupChart'].data.datasets[0].data = top5Setups.map(s => s.winRate);
-            chartInstances['setupChart'].update();
-        } else {
-            chartInstances['setupChart'] = new Chart(document.getElementById('setupChart'), {
-                type: 'bar',
-                data: {
-                    labels: top5Setups.map(s => s.setup),
-                    datasets: [{ label: 'Win Rate %', data: top5Setups.map(s => s.winRate), backgroundColor: colors.accent, borderRadius: {topLeft: 12, topRight: 12, bottomLeft: 12, bottomRight: 12}, borderSkipped: false }]
-                },
-                options: { clip: false, maintainAspectRatio: false, indexAxis: 'y', scales: { x: { display: false, beginAtZero: true, max: 100, border: { display: false }, grid: { display: false } }, y: { display: true, border: { display: false }, grid: { display: false } } }, plugins: { legend: { display: false } } }
-            });
-        }
+        destroyChart('setupChart');
+        chartInstances['setupChart'] = new Chart(document.getElementById('setupChart'), {
+            type: 'bar',
+            data: {
+                labels: top5Setups.map(s => s.setup),
+                datasets: [{ label: 'Win Rate %', data: top5Setups.map(s => s.winRate), backgroundColor: colors.accent, borderRadius: {topLeft: 12, topRight: 12, bottomLeft: 12, bottomRight: 12}, borderSkipped: false }]
+            },
+            options: { clip: false, maintainAspectRatio: false, indexAxis: 'y', scales: { x: { display: false, beginAtZero: true, max: 100, border: { display: false }, grid: { display: false } }, y: { display: true, border: { display: false }, grid: { display: false } } }, plugins: { legend: { display: false } } }
+        });
     });
 
     // 5. Market Condition
@@ -344,16 +324,12 @@ function renderStatsDashboard() {
         const dirLabels = ['Long', 'Short'];
         const dirWins = dirLabels.map(l => dirGroup[l] ? getWinRateData(dirGroup[l]).wins : 0);
         
-        if (chartInstances['directionChart']) {
-            chartInstances['directionChart'].data.datasets[0].data = dirWins;
-            chartInstances['directionChart'].update();
-        } else {
-            chartInstances['directionChart'] = new Chart(document.getElementById('directionChart'), {
-                type: 'doughnut',
-                data: { labels: dirLabels, datasets: [{ data: dirWins, backgroundColor: [colors.accent, colors.short], borderWidth: 0 }] },
-                options: { maintainAspectRatio: false, cutout: '80%', layout: { padding: { top: 30, left: 30, right: 30, bottom: 10 } }, plugins: { legend: { position: 'bottom', labels: { color: '#888', usePointStyle: true, pointStyle: 'circle', padding: 16 } } } }
-            });
-        }
+        destroyChart('directionChart');
+        chartInstances['directionChart'] = new Chart(document.getElementById('directionChart'), {
+            type: 'doughnut',
+            data: { labels: dirLabels, datasets: [{ data: dirWins, backgroundColor: [colors.accent, colors.short], borderWidth: 0 }] },
+            options: { maintainAspectRatio: false, cutout: '80%', layout: { padding: { top: 30, left: 30, right: 30, bottom: 10 } }, plugins: { legend: { position: 'bottom', labels: { color: '#888', usePointStyle: true, pointStyle: 'circle', padding: 16 } } } }
+        });
     });
 
     // 7. Psychology
@@ -364,20 +340,15 @@ function renderStatsDashboard() {
         psychStats.sort((a, b) => b.total - a.total);
         const top5Psych = psychStats.slice(0, 5);
         
-        if (chartInstances['psychologyChart']) {
-            chartInstances['psychologyChart'].data.labels = top5Psych.map(s => s.psych);
-            chartInstances['psychologyChart'].data.datasets[0].data = top5Psych.map(s => s.total);
-            chartInstances['psychologyChart'].update();
-        } else {
-            chartInstances['psychologyChart'] = new Chart(document.getElementById('psychologyChart'), {
-                type: 'bar',
-                data: {
-                    labels: top5Psych.map(s => s.psych),
-                    datasets: [{ label: 'Count', data: top5Psych.map(s => s.total), backgroundColor: colors.accent, borderRadius: {topLeft: 12, topRight: 12, bottomLeft: 12, bottomRight: 12}, borderSkipped: false }]
-                },
-                options: { clip: false, maintainAspectRatio: false, indexAxis: 'y', scales: { x: { display: false, beginAtZero: true, border: { display: false }, grid: { display: false } }, y: { display: true, border: { display: false }, grid: { display: false } } }, plugins: { legend: { display: false } } }
-            });
-        }
+        destroyChart('psychologyChart');
+        chartInstances['psychologyChart'] = new Chart(document.getElementById('psychologyChart'), {
+            type: 'bar',
+            data: {
+                labels: top5Psych.map(s => s.psych),
+                datasets: [{ label: 'Count', data: top5Psych.map(s => s.total), backgroundColor: colors.accent, borderRadius: {topLeft: 12, topRight: 12, bottomLeft: 12, bottomRight: 12}, borderSkipped: false }]
+            },
+            options: { clip: false, maintainAspectRatio: false, indexAxis: 'y', scales: { x: { display: false, beginAtZero: true, border: { display: false }, grid: { display: false } }, y: { display: true, border: { display: false }, grid: { display: false } } }, plugins: { legend: { display: false } } }
+        });
     });
 
     // 8. Invalidation
@@ -387,20 +358,15 @@ function renderStatsDashboard() {
         lostTrades.forEach(t => { (t.invalidations || []).forEach(inv => { const invName = inv.sub ? inv.sub : (inv.primary || inv); invCounts[invName] = (invCounts[invName] || 0) + 1; }); });
         const sortedInvs = Object.entries(invCounts).sort((a, b) => b[1] - a[1]).slice(0, 5);
         
-        if (chartInstances['invalidationChart']) {
-            chartInstances['invalidationChart'].data.labels = sortedInvs.map(i => i[0]);
-            chartInstances['invalidationChart'].data.datasets[0].data = sortedInvs.map(i => i[1]);
-            chartInstances['invalidationChart'].update();
-        } else {
-            chartInstances['invalidationChart'] = new Chart(document.getElementById('invalidationChart'), {
-                type: 'bar',
-                data: {
-                    labels: sortedInvs.map(i => i[0]),
-                    datasets: [{ label: 'Loss Count', data: sortedInvs.map(i => i[1]), backgroundColor: colors.loss, borderRadius: {topLeft: 12, topRight: 12, bottomLeft: 12, bottomRight: 12}, borderSkipped: false }]
-                },
-                options: { clip: false, maintainAspectRatio: false, indexAxis: 'y', scales: { x: { display: false }, y: { display: true, border: { display: false }, grid: { display: false } } }, plugins: { legend: { display: false } } }
-            });
-        }
+        destroyChart('invalidationChart');
+        chartInstances['invalidationChart'] = new Chart(document.getElementById('invalidationChart'), {
+            type: 'bar',
+            data: {
+                labels: sortedInvs.map(i => i[0]),
+                datasets: [{ label: 'Loss Count', data: sortedInvs.map(i => i[1]), backgroundColor: colors.loss, borderRadius: {topLeft: 12, topRight: 12, bottomLeft: 12, bottomRight: 12}, borderSkipped: false }]
+            },
+            options: { clip: false, maintainAspectRatio: false, indexAxis: 'y', scales: { x: { display: false }, y: { display: true, border: { display: false }, grid: { display: false } } }, plugins: { legend: { display: false } } }
+        });
     });
 
     // 9. Day of Week
@@ -411,16 +377,12 @@ function renderStatsDashboard() {
         const dayLabels = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'];
         const dayWinRates = dayLabels.map(d => dayGroups[d].length > 0 ? getWinRateData(dayGroups[d]).winRate : 0);
         
-        if (chartInstances['dayOfWeekChart']) {
-            chartInstances['dayOfWeekChart'].data.datasets[0].data = dayWinRates;
-            chartInstances['dayOfWeekChart'].update();
-        } else {
-            chartInstances['dayOfWeekChart'] = new Chart(document.getElementById('dayOfWeekChart'), {
-                type: 'line',
-                data: { labels: dayLabels, datasets: [{ label: 'Win Rate %', data: dayWinRates, borderColor: colors.accent, tension: 0.3, fill: true, backgroundColor: 'rgba(56, 106, 245, 0.1)' }] },
-                options: { maintainAspectRatio: false, scales: { y: { display: false, beginAtZero: true, max: 100, border: { display: false }, grid: { display: false } } }, plugins: { legend: { display: false } } }
-            });
-        }
+        destroyChart('dayOfWeekChart');
+        chartInstances['dayOfWeekChart'] = new Chart(document.getElementById('dayOfWeekChart'), {
+            type: 'line',
+            data: { labels: dayLabels, datasets: [{ label: 'Win Rate %', data: dayWinRates, borderColor: colors.accent, tension: 0.3, fill: true, backgroundColor: 'rgba(56, 106, 245, 0.1)' }] },
+            options: { maintainAspectRatio: false, scales: { y: { display: false, beginAtZero: true, max: 100, border: { display: false }, grid: { display: false } } }, plugins: { legend: { display: false } } }
+        });
     });
 
     // 10. Confluence Rate
@@ -435,20 +397,15 @@ function renderStatsDashboard() {
             }
         });
         
-        if (chartInstances['confluenceChart']) {
-            chartInstances['confluenceChart'].data.labels = Object.keys(confGroups);
-            chartInstances['confluenceChart'].data.datasets[0].data = Object.keys(confGroups).map(k => getWinRateData(confGroups[k]).winRate);
-            chartInstances['confluenceChart'].update();
-        } else {
-            chartInstances['confluenceChart'] = new Chart(document.getElementById('confluenceChart'), {
-                type: 'bar',
-                data: {
-                    labels: Object.keys(confGroups),
-                    datasets: [{ label: 'Win Rate %', data: Object.keys(confGroups).map(k => getWinRateData(confGroups[k]).winRate), backgroundColor: colors.win, borderRadius: {topLeft: 12, topRight: 12, bottomLeft: 12, bottomRight: 12}, borderSkipped: false }]
-                },
-                options: { maintainAspectRatio: false, scales: { y: { display: false, beginAtZero: true, max: 100, border: { display: false }, grid: { display: false } } }, plugins: { legend: { display: false } } }
-            });
-        }
+        destroyChart('confluenceChart');
+        chartInstances['confluenceChart'] = new Chart(document.getElementById('confluenceChart'), {
+            type: 'bar',
+            data: {
+                labels: Object.keys(confGroups),
+                datasets: [{ label: 'Win Rate %', data: Object.keys(confGroups).map(k => getWinRateData(confGroups[k]).winRate), backgroundColor: colors.win, borderRadius: {topLeft: 12, topRight: 12, bottomLeft: 12, bottomRight: 12}, borderSkipped: false }]
+            },
+            options: { maintainAspectRatio: false, scales: { y: { display: false, beginAtZero: true, max: 100, border: { display: false }, grid: { display: false } } }, plugins: { legend: { display: false } } }
+        });
     });
 
     // 11. Location Heatmap
@@ -482,32 +439,25 @@ function renderStatsDashboard() {
         const sortedLocLosses = locArray.map(item => parseFloat(item.lossPct.toFixed(1)));
         const sortedLocBE = locArray.map(item => parseFloat(item.bePct.toFixed(1)));
         
-        if (chartInstances['locationChart']) {
-            chartInstances['locationChart'].data.labels = sortedLocLabels;
-            chartInstances['locationChart'].data.datasets[0].data = sortedLocWins;
-            chartInstances['locationChart'].data.datasets[1].data = sortedLocLosses;
-            chartInstances['locationChart'].data.datasets[2].data = sortedLocBE;
-            chartInstances['locationChart'].update();
-        } else {
-            chartInstances['locationChart'] = new Chart(document.getElementById('locationChart'), {
-                type: 'bar',
-                data: {
-                    labels: sortedLocLabels,
-                    datasets: [
-                        { label: 'Wins', data: sortedLocWins, backgroundColor: colors.win, borderRadius: {topLeft: 12, topRight: 12, bottomLeft: 12, bottomRight: 12}, borderSkipped: false, borderWidth: 3, borderColor: heatmapBorder },
-                        { label: 'Losses', data: sortedLocLosses, backgroundColor: colors.loss, borderRadius: {topLeft: 12, topRight: 12, bottomLeft: 12, bottomRight: 12}, borderSkipped: false, borderWidth: 3, borderColor: heatmapBorder },
-                        { label: 'B/E', data: sortedLocBE, backgroundColor: colors.be, borderRadius: {topLeft: 12, topRight: 12, bottomLeft: 12, bottomRight: 12}, borderSkipped: false, borderWidth: 3, borderColor: heatmapBorder }
-                    ]
-                },
-                options: { 
-                    clip: false, maintainAspectRatio: false, indexAxis: 'y', 
-                    scales: { x: { stacked: true, max: 100, display: false }, y: { stacked: true, border: { display: false }, grid: { display: false } } },
-                    plugins: { 
-                        legend: { position: 'bottom', labels: { color: '#888', usePointStyle: true, pointStyle: 'circle' } },
-                        tooltip: { callbacks: { label: function(context) { return context.dataset.label + ': ' + context.parsed.x + '%'; } } }
-                    }
+        destroyChart('locationChart');
+        chartInstances['locationChart'] = new Chart(document.getElementById('locationChart'), {
+            type: 'bar',
+            data: {
+                labels: sortedLocLabels,
+                datasets: [
+                    { label: 'Wins', data: sortedLocWins, backgroundColor: colors.win, borderRadius: {topLeft: 12, topRight: 12, bottomLeft: 12, bottomRight: 12}, borderSkipped: false, borderWidth: 3, borderColor: heatmapBorder },
+                    { label: 'Losses', data: sortedLocLosses, backgroundColor: colors.loss, borderRadius: {topLeft: 12, topRight: 12, bottomLeft: 12, bottomRight: 12}, borderSkipped: false, borderWidth: 3, borderColor: heatmapBorder },
+                    { label: 'B/E', data: sortedLocBE, backgroundColor: colors.be, borderRadius: {topLeft: 12, topRight: 12, bottomLeft: 12, bottomRight: 12}, borderSkipped: false, borderWidth: 3, borderColor: heatmapBorder }
+                ]
+            },
+            options: { 
+                clip: false, maintainAspectRatio: false, indexAxis: 'y', 
+                scales: { x: { stacked: true, max: 100, display: false }, y: { stacked: true, border: { display: false }, grid: { display: false } } },
+                plugins: { 
+                    legend: { position: 'bottom', labels: { color: '#888', usePointStyle: true, pointStyle: 'circle' } },
+                    tooltip: { callbacks: { label: function(context) { return context.dataset.label + ': ' + context.parsed.x + '%'; } } }
                 }
-            });
-        }
+            }
+        });
     });
 }
