@@ -606,7 +606,7 @@ async function renderDashboard() {
             });
             
             // Hover effect just for the chevron area
-            chevronWrapper.addEventListener('mouseenter', () => chevronWrapper.style.backgroundColor = 'rgba(255,255,255,0.05)');
+            chevronWrapper.addEventListener('mouseenter', () => chevronWrapper.style.backgroundColor = 'var(--group-border)');
             chevronWrapper.addEventListener('mouseleave', () => chevronWrapper.style.backgroundColor = 'transparent');
             
             tableContainer.appendChild(row);

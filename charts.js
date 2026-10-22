@@ -150,7 +150,18 @@ function renderStatsDashboard() {
         return true;
     });
 
-    const colors = { win: '#51dc26', loss: '#ee354e', be: '#2b2c30', accent: '#386af5' };
+    
+    const isLight = document.documentElement.getAttribute('data-theme') === 'light';
+    const chartTextColor = isLight ? '#6E727A' : '#888888';
+    const chartGridColor = isLight ? '#E2E4E9' : '#2D2E33';
+    const gridZeroColor = isLight ? 'rgba(0,0,0,0.1)' : gridZeroColor;
+    const beColor = isLight ? '#C1C8D1' : '#2b2c30';
+    const heatmapBorder = isLight ? '#FFFFFF' : '#141517';
+
+    Chart.defaults.color = chartTextColor;
+    Chart.defaults.scale.grid.color = chartGridColor;
+    const colors = { win: '#51dc26', loss: '#ee354e', be: beColor, accent: '#386af5' };
+
 
     Chart.defaults.scale.grid.display = false;
     Chart.defaults.scale.grid.drawBorder = false;
@@ -224,7 +235,7 @@ function renderStatsDashboard() {
                 maintainAspectRatio: false, interaction: { mode: 'index', intersect: false, },
                 scales: { 
                     x: { display: false },
-                    y: { display: true, border: { display: false }, ticks: { display: false }, grid: { color: (ctx) => ctx.tick.value === 0 ? 'rgba(255,255,255,0.1)' : 'transparent' } } 
+                    y: { display: true, border: { display: false }, ticks: { display: false }, grid: { color: (ctx) => ctx.tick.value === 0 ? gridZeroColor : 'transparent' } } 
                 }, 
                 plugins: { legend: { display: false }, tooltip: { enabled: false } } 
             }
@@ -430,9 +441,9 @@ function renderStatsDashboard() {
             data: {
                 labels: sortedLocLabels,
                 datasets: [
-                    { label: 'Wins', data: sortedLocWins, backgroundColor: colors.win, borderRadius: {topLeft: 12, topRight: 12, bottomLeft: 12, bottomRight: 12}, borderSkipped: false, borderWidth: 3, borderColor: '#141517' },
-                    { label: 'Losses', data: sortedLocLosses, backgroundColor: colors.loss, borderRadius: {topLeft: 12, topRight: 12, bottomLeft: 12, bottomRight: 12}, borderSkipped: false, borderWidth: 3, borderColor: '#141517' },
-                    { label: 'B/E', data: sortedLocBE, backgroundColor: colors.be, borderRadius: {topLeft: 12, topRight: 12, bottomLeft: 12, bottomRight: 12}, borderSkipped: false, borderWidth: 3, borderColor: '#141517' }
+                    { label: 'Wins', data: sortedLocWins, backgroundColor: colors.win, borderRadius: {topLeft: 12, topRight: 12, bottomLeft: 12, bottomRight: 12}, borderSkipped: false, borderWidth: 3, borderColor: heatmapBorder },
+                    { label: 'Losses', data: sortedLocLosses, backgroundColor: colors.loss, borderRadius: {topLeft: 12, topRight: 12, bottomLeft: 12, bottomRight: 12}, borderSkipped: false, borderWidth: 3, borderColor: heatmapBorder },
+                    { label: 'B/E', data: sortedLocBE, backgroundColor: colors.be, borderRadius: {topLeft: 12, topRight: 12, bottomLeft: 12, bottomRight: 12}, borderSkipped: false, borderWidth: 3, borderColor: heatmapBorder }
                 ]
             },
             options: { 

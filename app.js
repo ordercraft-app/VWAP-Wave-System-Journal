@@ -22,7 +22,8 @@ document.addEventListener('DOMContentLoaded', async () => {
     setupDropdownEvents();
     setupCalendarEvents();
     setupImageUploadEvents();
-    setupImageViewer();
+        setupImageViewer();
+    setupThemeToggle();
     
     const btnToday = document.getElementById('btn-today');
     if (btnToday) {
@@ -115,7 +116,46 @@ document.addEventListener('DOMContentLoaded', async () => {
     }
 });
 
+
+function setupThemeToggle() {
+    const savedTheme = localStorage.getItem('vwap-theme') || 'dark';
+    applyTheme(savedTheme);
+
+    if (btnThemeToggle) {
+        btnThemeToggle.addEventListener('click', () => {
+            const currentTheme = document.documentElement.getAttribute('data-theme') || 'dark';
+            const newTheme = currentTheme === 'dark' ? 'light' : 'dark';
+            applyTheme(newTheme);
+            
+            localStorage.setItem('vwap-theme', newTheme);
+            if (appData && appData.settings) {
+                appData.settings.theme = newTheme;
+                autoSave();
+            }
+        });
+    }
+}
+
+function applyTheme(theme) {
+    document.documentElement.setAttribute('data-theme', theme);
+    
+    if (theme === 'light') {
+        if(iconSun) iconSun.style.display = 'none';
+        if(iconMoon) iconMoon.style.display = 'block';
+        if (flatpickrTheme) flatpickrTheme.href = 'https://cdn.jsdelivr.net/npm/flatpickr/dist/themes/light.css';
+    } else {
+        if(iconSun) iconSun.style.display = 'block';
+        if(iconMoon) iconMoon.style.display = 'none';
+        if (flatpickrTheme) flatpickrTheme.href = 'https://cdn.jsdelivr.net/npm/flatpickr/dist/themes/dark.css';
+    }
+    
+    if (typeof renderStatsDashboard === 'function' && document.getElementById('view-stats').classList.contains('active')) {
+        renderStatsDashboard();
+    }
+}
+
 // --- Navigation ---
+
 function setActiveNav(activeBtn) {
     [btnNavDashboard, btnNavStats, btnNavSettings, btnNavHelp].forEach(b => b.classList.remove('active'));
     activeBtn.classList.add('active');

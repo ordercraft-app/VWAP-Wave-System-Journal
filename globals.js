@@ -16,7 +16,8 @@ let appData = {
         invalidation: {},
         psychology: [],
         target: { "VWAP": { sub1: [], sub2: [] } },
-        features: { evidence: true, invalidation: true, target: true, psychology: true }
+        features: { evidence: true, invalidation: true, target: true, psychology: true },
+        theme: 'dark'
     }
 };
 
@@ -44,6 +45,12 @@ const btnDeleteTrade = document.getElementById('btn-delete-trade');
 const tradeForm = document.getElementById('trade-form');
 tradeForm.addEventListener('input', () => { isFormDirty = true; });
 tradeForm.addEventListener('change', () => { isFormDirty = true; });
+
+
+const btnThemeToggle = document.getElementById('btn-theme-toggle');
+const iconSun = document.getElementById('icon-sun');
+const iconMoon = document.getElementById('icon-moon');
+const flatpickrTheme = document.getElementById('flatpickr-theme');
 
 // Sidebar Nav Elements
 const btnNavDashboard = document.getElementById('btn-nav-dashboard');
