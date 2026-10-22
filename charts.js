@@ -153,7 +153,7 @@ function renderStatsDashboard() {
     
     const isLight = document.documentElement.getAttribute('data-theme') === 'light';
     const chartTextColor = isLight ? '#6E727A' : '#888888';
-    const chartGridColor = isLight ? '#E2E4E9' : '#2D2E33';
+    const chartGridColor = 'transparent';
     const gridZeroColor = isLight ? 'rgba(0,0,0,0.1)' : 'rgba(255,255,255,0.1)';
     const beColor = isLight ? '#C1C8D1' : '#2b2c30';
     const heatmapBorder = isLight ? '#FFFFFF' : '#141517';
@@ -167,6 +167,8 @@ function renderStatsDashboard() {
 
     Chart.defaults.scale.grid.display = false;
     Chart.defaults.scale.grid.drawBorder = false;
+    if(!Chart.defaults.scale.border) Chart.defaults.scale.border = {};
+    Chart.defaults.scale.border.display = false;
 
     // KPI's
     const overallStats = getWinRateData(trades);
@@ -278,8 +280,8 @@ function renderStatsDashboard() {
         const winRates = stats.map(s => s.winRate);
         
         const scales = horizontal 
-            ? { x: { display: !hideAxis, beginAtZero: true, max: 100 }, y: { display: true } }
-            : { y: { display: !hideAxis, beginAtZero: true, max: 100 }, x: { display: true } };
+            ? { x: { display: !hideAxis, beginAtZero: true, max: 100, border: { display: false }, grid: { display: false } }, y: { display: true, border: { display: false }, grid: { display: false } } }
+            : { y: { display: !hideAxis, beginAtZero: true, max: 100, border: { display: false }, grid: { display: false } }, x: { display: true, border: { display: false }, grid: { display: false } } };
 
         destroyChart(chartId);
         chartInstances[chartId] = new Chart(document.getElementById(chartId), {
@@ -314,7 +316,7 @@ function renderStatsDashboard() {
                 labels: top5Setups.map(s => s.setup),
                 datasets: [{ label: 'Win Rate %', data: top5Setups.map(s => s.winRate), backgroundColor: colors.accent, borderRadius: {topLeft: 12, topRight: 12, bottomLeft: 12, bottomRight: 12}, borderSkipped: false }]
             },
-            options: { clip: false, maintainAspectRatio: false, indexAxis: 'y', scales: { x: { display: false, beginAtZero: true, max: 100 }, y: { display: true } }, plugins: { legend: { display: false } } }
+            options: { clip: false, maintainAspectRatio: false, indexAxis: 'y', scales: { x: { display: false, beginAtZero: true, max: 100, border: { display: false }, grid: { display: false } }, y: { display: true, border: { display: false }, grid: { display: false } } }, plugins: { legend: { display: false } } }
         });
     });
 
@@ -348,7 +350,7 @@ function renderStatsDashboard() {
                 labels: top5Psych.map(s => s.psych),
                 datasets: [{ label: 'Count', data: top5Psych.map(s => s.total), backgroundColor: colors.accent, borderRadius: {topLeft: 12, topRight: 12, bottomLeft: 12, bottomRight: 12}, borderSkipped: false }]
             },
-            options: { clip: false, maintainAspectRatio: false, indexAxis: 'y', scales: { x: { display: false, beginAtZero: true }, y: { display: true } }, plugins: { legend: { display: false } } }
+            options: { clip: false, maintainAspectRatio: false, indexAxis: 'y', scales: { x: { display: false, beginAtZero: true, border: { display: false }, grid: { display: false } }, y: { display: true, border: { display: false }, grid: { display: false } } }, plugins: { legend: { display: false } } }
         });
     });
 
@@ -365,7 +367,7 @@ function renderStatsDashboard() {
                 labels: sortedInvs.map(i => i[0]),
                 datasets: [{ label: 'Loss Count', data: sortedInvs.map(i => i[1]), backgroundColor: colors.loss, borderRadius: {topLeft: 12, topRight: 12, bottomLeft: 12, bottomRight: 12}, borderSkipped: false }]
             },
-            options: { clip: false, maintainAspectRatio: false, indexAxis: 'y', scales: { x: { display: false }, y: { display: true } }, plugins: { legend: { display: false } } }
+            options: { clip: false, maintainAspectRatio: false, indexAxis: 'y', scales: { x: { display: false }, y: { display: true, border: { display: false }, grid: { display: false } } }, plugins: { legend: { display: false } } }
         });
     });
 
@@ -380,7 +382,7 @@ function renderStatsDashboard() {
         chartInstances['dayOfWeekChart'] = new Chart(document.getElementById('dayOfWeekChart'), {
             type: 'line',
             data: { labels: dayLabels, datasets: [{ label: 'Win Rate %', data: dayWinRates, borderColor: colors.accent, tension: 0.3, fill: true, backgroundColor: 'rgba(56, 106, 245, 0.1)' }] },
-            options: { maintainAspectRatio: false, scales: { y: { display: false, beginAtZero: true, max: 100 } }, plugins: { legend: { display: false } } }
+            options: { maintainAspectRatio: false, scales: { y: { display: false, beginAtZero: true, max: 100, border: { display: false }, grid: { display: false } } }, plugins: { legend: { display: false } } }
         });
     });
 
@@ -402,7 +404,7 @@ function renderStatsDashboard() {
                 labels: Object.keys(confGroups),
                 datasets: [{ label: 'Win Rate %', data: Object.keys(confGroups).map(k => getWinRateData(confGroups[k]).winRate), backgroundColor: colors.win, borderRadius: {topLeft: 12, topRight: 12, bottomLeft: 12, bottomRight: 12}, borderSkipped: false }]
             },
-            options: { maintainAspectRatio: false, scales: { y: { display: false, beginAtZero: true, max: 100 } }, plugins: { legend: { display: false } } }
+            options: { maintainAspectRatio: false, scales: { y: { display: false, beginAtZero: true, max: 100, border: { display: false }, grid: { display: false } } }, plugins: { legend: { display: false } } }
         });
     });
 
@@ -450,7 +452,7 @@ function renderStatsDashboard() {
             },
             options: { 
                 clip: false, maintainAspectRatio: false, indexAxis: 'y', 
-                scales: { x: { stacked: true, max: 100, display: false }, y: { stacked: true } },
+                scales: { x: { stacked: true, max: 100, display: false }, y: { stacked: true, border: { display: false }, grid: { display: false } } },
                 plugins: { 
                     legend: { position: 'bottom', labels: { color: '#888', usePointStyle: true, pointStyle: 'circle' } },
                     tooltip: { callbacks: { label: function(context) { return context.dataset.label + ': ' + context.parsed.x + '%'; } } }
