@@ -154,7 +154,7 @@ function renderStatsDashboard() {
     const isLight = document.documentElement.getAttribute('data-theme') === 'light';
     const chartTextColor = isLight ? '#6E727A' : '#888888';
     const chartGridColor = isLight ? '#E2E4E9' : '#2D2E33';
-    const gridZeroColor = isLight ? 'rgba(0,0,0,0.1)' : gridZeroColor;
+    const gridZeroColor = isLight ? 'rgba(0,0,0,0.1)' : 'rgba(255,255,255,0.1)';
     const beColor = isLight ? '#C1C8D1' : '#2b2c30';
     const heatmapBorder = isLight ? '#FFFFFF' : '#141517';
 

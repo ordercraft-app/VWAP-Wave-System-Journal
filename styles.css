@@ -39,28 +39,30 @@
     
     /* Calendar widget specific */
     --cal-bg-default: #1d1e21;
-    --cal-bg-active: var(--border-hover);
+    --cal-bg-active: #2b2c30;
     --cal-text-dim: #6E727A;
-    --bg-hover: var(--bg-hover);
-    --bg-disabled: var(--bg-disabled);
-    --border-hover: var(--border-hover);
-    --cal-active-bg: var(--cal-active-bg);
-    --cal-active-text: var(--cal-active-text);
-    --cal-trades-active: var(--cal-trades-active);
-    --group-bg: var(--group-bg);
-    --group-border: var(--group-border);
-    --divider-bg: var(--divider-bg);
-    --shadow-sm: var(--shadow-sm);
-    --shadow-md: var(--shadow-md);
-    --modal-overlay: var(--modal-overlay);
-    --invert-icon: var(--invert-icon);
+    
+    /* Interactive states */
+    --bg-hover: #2A2B30;
+    --bg-disabled: #1a1b1e;
+    --border-hover: #3B434C;
+    --cal-active-bg: #3B434C;
+    --cal-active-text: #E2E4E9;
+    --cal-trades-active: #A0A5B5;
+    --group-bg: rgba(255, 255, 255, 0.02);
+    --group-border: rgba(255, 255, 255, 0.05);
+    --divider-bg: rgba(255, 255, 255, 0.08);
+    --shadow-sm: rgba(0,0,0,0.3);
+    --shadow-md: rgba(0,0,0,0.5);
+    --modal-overlay: rgba(0, 0, 0, 0.4);
+    --invert-icon: invert(0.6) sepia(0) saturate(1) hue-rotate(0deg) brightness(0.9) contrast(1);
 }
 
 [data-theme="light"] {
     --bg-main: #F4F5F7;
     --bg-panel: #FFFFFF;
     --bg-input: #FFFFFF;
-    --border-color: var(--cal-active-text);
+    --border-color: #E2E4E9;
     --text-main: #141517;
     --text-muted: #6E727A;
     
@@ -69,9 +71,9 @@
     --cal-text-dim: #888888;
     
     --bg-hover: #F4F5F7;
-    --bg-disabled: #F4F5F7;
+    --bg-disabled: #E2E4E9;
     --border-hover: #C1C8D1;
-    --cal-active-bg: var(--cal-active-text);
+    --cal-active-bg: #E2E4E9;
     --cal-active-text: #141517;
     --cal-trades-active: #6E727A;
     --group-bg: rgba(0, 0, 0, 0.02);
@@ -82,7 +84,6 @@
     --modal-overlay: rgba(255, 255, 255, 0.5);
     --invert-icon: invert(0);
 }
-
 
 * {
     box-sizing: border-box;
