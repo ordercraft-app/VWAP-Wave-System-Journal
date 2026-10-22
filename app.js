@@ -1,5 +1,4 @@
 // --- Initialization ---
-
 document.addEventListener('DOMContentLoaded', async () => {
     const today = new Date();
     const todayStr = today.toLocaleDateString('en-CA'); 
@@ -43,7 +42,7 @@ document.addEventListener('DOMContentLoaded', async () => {
                   "IB": { "sub1": ["Current", "Previous"], "sub2": ["High", "Mid", "Low", "High +50%", "High +100%", "High +200%", "Low -50%", "Low -100%", "Low -200%"] }
                 },
                 "features": { "evidence": true, "invalidation": true, "target": true, "psychology": true },
-    "marketCondition": ["Balance", "Imbalance"],
+                "marketCondition": ["Balance", "Imbalance"],
                 "setup": ["Price Discovery Continuation", "Fade value area extremes", "Return to value", "VWAP Bounce", "Madonna", "VWAP/POC Scalpes in balance", "Late Entry Continuation", "Inside HTF balance fades", "IB Extension fades"],
                 "direction": ["Long", "Short"],
                 "evidence": {
@@ -104,12 +103,9 @@ document.addEventListener('DOMContentLoaded', async () => {
         console.error("Error loading DB:", e);
         renderDashboard();
     }
-
-
 });
 
 // --- Navigation ---
-
 function setActiveNav(activeBtn) {
     [btnNavDashboard, btnNavStats, btnNavSettings, btnNavHelp].forEach(b => b.classList.remove('active'));
     activeBtn.classList.add('active');
@@ -142,5 +138,19 @@ function setupNavigation() {
         viewHelp.classList.add('active');
         setActiveNav(btnNavHelp);
     });
-}
 
+    if (btnViewCard) {
+        btnViewCard.addEventListener('click', () => {
+            appData.settings.viewMode = 'card';
+            autoSave();
+            renderDashboard();
+        });
+    }
+    if (btnViewTable) {
+        btnViewTable.addEventListener('click', () => {
+            appData.settings.viewMode = 'table';
+            autoSave();
+            renderDashboard();
+        });
+    }
+}
