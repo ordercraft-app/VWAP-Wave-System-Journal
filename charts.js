@@ -240,7 +240,7 @@ function renderStatsDashboard() {
                 labels: ['Wins', 'Losses', 'B/E'],
                 datasets: [{ data: [overallStats.wins, overallStats.losses, overallStats.be], backgroundColor: [colors.win, colors.loss, colors.be], borderWidth: 0 }]
             },
-            options: { maintainAspectRatio: false, cutout: '80%', layout: { padding: { top: 30, left: 30, right: 30, bottom: 10 } }, plugins: { legend: { position: 'bottom', labels: { color: '#888', usePointStyle: true, pointStyle: 'circle', padding: 36 } } } }
+            options: { maintainAspectRatio: false, cutout: '80%', layout: { padding: { top: 30, left: 30, right: 30, bottom: 10 } }, plugins: { legend: { position: 'bottom', labels: { color: '#888', usePointStyle: true, pointStyle: 'circle', padding: 16 } } } }
         });
     });
 
@@ -317,7 +317,7 @@ function renderStatsDashboard() {
         chartInstances['directionChart'] = new Chart(document.getElementById('directionChart'), {
             type: 'doughnut',
             data: { labels: dirLabels, datasets: [{ data: dirWins, backgroundColor: [colors.accent, '#2b2c30'], borderWidth: 0 }] },
-            options: { maintainAspectRatio: false, cutout: '80%', layout: { padding: { top: 30, left: 30, right: 30, bottom: 10 } }, plugins: { legend: { position: 'bottom', labels: { color: '#888', usePointStyle: true, pointStyle: 'circle', padding: 36 } } } }
+            options: { maintainAspectRatio: false, cutout: '80%', layout: { padding: { top: 30, left: 30, right: 30, bottom: 10 } }, plugins: { legend: { position: 'bottom', labels: { color: '#888', usePointStyle: true, pointStyle: 'circle', padding: 16 } } } }
         });
     });
 
@@ -373,14 +373,13 @@ function renderStatsDashboard() {
 
     // 10. Confluence Rate
     handleChartRender('confluenceChart', 'confluence', () => {
-        const confGroups = { '1': [], '2': [], '3': [], '4+': [] };
+        const confGroups = { '1': [], '2': [], '3+': [] };
         trades.forEach(t => {
             if (t.result === 'WIN' || t.result === 'LOST') {
                 const count = (t.locations || []).length;
                 if(count === 1) confGroups['1'].push(t);
                 else if(count === 2) confGroups['2'].push(t);
-                else if(count === 3) confGroups['3'].push(t);
-                else if(count >= 4) confGroups['4+'].push(t);
+                else if(count >= 3) confGroups['3+'].push(t);
             }
         });
         destroyChart('confluenceChart');

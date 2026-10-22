@@ -24,6 +24,16 @@ document.addEventListener('DOMContentLoaded', async () => {
     setupImageUploadEvents();
     setupImageViewer();
     
+    const btnToday = document.getElementById('btn-today');
+    if (btnToday) {
+        btnToday.addEventListener('click', () => {
+            const tStr = new Date().toLocaleDateString('en-CA');
+            window.fpDatePicker.setDate(tStr);
+            alignWeekToDate(new Date(tStr));
+            renderDashboard();
+        });
+    }
+    
     document.querySelectorAll('.faq-question').forEach(question => {
         question.addEventListener('click', () => {
             const item = question.parentElement;

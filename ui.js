@@ -529,7 +529,7 @@ async function renderDashboard() {
                         <span class="row-primary">${primaryLoc}</span>
                         <span class="row-secondary" title="${subLoc}">${subLoc}</span>
                     </div>
-                    <div class="row-col row-col-res" style="margin-left: auto;">
+                    <div class="row-col-res" style="margin-left: auto; display: flex; align-items: center;">
                         <span class="badge ${resultClass}">${trade.result || '-'}</span>
                     </div>
                 </div>
