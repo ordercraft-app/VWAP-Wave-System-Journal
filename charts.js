@@ -161,7 +161,8 @@ function renderStatsDashboard() {
 
     Chart.defaults.color = chartTextColor;
     Chart.defaults.scale.grid.color = chartGridColor;
-    const colors = { win: winColor, loss: '#ee354e', be: beColor, accent: '#386af5' };
+    const shortColor = isLight ? '#C1C8D1' : '#2b2c30';
+    const colors = { win: winColor, loss: '#ee354e', be: beColor, accent: '#386af5', short: shortColor };
 
 
     Chart.defaults.scale.grid.display = false;
@@ -328,7 +329,7 @@ function renderStatsDashboard() {
         destroyChart('directionChart');
         chartInstances['directionChart'] = new Chart(document.getElementById('directionChart'), {
             type: 'doughnut',
-            data: { labels: dirLabels, datasets: [{ data: dirWins, backgroundColor: [colors.accent, '#2b2c30'], borderWidth: 0 }] },
+            data: { labels: dirLabels, datasets: [{ data: dirWins, backgroundColor: [colors.accent, colors.short], borderWidth: 0 }] },
             options: { maintainAspectRatio: false, cutout: '80%', layout: { padding: { top: 30, left: 30, right: 30, bottom: 10 } }, plugins: { legend: { position: 'bottom', labels: { color: '#888', usePointStyle: true, pointStyle: 'circle', padding: 16 } } } }
         });
     });
