@@ -509,27 +509,101 @@ async function renderDashboard() {
                 : `<div class="row-no-thumb"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect><circle cx="8.5" cy="8.5" r="1.5"></circle><polyline points="21 15 16 10 5 21"></polyline></svg></div>`;
             
             let primaryLoc = trade.locations && trade.locations[0] && trade.locations[0].primary ? trade.locations[0].primary : '-';
-            let subLoc = trade.locations && trade.locations[0] && trade.locations[0].sub1 ? trade.locations[0].sub1 : '';
+            let subLoc1 = trade.locations && trade.locations[0] && trade.locations[0].sub1 ? trade.locations[0].sub1 : '';
+            let subLoc2 = trade.locations && trade.locations[0] && trade.locations[0].sub2 ? trade.locations[0].sub2 : '';
+            let subLoc = [subLoc1, subLoc2].filter(Boolean).join(' - ');
             
             row.innerHTML = `
-                ${rowImageHtml}
-                <div class="row-col row-col-id">
-                    <span class="row-primary">#${trade.number || '-'}</span>
-                    <span class="symbol-tag" style="margin-left:0; width: fit-content; margin-top: 2px;">${trade.symbol || '-'}</span>
+                <div class="row-main" style="display: flex; align-items: center; gap: 16px; width: 100%;">
+                    <svg class="row-chevron" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="transition: transform 0.2s; color: var(--text-muted);"><polyline points="9 18 15 12 9 6"></polyline></svg>
+                    ${rowImageHtml}
+                    <div class="row-col row-col-id" style="flex-direction: row; align-items: center; gap: 8px;">
+                        <span class="row-primary">${trade.number || '-'}</span>
+                        ${trade.symbol ? `<span class="symbol-tag" style="margin:0;">${trade.symbol}</span>` : ''}
+                    </div>
+                    <div class="row-col row-col-setup">
+                        <span class="row-primary" title="${trade.setup || '-'}">${trade.setup || '-'}</span>
+                        <span class="row-secondary" title="${trade.direction || '-'} ${trade.marketCondition ? '| ' + trade.marketCondition : ''}">${trade.direction || '-'} ${trade.marketCondition ? '| ' + trade.marketCondition : ''}</span>
+                    </div>
+                    <div class="row-col row-col-loc">
+                        <span class="row-primary">${primaryLoc}</span>
+                        <span class="row-secondary" title="${subLoc}">${subLoc}</span>
+                    </div>
+                    <div class="row-col row-col-res" style="margin-left: auto;">
+                        <span class="badge ${resultClass}">${trade.result || '-'}</span>
+                    </div>
                 </div>
-                <div class="row-col row-col-setup">
-                    <span class="row-primary" title="${trade.setup || '-'}">${trade.setup || '-'}</span>
-                    <span class="row-secondary" title="${trade.direction || '-'} ${trade.marketCondition ? '| ' + trade.marketCondition : ''}">${trade.direction || '-'} ${trade.marketCondition ? '| ' + trade.marketCondition : ''}</span>
-                </div>
-                <div class="row-col row-col-loc">
-                    <span class="row-primary">Location</span>
-                    <span class="row-secondary" title="${primaryLoc}${subLoc ? ' - ' + subLoc : ''}">${primaryLoc}${subLoc ? ' - ' + subLoc : ''}</span>
-                </div>
-                <div class="row-col row-col-res">
-                    <span class="badge ${resultClass}">${trade.result || '-'}</span>
+                <div class="expanded-content" style="display: none; width: 100%; margin-top: 16px; padding-top: 16px; border-top: 1px solid var(--border-color);">
+                    <div class="card-body">
+                        <div class="card-group">
+                            <span class="group-title">Location</span>
+                            <div class="group-value">${formatMultiHierarchy(trade.locations)}</div>
+                        </div>
+                        <div class="card-group">
+                            <span class="group-title">Market Condition</span>
+                            <div class="group-value">${formatHierarchy(trade.marketCondition)}</div>
+                        </div>
+                        <div class="card-group">
+                            <span class="group-title">Setup</span>
+                            <div class="group-value">${formatHierarchy(trade.setup, trade.direction)}</div>
+                        </div>
+                        ${appData.settings.features.evidence ? `
+                        <div class="card-group">
+                            <span class="group-title">Evidence</span>
+                            <div class="group-value">${formatMultiHierarchy(trade.evidences)}</div>
+                        </div>` : ''}
+                        ${appData.settings.features.invalidation ? `
+                        <div class="card-group">
+                            <span class="group-title">Invalidation</span>
+                            <div class="group-value">${formatMultiHierarchy(trade.invalidations)}</div>
+                        </div>` : ''}
+                        ${appData.settings.features.target ? `
+                        <div class="card-group">
+                            <span class="group-title">Target</span>
+                            <div class="group-value">${formatHierarchy(trade.target, trade.targetSub1, trade.targetSub2)}</div>
+                        </div>` : ''}
+                        ${(appData.settings.features.psychology && trade.psychology && trade.psychology.length > 0) ? `
+                        <div class="card-group psych-group">
+                            <span class="group-title">Psychology</span>
+                            <div class="group-value">
+                                <div style="display: flex; flex-wrap: wrap; gap: 6px;">
+                                    ${trade.psychology.map(p => `<span class="psych-pill-tag" style="padding-right: 8px;">${p}</span>`).join('')}
+                                </div>
+                            </div>
+                        </div>
+                        ` : ''}
+                        ${trade.notes ? `
+                        <div class="card-group psych-group">
+                            <span class="group-title">Notes</span>
+                            <div class="group-value">
+                                <div class="group-primary" style="font-weight: 400; font-size: 13px; white-space: pre-wrap; line-height: 1.5;">${trade.notes}</div>
+                            </div>
+                        </div>
+                        ` : ''}
+                        <div style="width: 100%; display: flex; justify-content: flex-end; margin-top: 8px;">
+                            <button class="btn-secondary btn-sm btn-edit-trade">Edit Trade</button>
+                        </div>
+                    </div>
                 </div>
             `;
-            row.addEventListener('click', () => openTradeModal(trade.id));
+            
+            row.querySelector('.row-main').addEventListener('click', (e) => {
+                const expanded = row.querySelector('.expanded-content');
+                const chevron = row.querySelector('.row-chevron');
+                if (expanded.style.display === 'none') {
+                    expanded.style.display = 'block';
+                    chevron.style.transform = 'rotate(90deg)';
+                } else {
+                    expanded.style.display = 'none';
+                    chevron.style.transform = 'rotate(0deg)';
+                }
+            });
+            
+            row.querySelector('.btn-edit-trade').addEventListener('click', (e) => {
+                e.stopPropagation();
+                openTradeModal(trade.id);
+            });
+            
             tableContainer.appendChild(row);
         } else {
             card.innerHTML = `
