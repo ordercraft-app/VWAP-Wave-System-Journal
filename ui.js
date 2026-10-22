@@ -515,7 +515,7 @@ async function renderDashboard() {
             
             row.innerHTML = `
                 <div class="row-main" style="display: flex; align-items: center; gap: 16px; width: 100%;">
-                    <svg class="row-chevron" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="transition: transform 0.2s; color: var(--text-muted);"><polyline points="9 18 15 12 9 6"></polyline></svg>
+                    <div class="row-chevron-wrapper" style="padding: 4px 8px; margin-left: -8px; border-radius: 4px; cursor: pointer; display: flex; align-items: center; justify-content: center;" title="Expand details"><svg class="row-chevron" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="transition: transform 0.2s; color: var(--text-muted);"><polyline points="9 18 15 12 9 6"></polyline></svg></div>
                     ${rowImageHtml}
                     <div class="row-col row-col-id" style="flex-direction: row; align-items: center; gap: 8px;">
                         <span class="row-primary">${trade.number || '-'}</span>
@@ -580,14 +580,20 @@ async function renderDashboard() {
                             </div>
                         </div>
                         ` : ''}
-                        <div style="width: 100%; display: flex; justify-content: flex-end; margin-top: 8px;">
-                            <button class="btn-secondary btn-sm btn-edit-trade">Edit Trade</button>
-                        </div>
+
                     </div>
                 </div>
             `;
             
-            row.querySelector('.row-main').addEventListener('click', (e) => {
+            // Clicking anywhere on the row opens the modal
+            row.addEventListener('click', () => {
+                openTradeModal(trade.id);
+            });
+            
+            // Clicking specifically on the chevron wrapper expands/collapses the row
+            const chevronWrapper = row.querySelector('.row-chevron-wrapper');
+            chevronWrapper.addEventListener('click', (e) => {
+                e.stopPropagation(); // Stop the row click event
                 const expanded = row.querySelector('.expanded-content');
                 const chevron = row.querySelector('.row-chevron');
                 if (expanded.style.display === 'none') {
@@ -599,10 +605,9 @@ async function renderDashboard() {
                 }
             });
             
-            row.querySelector('.btn-edit-trade').addEventListener('click', (e) => {
-                e.stopPropagation();
-                openTradeModal(trade.id);
-            });
+            // Hover effect just for the chevron area
+            chevronWrapper.addEventListener('mouseenter', () => chevronWrapper.style.backgroundColor = 'rgba(255,255,255,0.05)');
+            chevronWrapper.addEventListener('mouseleave', () => chevronWrapper.style.backgroundColor = 'transparent');
             
             tableContainer.appendChild(row);
         } else {
