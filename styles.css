@@ -628,7 +628,7 @@ select.linear-input {
 .help-contact-icon { width: 48px; height: 48px; border-radius: 50%; display: flex; align-items: center; justify-content: center; background: rgba(56, 106, 245, 0.12); color: var(--accent); margin-bottom: 12px; }
 .help-contact-btn { display: block; width: 100%; text-align: center; text-decoration: none; font-size: 13px; font-weight: 500; border-radius: 100px; padding: 8px 16px; }
 .help-contact-card { background: var(--bg-panel); border-radius: 16px; padding: 24px 20px; display: flex; flex-direction: column; align-items: center; text-align: center; }
-.help-contact-logo { width: 72px; height: 72px; border-radius: 50%; overflow: hidden; border: 1px solid var(--border-color); margin-bottom: 12px; flex-shrink: 0; }
+.help-contact-logo { width: 72px; height: 72px; border-radius: 50%; overflow: hidden; margin-bottom: 12px; flex-shrink: 0; }
 .help-contact-logo img { width: 100%; height: 100%; object-fit: cover; display: block; }
 .help-contact-name { font-size: 15px; font-weight: 600; color: var(--text-main); margin-bottom: 8px; }
 .help-contact-text { font-size: 12px; color: var(--text-muted); line-height: 1.5; margin-bottom: 16px; }
@@ -747,7 +747,7 @@ span.flatpickr-weekday {
 
 .trade-row { display: flex; flex-direction: column; background-color: var(--bg-panel); border: 1px solid transparent; border-radius: 16px; padding: 12px 16px; cursor: pointer; transition: border-color 0.2s; }
 .trade-row:hover { border-color: var(--border-hover); }
-.row-thumb { width: 40px; height: 40px; border-radius: 4px; object-fit: cover; border: 1px solid var(--border-color); flex-shrink: 0; }
+.row-thumb { width: 40px; height: 40px; border-radius: 4px; object-fit: cover; flex-shrink: 0; }
 .row-no-thumb { width: 40px; height: 40px; border-radius: 4px; background: var(--bg-input); display: flex; align-items: center; justify-content: center; color: var(--text-muted); flex-shrink: 0; }
 .row-col { display: flex; flex-direction: column; gap: 4px; overflow: hidden; }
 .row-col-id { width: auto; min-width: 80px; flex-shrink: 0; }
@@ -829,7 +829,6 @@ span.flatpickr-weekday {
 .window-card img {
     width: 100%;
     border-radius: 4px;
-    border: 1px solid var(--border-color);
 }
 .window-title {
     font-size: 11px;
