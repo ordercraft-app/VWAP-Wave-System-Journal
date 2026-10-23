@@ -1627,6 +1627,8 @@ function showToast(message, type = 'info') {
     }, 3000);
 }
 
+let floatingToastTimer = null;
+let floatingToastShownThisSession = false;
 
 async function connectScreenshotWindow() {
     try {
@@ -1645,8 +1647,12 @@ async function connectScreenshotWindow() {
         };
         
         appData.settings.autoScreenshotEnabled = true;
-        autoSave();
+        await autoSave();
         
+        // Hide floating toast if open
+        const toastEl = document.getElementById('floating-screenshot-toast');
+        if (toastEl) toastEl.remove();
+
         if (currentSettingsTab === 'screenshot') renderSettingsUI();
         updateScreenshotBanner();
         showToast('Window connected successfully!', 'success');
@@ -1655,25 +1661,23 @@ async function connectScreenshotWindow() {
     }
 }
 
-let floatingToastTimer = null;
-let floatingToastShownThisSession = false;
-
 function updateScreenshotBanner() {
     const banner = document.getElementById('screenshot-connect-banner');
     const isConnected = (activeMediaStream && activeMediaStream.active);
     
-    // 1. Dashboard Banner logic
+    // 1. Dashboard Banner logic (When user previously enabled it but stream is lost/disconnected on reboot)
     if (banner) {
         banner.onclick = connectScreenshotWindow;
-        if (appData.settings.autoScreenshotEnabled && !isConnected) {
+        if (appData.settings.autoScreenshotEnabled === true && !isConnected) {
             banner.style.display = 'flex';
         } else {
             banner.style.display = 'none';
         }
     }
 
-    // 2. Floating Bottom-Right Toast Banner (Only at startup/first check when feature was NOT active/connected in previous session)
-    if (dirHandle && fileConnected && !appData.settings.autoScreenshotEnabled && !isConnected && !floatingToastShownThisSession) {
+    // 2. Floating Bottom-Right Toast Banner
+    // Condition: Folder is connected, stream is NOT connected, feature is NOT enabled (user had manually disconnected/never enabled), AND toast hasn't been shown yet this session.
+    if (dirHandle && fileConnected && appData.settings.autoScreenshotEnabled !== true && !isConnected && !floatingToastShownThisSession) {
         showFloatingScreenshotToast();
     }
 }
