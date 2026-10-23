@@ -363,6 +363,10 @@ select.linear-input {
 .cal-result-tag.win { background: var(--bg-win); color: var(--color-win); }
 .cal-result-tag.lost { background: rgba(238, 53, 78, 0.15); color: #ee354e; }
 .cal-result-tag.be { background: rgba(136, 136, 136, 0.15); color: var(--text-muted); }
+.cal-day.active .cal-result-tag { color: #FFFFFF; }
+.cal-day.active .cal-result-tag.win { background: var(--color-win); }
+.cal-day.active .cal-result-tag.lost { background: var(--danger); }
+.cal-day.active .cal-result-tag.be { background: #6E727A; }
 
 .trades-list { display: flex; flex-direction: column; gap: 8px; padding-bottom: 40px; }
 
