@@ -937,6 +937,10 @@ span.flatpickr-weekday {
 .anim-next { animation: slideFromRight 900ms var(--ease-day) both; animation-delay: calc(var(--i, 0) * 80ms); }
 .anim-prev { animation: slideFromLeft 900ms var(--ease-day) both; animation-delay: calc(var(--i, 0) * 80ms); }
 
+/* No horizontal scrollbar while items slide in sideways */
+.view { overflow-x: hidden; }
+.table-responsive-wrapper:has(.anim-next, .anim-prev, .anim-enter) { overflow-x: hidden; }
+
 /* 4. Sliding sidebar indicator */
 .sidebar-nav { position: relative; }
 .sidebar-nav .btn-icon { position: relative; z-index: 1; }
