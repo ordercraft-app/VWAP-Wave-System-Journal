@@ -1609,7 +1609,7 @@ function renderSettingsUI() {
 }
 
 
-function showToast(message, type = 'info') {
+function getToastContainer() {
     let container = document.getElementById('toast-container');
     if (!container) {
         container = document.createElement('div');
@@ -1617,6 +1617,11 @@ function showToast(message, type = 'info') {
         container.className = 'toast-container';
         document.body.appendChild(container);
     }
+    return container;
+}
+
+function showToast(message, type = 'info') {
+    const container = getToastContainer();
     const toast = document.createElement('div');
     toast.className = `toast ${type}`;
     toast.innerHTML = `<span>${escapeHTML(message)}</span>`;
@@ -1649,6 +1654,7 @@ async function connectScreenshotWindow() {
         
         if (currentSettingsTab === 'screenshot') renderSettingsUI();
         updateScreenshotBanner();
+        hideScreenshotPromo();
         showToast('Window connected successfully!', 'success');
     } catch (err) {
         console.error("Screen share error:", err);
@@ -1665,4 +1671,70 @@ function updateScreenshotBanner() {
             banner.style.display = 'none';
         }
     }
+}
+
+
+// --- Auto-Screenshot Promo Toast ---
+// Shown once per app session when auto-screenshots were NOT active in a previous
+// session (appData.settings.autoScreenshotEnabled is false/undefined).
+// Never shown while the installation guide or the reconnect screen is visible.
+
+const PROMO_TOAST_DURATION = 12000; // ms the toast stays visible (pauses on hover)
+const PROMO_TOAST_DELAY = 1200;     // ms after the dashboard has loaded
+let screenshotPromoShown = false;
+
+function maybeShowScreenshotPromo() {
+    if (screenshotPromoShown) return;
+    if (!dirHandle || !fileConnected) return;                        // installation guide / reconnect screen
+    if (appData.settings.autoScreenshotEnabled) return;              // dashboard banner handles this case
+    if (activeMediaStream && activeMediaStream.active) return;       // already connected
+    if (!navigator.mediaDevices || !navigator.mediaDevices.getDisplayMedia) return;
+
+    screenshotPromoShown = true;
+    setTimeout(showScreenshotPromo, PROMO_TOAST_DELAY);
+}
+
+function showScreenshotPromo() {
+    if (document.getElementById('screenshot-promo-toast')) return;
+    if (activeMediaStream && activeMediaStream.active) return;
+
+    const toast = document.createElement('div');
+    toast.id = 'screenshot-promo-toast';
+    toast.className = 'promo-toast';
+    toast.setAttribute('role', 'status');
+    toast.style.setProperty('--promo-duration', `${PROMO_TOAST_DURATION}ms`);
+    toast.innerHTML = `
+        <button type="button" class="promo-toast-close" title="Close" aria-label="Close">&times;</button>
+        <div class="promo-toast-header">
+            <div class="promo-toast-icon">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"></path><circle cx="12" cy="13" r="4"></circle></svg>
+            </div>
+            <span class="promo-toast-title">Instant Chart Captures</span>
+        </div>
+        <p class="promo-toast-text">Save time journaling! Connect your TradingView window for 1-click auto-screenshots on every trade.</p>
+        <button type="button" class="btn-primary btn-sm promo-toast-btn">Connect Window</button>
+        <div class="promo-toast-progress"></div>
+    `;
+
+    getToastContainer().appendChild(toast);
+
+    toast.querySelector('.promo-toast-close').addEventListener('click', hideScreenshotPromo);
+    toast.querySelector('.promo-toast-btn').addEventListener('click', () => {
+        // Same action as "Connect Window" on the Settings > Screenshot tab
+        connectScreenshotWindow();
+        hideScreenshotPromo();
+    });
+    // The progress bar drives the auto-hide timer (pauses while hovering)
+    toast.querySelector('.promo-toast-progress').addEventListener('animationend', hideScreenshotPromo);
+
+    // Double rAF so the slide-in transition actually plays
+    requestAnimationFrame(() => requestAnimationFrame(() => toast.classList.add('visible')));
+}
+
+function hideScreenshotPromo() {
+    const toast = document.getElementById('screenshot-promo-toast');
+    if (!toast || toast.classList.contains('hiding')) return;
+    toast.classList.add('hiding');
+    toast.classList.remove('visible');
+    setTimeout(() => toast.remove(), 500);
 }

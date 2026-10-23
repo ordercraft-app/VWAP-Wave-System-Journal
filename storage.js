@@ -201,6 +201,10 @@ async function loadDataFromFile() {
         // Force save to ensure both files exist in the new format
         await autoSave();
         renderDashboard();
+
+        // Promo toast for auto-screenshots (only after the folder is connected,
+        // so never while the installation guide / welcome screen is visible)
+        if (typeof maybeShowScreenshotPromo === 'function') maybeShowScreenshotPromo();
     } catch (err) {
         console.error("Load process failed:", err);
     }
