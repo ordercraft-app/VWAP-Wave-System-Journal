@@ -150,7 +150,7 @@ body {
 }
 
 .sidebar-nav .btn-icon.active {
-    background-color: transparent;
+    background-color: var(--cal-active-bg);
     color: var(--text-main);
     border-color: transparent;
 }
@@ -247,7 +247,7 @@ button { font-family: inherit; font-size: 13px; cursor: pointer; border-radius: 
 .btn-icon:hover {
     color: var(--text-main);
     background-color: var(--bg-input);
-    border-color: var(--border-color);
+    border-color: transparent;
 }
 
 .linear-input { 
@@ -735,3 +735,22 @@ span.flatpickr-weekday {
 .hotkey-table .table-section-title { font-weight: 600; background: var(--bg-hover); padding-top: 8px; padding-bottom: 8px; color: var(--text-main); }
 .hotkey-table code { background-color: var(--bg-input); padding: 2px 6px; border-radius: 4px; color: var(--text-main); border: 1px solid var(--border-color); font-size: 11px; white-space: nowrap; }
 
+
+/* Theme Toggle Button Specifics */
+#btn-theme-toggle {
+    background-color: #F4F5F7 !important;
+    color: #141517 !important;
+    border-color: transparent !important;
+}
+#btn-theme-toggle:hover {
+    background-color: #E2E4E9 !important;
+    color: #141517 !important;
+}
+[data-theme="light"] #btn-theme-toggle {
+    background-color: #0a0b0d !important;
+    color: #EEEEEE !important;
+}
+[data-theme="light"] #btn-theme-toggle:hover {
+    background-color: #141517 !important;
+    color: #EEEEEE !important;
+}
