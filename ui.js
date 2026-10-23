@@ -1476,8 +1476,8 @@ function renderSettingsUI() {
     tabScreenshot.onclick = () => { currentSettingsTab = 'screenshot'; renderSettingsUI(); };
     
     tabsDiv.appendChild(tabJournal);
-    tabsDiv.appendChild(tabScreenshot);
     tabsDiv.appendChild(tabChart);
+    tabsDiv.appendChild(tabScreenshot);
     settingsContainer.appendChild(tabsDiv);
     
     const onSettingsChange = async () => { await autoSave(); };
@@ -1675,6 +1675,7 @@ async function connectScreenshotWindow() {
 function updateScreenshotBanner() {
     const banner = document.getElementById('screenshot-connect-banner');
     if (banner) {
+        banner.onclick = connectScreenshotWindow;
         if (appData.settings.autoScreenshotEnabled && (!activeMediaStream || !activeMediaStream.active)) {
             banner.style.display = 'flex';
         } else {
