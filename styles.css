@@ -685,16 +685,16 @@ span.flatpickr-weekday {
 /* Settings Tabs */
 .settings-tabs { display: flex; gap: 8px; margin-bottom: 24px; }
 .settings-tab-btn { background: transparent; border: 1px solid transparent; color: var(--text-muted); padding: 8px 16px; font-size: 13px; font-weight: 500; cursor: pointer; border-radius: 100px; transition: all 0.2s; }
-.settings-tab-btn:hover { color: var(--text-main); background: var(--group-bg); }
+.settings-tab-btn:hover { color: var(--text-main); background-color: var(--bg-input); }
 .settings-tab-btn.active { background-color: var(--cal-active-bg); border-color: transparent; color: var(--text-main); }
 .chart-toggle-row { display: flex; justify-content: space-between; align-items: center; padding: 12px 16px; background: var(--bg-panel); border: none; border-radius: 8px; }
 .chart-toggle-label { font-size: 13px; font-weight: 500; color: var(--text-main); }
 
 /* View Toggle & Table View */
 .view-toggle { display: flex; gap: 8px; }
-.view-toggle .btn-icon { background: transparent; border: 1px solid transparent; color: var(--text-muted); padding: 8px; font-size: 13px; font-weight: 500; cursor: pointer; border-radius: 6px; transition: all 0.2s; width: 36px; height: 36px; min-width: unset; min-height: unset; display: flex; align-items: center; justify-content: center; }
+.view-toggle .btn-icon { background: transparent; border: 1px solid transparent; color: var(--text-muted); padding: 8px; font-size: 13px; font-weight: 500; cursor: pointer; border-radius: 100px; transition: all 0.2s; width: 36px; height: 36px; min-width: unset; min-height: unset; display: flex; align-items: center; justify-content: center; }
 .view-toggle .btn-icon.active { background-color: var(--cal-active-bg); border-color: transparent; color: var(--text-main); box-shadow: none; }
-.view-toggle .btn-icon:hover:not(.active) { color: var(--text-main); background: var(--group-bg); }
+.view-toggle .btn-icon:hover:not(.active) { color: var(--text-main); background-color: var(--bg-input); }
 
 .table-responsive-wrapper { width: 100%; overflow-x: auto; padding-bottom: 16px; }
 .trades-table { min-width: 700px; display: flex; flex-direction: column; gap: 8px; }
