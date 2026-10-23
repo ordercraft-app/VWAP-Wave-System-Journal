@@ -597,9 +597,9 @@ select.linear-input {
 
 /* FAQ / Help Section */
 .faq-container { display: flex; flex-direction: column; gap: 8px; margin-top: 24px; width: 100%; padding-bottom: 40px; }
-.faq-item { background: var(--bg-panel); border: none; border-radius: 8px; overflow: hidden; }
+.faq-item { background: var(--bg-panel); border: 1px solid transparent; border-radius: 8px; overflow: hidden; transition: border-color 0.2s; }
 .faq-question { padding: 16px 20px; display: flex; justify-content: space-between; align-items: center; cursor: pointer; font-weight: 600; font-size: 14px; user-select: none; transition: background-color 0.2s; }
-.faq-question:hover { background: var(--group-bg); }
+.faq-item:hover { border-color: var(--border-hover); }
 .faq-icon { transition: transform 0.3s; color: var(--text-muted); }
 .faq-item.open .faq-icon { transform: rotate(180deg); }
 .faq-answer { padding: 0 20px; max-height: 0; overflow: hidden; transition: max-height 0.3s ease-out, padding 0.3s ease; font-size: 13px; color: var(--text-muted); line-height: 1.6; }
