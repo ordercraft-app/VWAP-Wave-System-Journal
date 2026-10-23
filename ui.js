@@ -193,7 +193,7 @@ async function renderDashboard() {
     
     if (dirHandle && !fileConnected) {
         tradesList.innerHTML = `
-            <div class="empty-state" style="max-width: 400px; margin: 40px auto; padding: 32px; border: 1px solid var(--border-color); border-radius: 12px; background: var(--bg-panel); box-shadow: 0 12px 24px rgba(0,0,0,0.2);">
+            <div class="empty-state" style="max-width: 400px; margin: 40px auto; padding: 32px; border: 1px solid var(--border-color); border-radius: 16px; background: var(--bg-panel); box-shadow: 0 12px 24px rgba(0,0,0,0.2);">
                 <h3 style="color: var(--text-main); margin-bottom: 12px; font-size: 18px; letter-spacing: -0.4px;">Welcome back! 👋</h3>
                 <p style="color: var(--text-muted); font-size: 13px; line-height: 1.5; margin-bottom: 24px;">Ready to start journaling? Re-connect your folder to pick up right where you left off.</p>
                 <button id="btn-restore-conn" class="btn-primary" style="width: 100%;">Connect Folder</button>
@@ -209,7 +209,7 @@ async function renderDashboard() {
 
     if (!dirHandle) {
         tradesList.innerHTML = `
-            <div class="empty-state" style="max-width: 440px; margin: 40px auto; padding: 32px; border: 1px solid var(--border-color); border-radius: 12px; background: var(--bg-panel); box-shadow: 0 12px 24px rgba(0,0,0,0.2);">
+            <div class="empty-state" style="max-width: 440px; margin: 40px auto; padding: 32px; border: 1px solid var(--border-color); border-radius: 16px; background: var(--bg-panel); box-shadow: 0 12px 24px rgba(0,0,0,0.2);">
                 <h3 style="color: var(--text-main); margin-bottom: 12px; font-size: 18px; letter-spacing: -0.4px;">Welcome to VWAP Wave System Journal</h3>
                 <p style="color: var(--text-muted); font-size: 13px; line-height: 1.5; margin-bottom: 24px;">To get started, you need to set up a local folder on your computer to store your trades and images securely.</p>
                 
