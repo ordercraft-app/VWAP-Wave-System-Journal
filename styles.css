@@ -437,7 +437,7 @@ select.linear-input {
 .modal-overlay.active { visibility: visible; opacity: 1; }
 .linear-modal { background-color: var(--bg-main); border-left: 1px solid var(--border-color); width: 700px; max-width: 100vw; height: 100vh; max-height: 100vh; display: flex; flex-direction: column; box-shadow: -10px 0 40px var(--shadow-md); position: absolute; right: 0; top: 0; transform: translateX(100%); transition: transform 0.3s cubic-bezier(0.2, 0.8, 0.2, 1); }
 .modal-overlay.active .linear-modal { transform: translateX(0); }
-.modal-header { padding: 20px 24px; border-bottom: 1px solid var(--border-color); display: flex; justify-content: space-between; align-items: center; }
+.modal-header { padding: 20px 24px; display: flex; justify-content: space-between; align-items: center; }
 .close-btn { background: none; border: none; color: var(--text-muted); font-size: 20px; padding: 0; }
 .close-btn:hover { color: var(--text-main); }
 .modal-body { padding: 24px; overflow-y: auto; flex: 1; }
@@ -456,11 +456,11 @@ select.linear-input {
 
 .btn-remove-row { background: transparent; border: none; color: var(--danger); font-size: 22px; cursor: pointer; opacity: 0.7; display: flex; justify-content: center; align-items: center; height: 34px; }
 .btn-remove-row:hover:not(:disabled) { opacity: 1; }
-.btn-remove-row:disabled { opacity: 0.2; cursor: not-allowed; }
+.btn-remove-row:disabled { color: var(--text-muted); opacity: 0.4; cursor: not-allowed; }
 
-.section-header { display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid var(--border-color); padding-bottom: 6px; margin: 24px 0 8px 0; }
+.section-header { display: flex; justify-content: space-between; align-items: center; margin: 24px 0 8px 0; }
 .section-header span { font-size: 11px; text-transform: uppercase; color: var(--text-muted); letter-spacing: 0.5px; }
-.form-separator { font-size: 11px; text-transform: uppercase; color: var(--text-muted); letter-spacing: 0.5px; margin: 24px 0 8px 0; border-bottom: 1px solid var(--border-color); padding-bottom: 6px; }
+.form-separator { font-size: 11px; text-transform: uppercase; color: var(--text-muted); letter-spacing: 0.5px; margin: 24px 0 8px 0; }
 .form-separator.section-header { margin: 24px 0 8px 0; }
 
 .add-confluence-btn { font-size: 10px; padding: 4px 8px; background: transparent; border: 1px solid var(--border-color); color: var(--text-muted); }
