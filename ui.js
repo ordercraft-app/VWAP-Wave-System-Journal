@@ -64,7 +64,7 @@ async function compressImage(file) {
             canvas.height = height;
             const ctx = canvas.getContext('2d');
             ctx.drawImage(img, 0, 0, width, height);
-            canvas.toBlob((blob) => resolve(blob), 'image/webp', 0.8);
+            canvas.toBlob((blob) => resolve(blob), 'image/webp', 0.90);
         };
         img.onerror = reject;
         img.src = URL.createObjectURL(file);
@@ -933,14 +933,14 @@ async function openTradeModal(tradeId = null) {
                 
                 canvas.toBlob(async (blob) => {
                     if(!blob) throw new Error("Canvas to Blob failed");
-                    const file = new File([blob], `${symbol}_screenshot_${Date.now()}.png`, { type: 'image/png' });
+                    const file = new File([blob], `${symbol}_screenshot_${Date.now()}.webp`, { type: 'image/webp' });
                     
                     await handleImageFile(file);
                     showToast('Screenshot captured!', 'success');
                     
                     newAutoShotBtn.innerHTML = originalText;
                     newAutoShotBtn.disabled = false;
-                }, 'image/png', 1.0);
+                }, 'image/webp', 0.9);
                 
             } catch (error) {
                 alert(`Capture failed: ${error.message}`);
@@ -993,7 +993,7 @@ btnSaveTrade.addEventListener('click', async (e) => {
         if (existingImageFilename && !imageRemoved) {
              await deleteImageFromDir(existingImageFilename); 
         }
-        finalImageName = `trade_${tradeId}_${Date.now()}.png`;
+        finalImageName = `trade_${tradeId}_${Date.now()}.webp`;
         await saveImageToDir(pendingImageBlob, finalImageName);
     }
     
