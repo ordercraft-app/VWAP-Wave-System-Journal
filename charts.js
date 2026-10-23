@@ -158,7 +158,7 @@ function renderStatsDashboard() {
     const chartTextColor = isLight ? '#6E727A' : '#888888';
     const beColor = isLight ? '#C1C8D1' : '#2b2c30';
     const heatmapBorder = isLight ? '#FFFFFF' : '#141517';
-    const winColor = isLight ? '#44BD1E' : '#51dc26';
+    const winColor = isLight ? '#44BD1E' : '#44BD1E';
     const shortColor = isLight ? '#C1C8D1' : '#2b2c30';
     
     Chart.defaults.color = chartTextColor;
