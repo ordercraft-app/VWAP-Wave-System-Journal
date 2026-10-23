@@ -1727,5 +1727,4 @@ function showFloatingScreenshotToast() {
     floatingToastTimer = setTimeout(() => {
         closeToast();
     }, 9000);
-}    }
 }
