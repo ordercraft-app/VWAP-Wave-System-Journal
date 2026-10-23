@@ -10,6 +10,36 @@ Chart.defaults.scale.grid.drawBorder = false;
 if(!Chart.defaults.scale.border) Chart.defaults.scale.border = {};
 Chart.defaults.scale.border.display = false;
 
+// --- Chart motion (6) ---
+// Smooth ease-out; bars grow from zero one after another; disabled with OS "reduce motion"
+if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
+    Chart.defaults.animation = false;
+} else {
+    Chart.defaults.animation.duration = 750;
+    Chart.defaults.animation.easing = 'easeOutQuart';
+    Chart.defaults.animation.delay = (ctx) => {
+        if (ctx.type === 'data' && ctx.mode === 'default' && ctx.chart.config.type === 'bar') {
+            return 150 + ctx.dataIndex * 70 + ctx.datasetIndex * 40;
+        }
+        return 0;
+    };
+}
+
+// Growth line draws itself from left to right
+function progressiveLineAnimation(pointCount, totalDuration = 1000) {
+    if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) return undefined;
+    const step = totalDuration / Math.max(pointCount, 1);
+    const previousY = (ctx) => ctx.index === 0
+        ? ctx.chart.scales.y.getPixelForValue(0)
+        : ctx.chart.getDatasetMeta(ctx.datasetIndex).data[ctx.index - 1].getProps(['y'], true).y;
+    return {
+        x: { type: 'number', easing: 'linear', duration: step, from: NaN,
+             delay(ctx) { if (ctx.type !== 'data' || ctx.xStarted) return 0; ctx.xStarted = true; return ctx.index * step; } },
+        y: { type: 'number', easing: 'linear', duration: step, from: previousY,
+             delay(ctx) { if (ctx.type !== 'data' || ctx.yStarted) return 0; ctx.yStarted = true; return ctx.index * step; } }
+    };
+}
+
 function getWinRateData(tradesArray) {
     const wins = tradesArray.filter(t => t.result === 'WIN').length;
     const losses = tradesArray.filter(t => t.result === 'LOST').length;
@@ -258,6 +288,7 @@ function renderStatsDashboard() {
                 }]
             },
             options: { 
+                animations: progressiveLineAnimation(growthData.length),
                 maintainAspectRatio: false, interaction: { mode: 'index', intersect: false, },
                 scales: { 
                     x: { display: false },

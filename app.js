@@ -24,6 +24,8 @@ document.addEventListener('DOMContentLoaded', async () => {
     setupImageUploadEvents();
         setupImageViewer();
     setupThemeToggle();
+    moveNavIndicator(btnNavDashboard, false);
+    window.addEventListener('resize', () => moveNavIndicator(document.querySelector('.sidebar-nav .btn-icon.active'), false));
     tradesList.addEventListener('click', (e) => {
         const imgTarget = e.target.closest('.trade-img-trigger');
         if (imgTarget) {
@@ -269,8 +271,13 @@ function applyTheme(theme) {
 // --- Navigation ---
 
 function setActiveNav(activeBtn) {
+    const wasActive = activeBtn.classList.contains('active');
     [btnNavDashboard, btnNavStats, btnNavSettings, btnNavHelp].forEach(b => b.classList.remove('active'));
     activeBtn.classList.add('active');
+
+    // Motion: slide the sidebar indicator and play the page-enter animation
+    moveNavIndicator(activeBtn, true);
+    if (!wasActive) playViewEnter(document.querySelector('.view.active'));
 }
 
 function setupNavigation() {

@@ -191,10 +191,94 @@ function renderWeeklyCalendar() {
     }
 }
 
+// --- Motion / Animations ---
+// Subtle SaaS-style motion. Disabled automatically when the OS "reduce motion" setting is on.
+const REDUCED_MOTION = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+const MAX_STAGGER_ITEMS = 10;   // items after this all share the last delay
+let pendingTradesAnimation = 'enter'; // 'enter' | 'next' | 'prev' | null
+let lastRenderedDate = null;
+let lastRenderedWeek = null;
+
+// Plays a staggered animation on a list of elements: 'enter' (fade + slide up), 'next' or 'prev' (slide sideways)
+function animateItems(elements, type = 'enter') {
+    if (REDUCED_MOTION || !elements) return;
+    const cls = 'anim-' + type;
+    Array.from(elements).forEach((el, i) => {
+        el.classList.remove('anim-enter', 'anim-next', 'anim-prev');
+        el.style.setProperty('--i', Math.min(i, MAX_STAGGER_ITEMS));
+        void el.offsetWidth; // restart animation
+        el.classList.add(cls);
+        const cleanup = (e) => {
+            if (e.target !== el) return;
+            el.classList.remove(cls);
+            el.removeEventListener('animationend', cleanup);
+        };
+        el.addEventListener('animationend', cleanup);
+    });
+}
+
+// Page enter: quick fade of the view + staggered content (runs after the page has rendered)
+function playViewEnter(view) {
+    if (REDUCED_MOTION || !view) return;
+    view.classList.remove('view-enter');
+    void view.offsetWidth;
+    view.classList.add('view-enter');
+
+    if (view.id === 'view-dashboard') pendingTradesAnimation = 'enter';
+
+    // Microtask: runs after the synchronous render of the page, before the browser paints
+    queueMicrotask(() => {
+        const selectors = {
+            'view-dashboard': '#screenshot-connect-banner, #weekly-calendar-widget',
+            'view-stats': '.view-header, .stats-filters, .kpi-card, .stats-grid > .stat-card',
+            'view-settings': '.view-header, .settings-tabs, #settings-ui-container > .info-banner, .setting-category-card, .chart-toggle-row',
+            'view-help': '.view-header, .faq-item, .help-contact-card'
+        };
+        const sel = selectors[view.id];
+        if (!sel) return;
+        const items = Array.from(view.querySelectorAll(sel)).filter(el => el.offsetParent !== null);
+        animateItems(items, 'enter');
+    });
+}
+
+// Sliding active indicator behind the sidebar icons
+function moveNavIndicator(btn, animate = true) {
+    const nav = document.querySelector('.sidebar-nav');
+    if (!nav || !btn) return;
+    let indicator = nav.querySelector('.nav-indicator');
+    if (!indicator) {
+        indicator = document.createElement('div');
+        indicator.className = 'nav-indicator';
+        nav.prepend(indicator);
+        nav.classList.add('has-indicator');
+        animate = false;
+    }
+    if (!animate || REDUCED_MOTION) indicator.style.transition = 'none';
+    indicator.style.transform = `translate(${btn.offsetLeft}px, ${btn.offsetTop}px)`;
+    if (!animate || REDUCED_MOTION) {
+        void indicator.offsetWidth;
+        indicator.style.transition = '';
+    }
+}
+
 // --- Dashboard Rendering ---
 
 async function renderDashboard() {
     renderWeeklyCalendar();
+
+    // Direction-aware motion: compare with what was shown before
+    const renderDate = datePicker.value;
+    const renderWeek = currentWeekStartDate.toLocaleDateString('en-CA');
+    if (lastRenderedWeek && renderWeek !== lastRenderedWeek) {
+        animateItems([calDaysContainer], renderWeek > lastRenderedWeek ? 'next' : 'prev');
+    }
+    if (lastRenderedDate && renderDate !== lastRenderedDate && !pendingTradesAnimation) {
+        pendingTradesAnimation = renderDate > lastRenderedDate ? 'next' : 'prev';
+    }
+    lastRenderedDate = renderDate;
+    lastRenderedWeek = renderWeek;
+    const tradesAnimation = pendingTradesAnimation;
+    pendingTradesAnimation = null;
     revokeObjectUrls();
     tradesList.innerHTML = '';
     if(dashboardToolbar) dashboardToolbar.style.display = 'none';
@@ -472,6 +556,7 @@ async function renderDashboard() {
         document.getElementById('btn-add-first-trade').addEventListener('click', () => {
             openTradeModal();
         });
+        if (tradesAnimation) animateItems(tradesList.children, tradesAnimation);
         return;
     }
 
@@ -667,6 +752,12 @@ async function renderDashboard() {
     
     tradesList.appendChild(fragment);
 
+    if (tradesAnimation) {
+        const items = [];
+        if (dashboardToolbar && tradesAnimation === 'enter') items.push(dashboardToolbar);
+        items.push(...tradesList.querySelectorAll(':scope > .trade-card, .trade-row'));
+        animateItems(items, tradesAnimation);
+    }
 }
 
 // --- Trade Modal Dynamic Dropdowns (Elements instead of IDs) ---

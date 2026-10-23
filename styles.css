@@ -915,3 +915,43 @@ span.flatpickr-weekday {
         display: none;
     }
 }
+
+
+/* ==========================================================
+   Motion / Animations (subtle, SaaS-style)
+   ========================================================== */
+:root { --ease-out-soft: cubic-bezier(0.2, 0.8, 0.2, 1); --stagger: 35ms; }
+
+@keyframes viewFadeIn { from { opacity: 0; } to { opacity: 1; } }
+@keyframes fadeSlideUp { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: none; } }
+@keyframes slideFromRight { from { opacity: 0; transform: translateX(18px); } to { opacity: 1; transform: none; } }
+@keyframes slideFromLeft { from { opacity: 0; transform: translateX(-18px); } to { opacity: 1; transform: none; } }
+
+/* 1. Page enter */
+.view.view-enter { animation: viewFadeIn 180ms ease-out both; }
+
+/* 2. Staggered items (delay = index x --stagger) */
+.anim-enter { animation: fadeSlideUp 320ms var(--ease-out-soft) both; animation-delay: calc(var(--i, 0) * var(--stagger)); }
+
+/* 5. Direction-aware day / week switch */
+.anim-next { animation: slideFromRight 280ms var(--ease-out-soft) both; animation-delay: calc(var(--i, 0) * 25ms); }
+.anim-prev { animation: slideFromLeft 280ms var(--ease-out-soft) both; animation-delay: calc(var(--i, 0) * 25ms); }
+
+/* 4. Sliding sidebar indicator */
+.sidebar-nav { position: relative; }
+.sidebar-nav .btn-icon { position: relative; z-index: 1; }
+.nav-indicator {
+    position: absolute; top: 0; left: 0;
+    width: 40px; height: 40px; border-radius: 100px;
+    background-color: var(--cal-active-bg);
+    transition: transform 380ms var(--ease-out-soft);
+    pointer-events: none; z-index: 0;
+}
+.sidebar-nav.has-indicator .btn-icon.active,
+.sidebar-nav.has-indicator .btn-icon.active:hover { background-color: transparent; }
+
+/* Respect the OS "reduce motion" setting */
+@media (prefers-reduced-motion: reduce) {
+    .view.view-enter, .anim-enter, .anim-next, .anim-prev { animation: none !important; }
+    .nav-indicator { transition: none !important; }
+}
