@@ -451,16 +451,6 @@ async function renderDashboard() {
         return;
     }
 
-    updateScreenshotBanner();
-    
-    if (!window.initialToastChecked && dirHandle && fileConnected) {
-        window.initialToastChecked = true;
-        const isConnected = !!(activeMediaStream && activeMediaStream.active);
-        if (!appData.settings.autoScreenshotEnabled && !isConnected) {
-            showFloatingScreenshotToast();
-        }
-    }
-
     const selectedDate = datePicker.value;
     const tradesForDate = appData.trades.filter(t => t.date === selectedDate);
     
@@ -477,6 +467,7 @@ async function renderDashboard() {
         return;
     }
 
+    updateScreenshotBanner();
     if(dashboardToolbar) dashboardToolbar.style.display = 'flex';
     if(!appData.settings.viewMode) appData.settings.viewMode = 'card';
     btnViewCard.classList.toggle('active', appData.settings.viewMode === 'card');
@@ -1558,7 +1549,7 @@ function renderSettingsUI() {
                 activeMediaStream = null;
                 hiddenVideoElement.srcObject = null;
                 appData.settings.autoScreenshotEnabled = false;
-                await autoSave();
+                onSettingsChange();
                 renderSettingsUI();
                 updateScreenshotBanner();
                 showToast('Window disconnected', 'info');
@@ -1636,67 +1627,42 @@ function showToast(message, type = 'info') {
     }, 3000);
 }
 
-let floatingToastTimer = null;
+
+async function connectScreenshotWindow() {
+    try {
+        activeMediaStream = await navigator.mediaDevices.getDisplayMedia({
+            video: { displaySurface: 'window' },
+            audio: false
+        });
+        
+        hiddenVideoElement.srcObject = activeMediaStream;
+        
+        activeMediaStream.getVideoTracks()[0].onended = () => {
+            activeMediaStream = null;
+            hiddenVideoElement.srcObject = null;
+            if (currentSettingsTab === 'screenshot') renderSettingsUI();
+            updateScreenshotBanner();
+        };
+        
+        appData.settings.autoScreenshotEnabled = true;
+        autoSave();
+        
+        if (currentSettingsTab === 'screenshot') renderSettingsUI();
+        updateScreenshotBanner();
+        showToast('Window connected successfully!', 'success');
+    } catch (err) {
+        console.error("Screen share error:", err);
+    }
+}
 
 function updateScreenshotBanner() {
     const banner = document.getElementById('screenshot-connect-banner');
-    const isConnected = !!(activeMediaStream && activeMediaStream.active);
-    
     if (banner) {
         banner.onclick = connectScreenshotWindow;
-        if (appData.settings.autoScreenshotEnabled && !isConnected) {
+        if (appData.settings.autoScreenshotEnabled && (!activeMediaStream || !activeMediaStream.active)) {
             banner.style.display = 'flex';
         } else {
             banner.style.display = 'none';
         }
     }
-}
-
-function showFloatingScreenshotToast() {
-    let container = document.getElementById('floating-screenshot-toast');
-    if (container) container.remove();
-
-    container = document.createElement('div');
-    container.id = 'floating-screenshot-toast';
-    container.className = 'floating-toast-banner';
-
-    container.innerHTML = `
-        <div class="toast-banner-header">
-            <div class="toast-banner-title">
-                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="var(--accent)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect><circle cx="8.5" cy="8.5" r="1.5"></circle><polyline points="21 15 16 10 5 21"></polyline></svg>
-                <span>Instant Chart Captures 🚀</span>
-            </div>
-            <button class="toast-banner-close" id="btn-close-floating-toast">&times;</button>
-        </div>
-        <div class="toast-banner-body">
-            Save time journaling! Connect your TradingView window for 1-click auto-screenshots on every trade.
-        </div>
-        <div class="toast-banner-actions">
-            <button class="btn-primary btn-sm" id="btn-connect-floating-toast">Connect Window</button>
-        </div>
-    `;
-
-    document.body.appendChild(container);
-
-    const closeToast = () => {
-        if (floatingToastTimer) clearTimeout(floatingToastTimer);
-        container.classList.add('fade-out');
-        setTimeout(() => container.remove(), 400);
-    };
-
-    document.getElementById('btn-close-floating-toast').onclick = (e) => {
-        e.stopPropagation();
-        closeToast();
-    };
-
-    document.getElementById('btn-connect-floating-toast').onclick = async (e) => {
-        e.stopPropagation();
-        closeToast();
-        await connectScreenshotWindow();
-    };
-
-    // Auto dismiss after 9 seconds
-    floatingToastTimer = setTimeout(() => {
-        closeToast();
-    }, 9000);
 }
