@@ -965,6 +965,12 @@ span.flatpickr-weekday {
 .pill-indicator-host.has-indicator > button.active,
 .pill-indicator-host.has-indicator > button.active:hover { background-color: transparent !important; }
 
+/* Sliding pill behind the selected day in the week calendar */
+.cal-days-container > .pill-indicator { border-radius: 8px; background-color: var(--cal-active-bg); }
+.cal-days-container > .cal-day { z-index: 1; }
+.cal-days-container.has-indicator > .cal-day.active,
+.cal-days-container.has-indicator > .cal-day.active:hover { background-color: transparent; }
+
 /* Respect the OS "reduce motion" setting */
 @media (prefers-reduced-motion: reduce) {
     .view.view-enter, .anim-enter, .anim-next, .anim-prev { animation: none !important; }

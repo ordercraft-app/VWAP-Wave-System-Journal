@@ -267,6 +267,7 @@ const pillIndicatorState = {};
 function slidePillIndicator(host, activeEl, key) {
     if (!host || !activeEl) return;
     host.classList.add('pill-indicator-host', 'has-indicator');
+    host.dataset.pillKey = key;
     let ind = host.querySelector(':scope > .pill-indicator');
     if (!ind) {
         ind = document.createElement('div');
@@ -295,6 +296,18 @@ function slidePillIndicator(host, activeEl, key) {
     pillIndicatorState[key] = target;
 }
 
+// Re-place all pills without animation (e.g. after a window resize changes the layout)
+function refreshPillIndicators() {
+    document.querySelectorAll('.pill-indicator-host.has-indicator').forEach(host => {
+        const active = host.querySelector(':scope > .active');
+        const key = host.dataset.pillKey;
+        if (!active || !key) return;
+        delete pillIndicatorState[key];
+        slidePillIndicator(host, active, key);
+    });
+}
+window.addEventListener('resize', refreshPillIndicators);
+
 // Settings tab switch: slide the pill + stagger the new tab content
 function switchSettingsTab(tab) {
     if (currentSettingsTab === tab) return;
@@ -311,9 +324,16 @@ async function renderDashboard() {
     // Direction-aware motion: compare with what was shown before
     const renderDate = datePicker.value;
     const renderWeek = currentWeekStartDate.toLocaleDateString('en-CA');
-    if (lastRenderedWeek && renderWeek !== lastRenderedWeek) {
+    const weekChanged = lastRenderedWeek && renderWeek !== lastRenderedWeek;
+    if (weekChanged) {
         animateItems([calDaysContainer], renderWeek > lastRenderedWeek ? 'next' : 'prev');
     }
+
+    // Sliding pill behind the selected day (same motion as the sidebar).
+    // On a week change the whole strip slides, so the pill is placed directly.
+    const activeDay = calDaysContainer.querySelector('.cal-day.active');
+    if (weekChanged || !activeDay) delete pillIndicatorState.calDay;
+    if (activeDay) slidePillIndicator(calDaysContainer, activeDay, 'calDay');
     if (lastRenderedDate && renderDate !== lastRenderedDate && !pendingTradesAnimation) {
         pendingTradesAnimation = renderDate > lastRenderedDate ? 'next' : 'prev';
     }
