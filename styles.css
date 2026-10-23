@@ -286,7 +286,7 @@ select.linear-input {
 .weekly-calendar-widget {
     display: flex;
     align-items: center;
-    justify-content: space-between;
+    gap: 8px;
     margin-bottom: 32px;
     user-select: none;
     background-color: var(--bg-panel);
@@ -295,9 +295,28 @@ select.linear-input {
     padding: 4px;
     width: 100%;
 }
-.cal-nav-btn { color: var(--text-muted); padding: 8px; border-radius: 8px; height: 86px; }
+.cal-nav-btn { color: var(--text-muted); padding: 8px; border-radius: 8px; height: 86px; position: relative; }
 .cal-nav-btn:hover { color: var(--text-main); background-color: var(--bg-hover); }
-.cal-days-container { display: flex; flex: 1; gap: 8px; margin: 0 16px; }
+
+#cal-prev-week::after {
+    content: '';
+    position: absolute;
+    right: -4px;
+    top: 15%;
+    bottom: 15%;
+    width: 1px;
+    background-color: var(--divider-bg);
+}
+#cal-next-week::before {
+    content: '';
+    position: absolute;
+    left: -4px;
+    top: 15%;
+    bottom: 15%;
+    width: 1px;
+    background-color: var(--divider-bg);
+}
+.cal-days-container { display: flex; flex: 1; gap: 8px; margin: 0; }
 .cal-day {
     display: flex;
     flex: 1;
