@@ -1719,7 +1719,7 @@ function showScreenshotPromo() {
             </div>
             <span class="promo-toast-title">Instant Chart Captures</span>
         </div>
-        <p class="promo-toast-text">Save time journaling! Connect your TradingView window for 1-click auto-screenshots on every trade.</p>
+        <p class="promo-toast-text">Save time journaling! Connect your charting app window for 1-click auto-screenshots on every trade.</p>
         <button type="button" class="btn-primary btn-sm promo-toast-btn">Connect Window</button>
         <div class="promo-toast-progress"></div>
     `;
