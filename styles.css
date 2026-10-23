@@ -295,7 +295,7 @@ select.linear-input {
     padding: 4px;
     width: 100%;
 }
-.cal-nav-btn { color: var(--text-muted); padding: 8px; border-radius: 8px; height: 86px; position: relative; }
+.cal-nav-btn { color: var(--text-muted); padding: 8px; border-radius: 8px; height: 89px; position: relative; }
 .cal-nav-btn:hover { color: var(--text-main); background-color: var(--bg-hover); }
 
 #cal-prev-week::after {
@@ -324,8 +324,8 @@ select.linear-input {
     align-items: center;
     justify-content: center;
     padding-top: 12px;
-    padding-bottom: 8px;
-    height: 86px;
+    padding-bottom: 6px;
+    height: 89px;
     border-radius: 8px;
     background-color: transparent;
     cursor: pointer;
@@ -358,8 +358,11 @@ select.linear-input {
     font-size: 14px;
     font-weight: 600;
 }
-.cal-day-trades { font-size: 10px; color: var(--cal-text-dim); height: 12px; line-height: 12px; margin-top: auto; margin-bottom: 2px; }
-.cal-day.active .cal-day-trades { color: var(--cal-trades-active); }
+.cal-day-trades { display: flex; align-items: center; justify-content: center; gap: 4px; height: 15px; margin-top: auto; margin-bottom: 0; }
+.cal-result-tag { min-width: 22px; height: 15px; padding: 0 7px; border-radius: 100px; font-size: 10px; font-weight: 600; line-height: 15px; text-align: center; }
+.cal-result-tag.win { background: var(--bg-win); color: var(--color-win); }
+.cal-result-tag.lost { background: rgba(238, 53, 78, 0.15); color: #ee354e; }
+.cal-result-tag.be { background: rgba(136, 136, 136, 0.15); color: var(--text-muted); }
 
 .trades-list { display: flex; flex-direction: column; gap: 8px; padding-bottom: 40px; }
 

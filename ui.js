@@ -166,7 +166,15 @@ function renderWeeklyCalendar() {
         const dayDiv = document.createElement('div');
         dayDiv.className = `cal-day ${isActive ? 'active' : ''} ${isToday ? 'is-today' : ''}`;
         
-        const tradesText = tradesCount > 0 ? `${tradesCount} ${tradesCount === 1 ? 'trade' : 'trades'}` : '';
+        // Result tags: green = wins, red = losses, grey = break-even (only shown when > 0)
+        const winCount = tradesForThisDate.filter(t => t.result === 'WIN').length;
+        const lossCount = tradesForThisDate.filter(t => t.result === 'LOST').length;
+        const beCount = tradesForThisDate.filter(t => t.result === 'B/E').length;
+        const tradesText = [
+            winCount > 0 ? `<span class="cal-result-tag win" title="${winCount} winning">${winCount}</span>` : '',
+            lossCount > 0 ? `<span class="cal-result-tag lost" title="${lossCount} losing">${lossCount}</span>` : '',
+            beCount > 0 ? `<span class="cal-result-tag be" title="${beCount} break-even">${beCount}</span>` : ''
+        ].join('');
         
         dayDiv.innerHTML = `
             <span class="cal-day-name">${dayNames[i]}</span>
