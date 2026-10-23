@@ -285,31 +285,44 @@ select.linear-input {
 .weekly-calendar-widget {
     display: flex;
     align-items: center;
-    justify-content: center;
-    gap: 16px;
+    justify-content: space-between;
     margin-bottom: 32px;
     user-select: none;
+    background-color: var(--bg-panel);
+    border: 1px solid var(--border-color);
+    border-radius: 8px;
+    padding: 12px 16px;
+    width: 100%;
 }
-.cal-nav-btn { color: var(--text-muted); }
-.cal-nav-btn:hover { color: var(--text-main); }
-.cal-days-container { display: flex; gap: 8px; }
+.cal-nav-btn { color: var(--text-muted); padding: 8px; border-radius: 8px; }
+.cal-nav-btn:hover { color: var(--text-main); background-color: var(--bg-hover); }
+.cal-days-container { display: flex; flex: 1; gap: 8px; margin: 0 16px; }
 .cal-day {
     display: flex;
+    flex: 1;
     flex-direction: column;
     align-items: center;
     justify-content: center;
     padding-top: 12px;
     padding-bottom: 8px;
-    width: 72px;
     height: 86px;
     border-radius: 8px;
-    background-color: var(--cal-bg-default);
+    background-color: transparent;
     cursor: pointer;
     transition: all 0.2s;
-    border: 1px solid transparent;
+    position: relative;
 }
-.cal-day:hover { background-color: var(--cal-bg-active); }
-.cal-day.active { background-color: var(--cal-active-bg); border-color: var(--border-hover); }
+.cal-day:not(:last-child)::after {
+    content: '';
+    position: absolute;
+    right: -4px;
+    top: 15%;
+    bottom: 15%;
+    width: 1px;
+    background-color: var(--divider-bg);
+}
+.cal-day:hover { background-color: var(--bg-hover); }
+.cal-day.active { background-color: var(--cal-active-bg); }
 .cal-day-name { font-size: 11px; font-weight: 500; color: var(--cal-text-dim); margin-bottom: 6px; text-transform: capitalize; }
 .cal-day.active .cal-day-name { color: var(--cal-active-text); }
 .cal-day-num { font-size: 18px; font-weight: 500; color: var(--text-main); }
@@ -327,7 +340,6 @@ select.linear-input {
 }
 .cal-day-trades { font-size: 10px; color: var(--cal-text-dim); height: 12px; line-height: 12px; margin-top: auto; margin-bottom: 2px; }
 .cal-day.active .cal-day-trades { color: var(--cal-trades-active); }
-
 
 .trades-list { display: flex; flex-direction: column; gap: 8px; padding-bottom: 40px; }
 
@@ -722,6 +734,3 @@ span.flatpickr-weekday {
 .hotkey-table .table-section-title { font-weight: 600; background: var(--bg-hover); padding-top: 8px; padding-bottom: 8px; color: var(--text-main); }
 .hotkey-table code { background-color: var(--bg-input); padding: 2px 6px; border-radius: 4px; color: var(--text-main); border: 1px solid var(--border-color); font-size: 11px; white-space: nowrap; }
 
-[data-theme="light"] .cal-day.active {
-    border-color: transparent;
-}
