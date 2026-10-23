@@ -927,7 +927,7 @@ async function openTradeModal(tradeId = null) {
         newAutoShotBtn.addEventListener('click', async () => {
             const symbol = document.getElementById('t-symbol').value || 'Unknown';
             const originalText = newAutoShotBtn.innerHTML;
-            newAutoShotBtn.innerHTML = '⏳ Capturing...';
+            newAutoShotBtn.innerHTML = 'Capturing...';
             newAutoShotBtn.disabled = true;
 
             try {
