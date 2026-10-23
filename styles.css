@@ -347,7 +347,7 @@ select.linear-input {
 /* Dashboard Cards */
 .trade-card { 
     background-color: var(--bg-panel); 
-    border: 1px solid var(--border-color); 
+    border: 1px solid transparent; 
     border-radius: 8px; 
     padding: 20px; 
     cursor: pointer; 
@@ -699,7 +699,7 @@ span.flatpickr-weekday {
 .table-responsive-wrapper { width: 100%; overflow-x: auto; padding-bottom: 16px; }
 .trades-table { min-width: 700px; display: flex; flex-direction: column; gap: 8px; }
 
-.trade-row { display: flex; flex-direction: column; background-color: var(--bg-panel); border: 1px solid var(--border-color); border-radius: 8px; padding: 12px 16px; cursor: pointer; transition: border-color 0.2s; }
+.trade-row { display: flex; flex-direction: column; background-color: var(--bg-panel); border: 1px solid transparent; border-radius: 8px; padding: 12px 16px; cursor: pointer; transition: border-color 0.2s; }
 .trade-row:hover { border-color: var(--border-hover); }
 .row-thumb { width: 40px; height: 40px; border-radius: 4px; object-fit: cover; border: 1px solid var(--border-color); flex-shrink: 0; }
 .row-no-thumb { width: 40px; height: 40px; border-radius: 4px; background: var(--bg-input); display: flex; align-items: center; justify-content: center; color: var(--text-muted); flex-shrink: 0; }
