@@ -1581,22 +1581,76 @@ function renderSettingsUI() {
             { key: 'location', label: 'Location Effectiveness Heatmap' }
         ];
         
+        const banner = document.createElement('div');
+        banner.className = 'info-banner';
+        banner.innerHTML = `<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"></circle><line x1="12" y1="16" x2="12" y2="12"></line><line x1="12" y1="8" x2="12.01" y2="8"></line></svg><span><strong>Tip:</strong> Drag a chart by its <strong>&#8942;&#8942;</strong> handle to change the order on the Stats page.</span>`;
+        settingsContainer.appendChild(banner);
+
         // Wrap inside a container with an 8px gap
         const chartsWrapper = document.createElement('div');
         chartsWrapper.style.display = 'flex';
         chartsWrapper.style.flexDirection = 'column';
         chartsWrapper.style.gap = '8px';
 
-        chartsConfig.forEach(c => {
-            if (c.depends && !appData.settings.features[c.depends]) return; 
-            
+        // Sort rows by the saved chart order (settings.json -> chartOrder)
+        const order = getChartOrder();
+        const sortedConfig = [...chartsConfig].sort((a, b) => order.indexOf(a.key) - order.indexOf(b.key));
+        let draggedChartKey = null;
+
+        sortedConfig.forEach(c => {
+            if (c.depends && !appData.settings.features[c.depends]) return;
+
             const row = document.createElement('div');
             row.className = 'chart-toggle-row';
-            
+
+            // --- Drag & drop to reorder (handle only, like the category rows) ---
+            row.ondragstart = (e) => {
+                draggedChartKey = c.key;
+                e.dataTransfer.effectAllowed = 'move';
+                setTimeout(() => row.classList.add('dragging-row'), 0);
+            };
+            row.ondragend = () => {
+                draggedChartKey = null;
+                row.draggable = false;
+                row.classList.remove('dragging-row');
+                chartsWrapper.querySelectorAll('.chart-toggle-row').forEach(r => r.classList.remove('row-drag-over'));
+            };
+            row.ondragover = (e) => {
+                e.preventDefault();
+                if (draggedChartKey && draggedChartKey !== c.key) row.classList.add('row-drag-over');
+            };
+            row.ondragleave = () => row.classList.remove('row-drag-over');
+            row.ondrop = (e) => {
+                e.preventDefault();
+                row.classList.remove('row-drag-over');
+                if (!draggedChartKey || draggedChartKey === c.key) return;
+                const newOrder = getChartOrder();
+                const dropIdx = newOrder.indexOf(c.key);
+                newOrder.splice(newOrder.indexOf(draggedChartKey), 1);
+                newOrder.splice(dropIdx, 0, draggedChartKey);
+                appData.settings.chartOrder = newOrder;
+                onSettingsChange();
+                renderSettingsUI();
+            };
+
+            const leftDiv = document.createElement('div');
+            leftDiv.className = 'chart-toggle-left';
+
+            const dragHandle = document.createElement('div');
+            dragHandle.innerHTML = '&#8942;&#8942;';
+            dragHandle.className = 'row-drag-handle';
+            dragHandle.title = 'Drag to reorder chart';
+            dragHandle.onmousedown = () => { row.draggable = true; };
+            dragHandle.onmouseup = () => { row.draggable = false; };
+            dragHandle.onmouseleave = () => { if (!draggedChartKey) row.draggable = false; };
+
             const label = document.createElement('span');
             label.className = 'chart-toggle-label';
             label.textContent = c.label;
-            
+
+            leftDiv.appendChild(dragHandle);
+            leftDiv.appendChild(label);
+
             const btn = document.createElement('button');
             const isEnabled = appData.settings.chartVisibility[c.key] !== false; 
             btn.className = isEnabled ? 'btn-secondary btn-sm' : 'btn-primary btn-sm';
@@ -1607,7 +1661,7 @@ function renderSettingsUI() {
                 renderSettingsUI();
             };
             
-            row.appendChild(label);
+            row.appendChild(leftDiv);
             row.appendChild(btn);
             chartsWrapper.appendChild(row);
         });

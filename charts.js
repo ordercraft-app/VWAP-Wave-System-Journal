@@ -123,8 +123,36 @@ function initFilters() {
     filtersInitialized = true;
 }
 
+// --- Chart order (saved in settings.json as "chartOrder") ---
+const DEFAULT_CHART_ORDER = ['growth', 'winLoss', 'directionalBias', 'dayOfWeek', 'setup', 'invalidation', 'psychology', 'confluence', 'symbol', 'marketCond', 'location'];
+const CHART_CANVAS_IDS = {
+    growth: 'growthChart', winLoss: 'winLossChart', directionalBias: 'directionChart', dayOfWeek: 'dayOfWeekChart',
+    setup: 'setupChart', invalidation: 'invalidationChart', psychology: 'psychologyChart', confluence: 'confluenceChart',
+    symbol: 'symbolChart', marketCond: 'marketCondChart', location: 'locationChart'
+};
+
+// Returns a complete, valid order: saved keys first, any missing (new) charts appended
+function getChartOrder() {
+    const saved = Array.isArray(appData.settings.chartOrder) ? appData.settings.chartOrder : [];
+    const order = saved.filter(k => DEFAULT_CHART_ORDER.includes(k));
+    DEFAULT_CHART_ORDER.forEach(k => { if (!order.includes(k)) order.push(k); });
+    return order;
+}
+
+// Moves the chart cards on the Stats page into the saved order
+function applyChartOrder() {
+    const grid = document.querySelector('.stats-grid');
+    if (!grid) return;
+    getChartOrder().forEach(key => {
+        const canvas = document.getElementById(CHART_CANVAS_IDS[key]);
+        const card = canvas ? canvas.closest('.stat-card') : null;
+        if (card) grid.appendChild(card);
+    });
+}
+
 function renderStatsDashboard() {
     initFilters();
+    applyChartOrder();
 
     const fY = filterYear.value;
     const fM = filterMonth.value;
