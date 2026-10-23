@@ -65,6 +65,11 @@
                 <!-- Dashboard View -->
                 <section id="view-dashboard" class="view active">
                     
+                    
+                    <div id="screenshot-connect-banner" class="info-banner hoverable-banner" style="display: none; cursor: pointer; background-color: rgba(56, 106, 245, 0.05); border-color: var(--accent); margin-bottom: 32px; transition: all 0.2s;">
+                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="var(--accent)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="3" width="20" height="14" rx="2" ry="2"></rect><line x1="8" y1="21" x2="16" y2="21"></line><line x1="12" y1="17" x2="12" y2="21"></line></svg>
+                        <span style="color: var(--text-main);"><strong>Auto-Screenshot is enabled</strong> but no window is connected. Click here to connect a window.</span>
+                    </div>
                     <!-- Weekly Calendar Widget -->
                     <div class="weekly-calendar-widget" id="weekly-calendar-widget">
                         <button class="btn-icon cal-nav-btn" id="cal-prev-week">
@@ -407,7 +412,10 @@
                     </div>
 
                     <!-- Screenshot -->
-                    <div class="form-separator">Screenshot</div>
+                    <div class="form-separator" style="display: flex; justify-content: space-between; align-items: center;">
+                        <span>Screenshot</span>
+                        <button type="button" id="btn-auto-screenshot" class="btn-primary btn-sm" style="display: none; padding: 4px 8px; font-size: 10px;">📸 Auto-Capture</button>
+                    </div>
                     <div class="form-grid compact-grid single-col">
                         <div class="form-group">
                             <input type="file" id="t-image-input" accept="image/*" style="display: none;">

@@ -467,6 +467,7 @@ async function renderDashboard() {
         return;
     }
 
+    updateScreenshotBanner();
     if(dashboardToolbar) dashboardToolbar.style.display = 'flex';
     if(!appData.settings.viewMode) appData.settings.viewMode = 'card';
     btnViewCard.classList.toggle('active', appData.settings.viewMode === 'card');
@@ -902,6 +903,52 @@ async function openTradeModal(tradeId = null) {
     document.getElementById('section-invalidation').style.display = appData.settings.features.invalidation ? 'block' : 'none';
     document.getElementById('section-target').style.display = appData.settings.features.target ? 'block' : 'none';
     document.getElementById('section-psychology').style.display = appData.settings.features.psychology ? 'block' : 'none';
+
+
+        const autoShotBtn = document.getElementById('btn-auto-screenshot');
+    if (autoShotBtn) {
+        if (activeMediaStream && activeMediaStream.active) {
+            autoShotBtn.style.display = 'block';
+        } else {
+            autoShotBtn.style.display = 'none';
+        }
+
+        const newAutoShotBtn = autoShotBtn.cloneNode(true);
+        autoShotBtn.parentNode.replaceChild(newAutoShotBtn, autoShotBtn);
+
+        newAutoShotBtn.addEventListener('click', async () => {
+            const symbol = document.getElementById('t-symbol').value || 'Unknown';
+            const originalText = newAutoShotBtn.innerHTML;
+            newAutoShotBtn.innerHTML = '⏳ Capturing...';
+            newAutoShotBtn.disabled = true;
+
+            try {
+                if (!hiddenVideoElement.videoWidth) throw new Error("Video stream not ready");
+                
+                const canvas = document.createElement('canvas');
+                canvas.width = hiddenVideoElement.videoWidth;
+                canvas.height = hiddenVideoElement.videoHeight;
+                const ctx = canvas.getContext('2d');
+                ctx.drawImage(hiddenVideoElement, 0, 0, canvas.width, canvas.height);
+                
+                canvas.toBlob(async (blob) => {
+                    if(!blob) throw new Error("Canvas to Blob failed");
+                    const file = new File([blob], `${symbol}_screenshot_${Date.now()}.png`, { type: 'image/png' });
+                    
+                    await handleImageFile(file);
+                    showToast('Screenshot captured!', 'success');
+                    
+                    newAutoShotBtn.innerHTML = originalText;
+                    newAutoShotBtn.disabled = false;
+                }, 'image/png', 1.0);
+                
+            } catch (error) {
+                alert(`Capture failed: ${error.message}`);
+                newAutoShotBtn.innerHTML = originalText;
+                newAutoShotBtn.disabled = false;
+            }
+        });
+    }
 
     tradeModal.classList.add('active');
     setTimeout(() => { isFormDirty = false; }, 50);
@@ -1417,12 +1464,19 @@ function renderSettingsUI() {
     tabJournal.textContent = 'Journal';
     tabJournal.onclick = () => { currentSettingsTab = 'journal'; renderSettingsUI(); };
     
+    
     const tabChart = document.createElement('button');
     tabChart.className = `settings-tab-btn ${currentSettingsTab === 'chart' ? 'active' : ''}`;
     tabChart.textContent = 'Chart';
     tabChart.onclick = () => { currentSettingsTab = 'chart'; renderSettingsUI(); };
     
+    const tabScreenshot = document.createElement('button');
+    tabScreenshot.className = `settings-tab-btn ${currentSettingsTab === 'screenshot' ? 'active' : ''}`;
+    tabScreenshot.textContent = 'Screenshot';
+    tabScreenshot.onclick = () => { currentSettingsTab = 'screenshot'; renderSettingsUI(); };
+    
     tabsDiv.appendChild(tabJournal);
+    tabsDiv.appendChild(tabScreenshot);
     tabsDiv.appendChild(tabChart);
     settingsContainer.appendChild(tabsDiv);
     
@@ -1441,7 +1495,89 @@ function renderSettingsUI() {
         settingsContainer.appendChild(renderComplexSetting('Evidence', appData.settings.evidence, '2-level', onSettingsChange, 'evidence'));
         settingsContainer.appendChild(renderComplexSetting('Invalidation', appData.settings.invalidation, '2-level', onSettingsChange, 'invalidation'));
         settingsContainer.appendChild(renderComplexSetting('Target', appData.settings.target, '3-level', onSettingsChange, 'target'));
+        
         settingsContainer.appendChild(renderSimpleSetting('Psychology', appData.settings.psychology, onSettingsChange, 'psychology'));
+
+                
+
+        } else if (currentSettingsTab === 'screenshot') {
+        // --- Auto-Screenshot Settings Block (Browser API) ---
+        const screenshotContainer = document.createElement('div');
+        screenshotContainer.className = 'setting-category-card';
+        
+        const scHeaderWrapper = document.createElement('div');
+        scHeaderWrapper.style.display = 'flex';
+        scHeaderWrapper.style.justifyContent = 'space-between';
+        scHeaderWrapper.style.alignItems = 'center';
+        
+        const scHeaderInfo = document.createElement('div');
+        scHeaderInfo.innerHTML = '<h3 class="setting-cat-title" style="margin-bottom: 0;">Auto-Screenshots</h3><p class="help-text" style="margin-top: 4px; margin-bottom: 0;">Enable auto-screenshots to connect a window for 1-click capturing.</p>';
+        scHeaderWrapper.appendChild(scHeaderInfo);
+
+        if (appData.settings.autoScreenshotEnabled === undefined) {
+            appData.settings.autoScreenshotEnabled = false;
+        }
+
+        const isEnabled = appData.settings.autoScreenshotEnabled;
+        const scToggleBtn = document.createElement('button');
+        scToggleBtn.className = isEnabled ? 'btn-secondary btn-sm' : 'btn-primary btn-sm';
+        scToggleBtn.textContent = isEnabled ? 'Disable' : 'Enable';
+        scToggleBtn.onclick = () => {
+            appData.settings.autoScreenshotEnabled = !appData.settings.autoScreenshotEnabled;
+            onSettingsChange();
+            updateScreenshotBanner();
+            renderSettingsUI();
+        };
+        scHeaderWrapper.appendChild(scToggleBtn);
+        screenshotContainer.appendChild(scHeaderWrapper);
+
+        const missionControl = document.createElement('div');
+        missionControl.style.display = isEnabled ? 'block' : 'none';
+        missionControl.style.marginTop = '16px';
+        missionControl.style.paddingTop = '16px';
+        missionControl.style.borderTop = '1px solid var(--border-color)';
+
+        const isConnected = (activeMediaStream && activeMediaStream.active);
+        const scActionBtn = document.createElement('button');
+        scActionBtn.className = isConnected ? 'btn-danger' : 'btn-primary';
+        scActionBtn.textContent = isConnected ? 'Disconnect Window' : 'Connect Window';
+        missionControl.appendChild(scActionBtn);
+
+        const previewContainer = document.createElement('div');
+        previewContainer.className = 'stream-preview-container';
+        previewContainer.style.display = isConnected ? 'flex' : 'none';
+        
+        const videoWrapper = document.createElement('div');
+        videoWrapper.className = 'video-wrapper';
+        if (isConnected) {
+            const previewVideo = document.createElement('video');
+            previewVideo.srcObject = activeMediaStream;
+            previewVideo.autoplay = true;
+            previewVideo.muted = true;
+            previewVideo.style.width = '100%';
+            previewVideo.style.objectFit = 'cover';
+            previewVideo.style.borderRadius = '4px';
+            videoWrapper.appendChild(previewVideo);
+        }
+        
+        previewContainer.appendChild(videoWrapper);
+        missionControl.appendChild(previewContainer);
+        screenshotContainer.appendChild(missionControl);
+        settingsContainer.appendChild(screenshotContainer);
+
+        scActionBtn.onclick = async () => {
+            if (isConnected) {
+                activeMediaStream.getTracks().forEach(track => track.stop());
+                activeMediaStream = null;
+                hiddenVideoElement.srcObject = null;
+                renderSettingsUI();
+                updateScreenshotBanner();
+                showToast('Window disconnected', 'info');
+            } else {
+                await connectScreenshotWindow();
+            }
+        };
+        // --- End Auto-Screenshot Settings Block ---
     } else {
         const chartsConfig = [
             { key: 'growth', label: 'Execution Growth' },
@@ -1509,4 +1645,40 @@ function showToast(message, type = 'info') {
         toast.classList.add('fade-out');
         setTimeout(() => toast.remove(), 300);
     }, 3000);
+}
+
+
+async function connectScreenshotWindow() {
+    try {
+        activeMediaStream = await navigator.mediaDevices.getDisplayMedia({
+            video: { displaySurface: 'window' },
+            audio: false
+        });
+        
+        hiddenVideoElement.srcObject = activeMediaStream;
+        
+        activeMediaStream.getVideoTracks()[0].onended = () => {
+            activeMediaStream = null;
+            hiddenVideoElement.srcObject = null;
+            if (currentSettingsTab === 'screenshot') renderSettingsUI();
+            updateScreenshotBanner();
+        };
+        
+        if (currentSettingsTab === 'screenshot') renderSettingsUI();
+        updateScreenshotBanner();
+        showToast('Window connected successfully!', 'success');
+    } catch (err) {
+        console.error("Screen share error:", err);
+    }
+}
+
+function updateScreenshotBanner() {
+    const banner = document.getElementById('screenshot-connect-banner');
+    if (banner) {
+        if (appData.settings.autoScreenshotEnabled && (!activeMediaStream || !activeMediaStream.active)) {
+            banner.style.display = 'flex';
+        } else {
+            banner.style.display = 'none';
+        }
+    }
 }

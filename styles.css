@@ -773,3 +773,67 @@ span.flatpickr-weekday {
     background-color: #141517 !important;
     color: #EEEEEE !important;
 }
+
+/* Mission Control / Auto-Screenshot Settings */
+.mission-control-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
+    gap: 16px;
+    margin-top: 12px;
+}
+.window-card {
+    background: var(--bg-input);
+    border: 2px solid transparent;
+    border-radius: 8px;
+    padding: 8px;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+.window-card:hover {
+    background: var(--group-bg);
+}
+.window-card.active {
+    border-color: var(--accent);
+    background: rgba(56, 106, 245, 0.05);
+}
+.window-card img {
+    width: 100%;
+    border-radius: 4px;
+    border: 1px solid var(--border-color);
+}
+.window-title {
+    font-size: 11px;
+    color: var(--text-main);
+    font-weight: 500;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.stream-preview-container {
+    background: var(--bg-input);
+    border: 1px solid var(--border-color);
+    border-radius: 8px;
+    padding: 8px;
+    margin-top: 16px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+.video-wrapper {
+    width: 100%;
+    max-height: 250px;
+    overflow: hidden;
+    border-radius: 4px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.hoverable-banner:hover {
+    background-color: rgba(56, 106, 245, 0.15) !important;
+    border-color: var(--accent-hover) !important;
+}
