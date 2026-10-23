@@ -451,6 +451,16 @@ async function renderDashboard() {
         return;
     }
 
+    updateScreenshotBanner();
+    
+    if (!window.initialToastChecked && dirHandle && fileConnected) {
+        window.initialToastChecked = true;
+        const isConnected = !!(activeMediaStream && activeMediaStream.active);
+        if (!appData.settings.autoScreenshotEnabled && !isConnected) {
+            showFloatingScreenshotToast();
+        }
+    }
+
     const selectedDate = datePicker.value;
     const tradesForDate = appData.trades.filter(t => t.date === selectedDate);
     
@@ -467,7 +477,6 @@ async function renderDashboard() {
         return;
     }
 
-    updateScreenshotBanner();
     if(dashboardToolbar) dashboardToolbar.style.display = 'flex';
     if(!appData.settings.viewMode) appData.settings.viewMode = 'card';
     btnViewCard.classList.toggle('active', appData.settings.viewMode === 'card');
@@ -1549,7 +1558,7 @@ function renderSettingsUI() {
                 activeMediaStream = null;
                 hiddenVideoElement.srcObject = null;
                 appData.settings.autoScreenshotEnabled = false;
-                onSettingsChange();
+                await autoSave();
                 renderSettingsUI();
                 updateScreenshotBanner();
                 showToast('Window disconnected', 'info');
@@ -1628,63 +1637,22 @@ function showToast(message, type = 'info') {
 }
 
 let floatingToastTimer = null;
-let floatingToastShownThisSession = false;
-
-async function connectScreenshotWindow() {
-    try {
-        activeMediaStream = await navigator.mediaDevices.getDisplayMedia({
-            video: { displaySurface: 'window' },
-            audio: false
-        });
-        
-        hiddenVideoElement.srcObject = activeMediaStream;
-        
-        activeMediaStream.getVideoTracks()[0].onended = () => {
-            activeMediaStream = null;
-            hiddenVideoElement.srcObject = null;
-            if (currentSettingsTab === 'screenshot') renderSettingsUI();
-            updateScreenshotBanner();
-        };
-        
-        appData.settings.autoScreenshotEnabled = true;
-        await autoSave();
-        
-        // Hide floating toast if open
-        const toastEl = document.getElementById('floating-screenshot-toast');
-        if (toastEl) toastEl.remove();
-
-        if (currentSettingsTab === 'screenshot') renderSettingsUI();
-        updateScreenshotBanner();
-        showToast('Window connected successfully!', 'success');
-    } catch (err) {
-        console.error("Screen share error:", err);
-    }
-}
 
 function updateScreenshotBanner() {
     const banner = document.getElementById('screenshot-connect-banner');
-    const isConnected = (activeMediaStream && activeMediaStream.active);
+    const isConnected = !!(activeMediaStream && activeMediaStream.active);
     
-    // 1. Dashboard Banner logic (When user previously enabled it but stream is lost/disconnected on reboot)
     if (banner) {
         banner.onclick = connectScreenshotWindow;
-        if (appData.settings.autoScreenshotEnabled === true && !isConnected) {
+        if (appData.settings.autoScreenshotEnabled && !isConnected) {
             banner.style.display = 'flex';
         } else {
             banner.style.display = 'none';
         }
     }
-
-    // 2. Floating Bottom-Right Toast Banner
-    // Condition: Folder is connected, stream is NOT connected, feature is NOT enabled (user had manually disconnected/never enabled), AND toast hasn't been shown yet this session.
-    if (dirHandle && fileConnected && appData.settings.autoScreenshotEnabled !== true && !isConnected && !floatingToastShownThisSession) {
-        showFloatingScreenshotToast();
-    }
 }
 
 function showFloatingScreenshotToast() {
-    floatingToastShownThisSession = true;
-    
     let container = document.getElementById('floating-screenshot-toast');
     if (container) container.remove();
 
