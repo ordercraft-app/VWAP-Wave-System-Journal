@@ -617,7 +617,9 @@ select.linear-input {
 /* FAQ / Help Section */
 .help-layout { display: flex; align-items: flex-start; gap: 8px; margin-top: 24px; padding-bottom: 40px; }
 .help-layout .faq-container { flex: 1; min-width: 0; margin-top: 0; padding-bottom: 0; }
-.help-contact { flex: 0 0 260px; position: sticky; top: 0; }
+.help-contact { flex: 0 0 260px; position: sticky; top: 0; display: flex; flex-direction: column; gap: 8px; }
+.help-contact-icon { width: 48px; height: 48px; border-radius: 50%; display: flex; align-items: center; justify-content: center; background: rgba(56, 106, 245, 0.12); color: var(--accent); margin-bottom: 12px; }
+.help-contact-btn { display: block; width: 100%; text-align: center; text-decoration: none; font-size: 13px; font-weight: 500; border-radius: 100px; padding: 8px 16px; }
 .help-contact-card { background: var(--bg-panel); border-radius: 16px; padding: 24px 20px; display: flex; flex-direction: column; align-items: center; text-align: center; }
 .help-contact-logo { width: 72px; height: 72px; border-radius: 50%; overflow: hidden; border: 1px solid var(--border-color); margin-bottom: 12px; flex-shrink: 0; }
 .help-contact-logo img { width: 100%; height: 100%; object-fit: cover; display: block; }
