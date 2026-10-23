@@ -310,6 +310,7 @@ function setupNavigation() {
 
     if (btnViewCard) {
         btnViewCard.addEventListener('click', () => {
+            if (appData.settings.viewMode !== 'card') pendingTradesAnimation = 'enter';
             appData.settings.viewMode = 'card';
             autoSave();
             renderDashboard();
@@ -317,6 +318,7 @@ function setupNavigation() {
     }
     if (btnViewTable) {
         btnViewTable.addEventListener('click', () => {
+            if (appData.settings.viewMode !== 'table') pendingTradesAnimation = 'enter';
             appData.settings.viewMode = 'table';
             autoSave();
             renderDashboard();

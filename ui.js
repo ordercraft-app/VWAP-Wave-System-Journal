@@ -261,6 +261,48 @@ function moveNavIndicator(btn, animate = true) {
     }
 }
 
+// Sliding pill behind the active tab / toggle (settings tabs, card/list toggle).
+// Remembers the previous position per key, so it also slides when the tabs are re-rendered.
+const pillIndicatorState = {};
+function slidePillIndicator(host, activeEl, key) {
+    if (!host || !activeEl) return;
+    host.classList.add('pill-indicator-host', 'has-indicator');
+    let ind = host.querySelector(':scope > .pill-indicator');
+    if (!ind) {
+        ind = document.createElement('div');
+        ind.className = 'pill-indicator';
+        host.prepend(ind);
+    }
+    const target = { x: activeEl.offsetLeft, y: activeEl.offsetTop, w: activeEl.offsetWidth, h: activeEl.offsetHeight };
+    if (!target.w) return; // not visible (yet)
+    const place = (r) => {
+        ind.style.transform = `translate(${r.x}px, ${r.y}px)`;
+        ind.style.width = r.w + 'px';
+        ind.style.height = r.h + 'px';
+    };
+    const prev = pillIndicatorState[key];
+    ind.style.transition = 'none';
+    if (prev && !REDUCED_MOTION && (prev.x !== target.x || prev.y !== target.y || prev.w !== target.w)) {
+        place(prev);
+        void ind.offsetWidth;
+        ind.style.transition = '';
+        place(target);
+    } else {
+        place(target);
+        void ind.offsetWidth;
+        ind.style.transition = '';
+    }
+    pillIndicatorState[key] = target;
+}
+
+// Settings tab switch: slide the pill + stagger the new tab content
+function switchSettingsTab(tab) {
+    if (currentSettingsTab === tab) return;
+    currentSettingsTab = tab;
+    renderSettingsUI();
+    animateItems(settingsContainer.querySelectorAll(':scope > .info-banner, .setting-category-card, .chart-toggle-row'), 'enter');
+}
+
 // --- Dashboard Rendering ---
 
 async function renderDashboard() {
@@ -565,6 +607,7 @@ async function renderDashboard() {
     if(!appData.settings.viewMode) appData.settings.viewMode = 'card';
     btnViewCard.classList.toggle('active', appData.settings.viewMode === 'card');
     btnViewTable.classList.toggle('active', appData.settings.viewMode === 'table');
+    slidePillIndicator(btnViewCard.parentElement, appData.settings.viewMode === 'table' ? btnViewTable : btnViewCard, 'viewToggle');
     
     const isTableView = appData.settings.viewMode === 'table';
     let tableWrapper, tableContainer;
@@ -1561,23 +1604,24 @@ function renderSettingsUI() {
     const tabJournal = document.createElement('button');
     tabJournal.className = `settings-tab-btn ${currentSettingsTab === 'journal' ? 'active' : ''}`;
     tabJournal.textContent = 'Journal';
-    tabJournal.onclick = () => { currentSettingsTab = 'journal'; renderSettingsUI(); };
+    tabJournal.onclick = () => switchSettingsTab('journal');
     
     
     const tabChart = document.createElement('button');
     tabChart.className = `settings-tab-btn ${currentSettingsTab === 'chart' ? 'active' : ''}`;
     tabChart.textContent = 'Chart';
-    tabChart.onclick = () => { currentSettingsTab = 'chart'; renderSettingsUI(); };
+    tabChart.onclick = () => switchSettingsTab('chart');
     
     const tabScreenshot = document.createElement('button');
     tabScreenshot.className = `settings-tab-btn ${currentSettingsTab === 'screenshot' ? 'active' : ''}`;
     tabScreenshot.textContent = 'Screenshot';
-    tabScreenshot.onclick = () => { currentSettingsTab = 'screenshot'; renderSettingsUI(); };
+    tabScreenshot.onclick = () => switchSettingsTab('screenshot');
     
     tabsDiv.appendChild(tabJournal);
     tabsDiv.appendChild(tabChart);
     tabsDiv.appendChild(tabScreenshot);
     settingsContainer.appendChild(tabsDiv);
+    slidePillIndicator(tabsDiv, { journal: tabJournal, chart: tabChart, screenshot: tabScreenshot }[currentSettingsTab], 'settingsTabs');
     
     const onSettingsChange = async () => { await autoSave(); };
 

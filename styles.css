@@ -920,22 +920,22 @@ span.flatpickr-weekday {
 /* ==========================================================
    Motion / Animations (subtle, SaaS-style)
    ========================================================== */
-:root { --ease-out-soft: cubic-bezier(0.2, 0.8, 0.2, 1); --stagger: 35ms; }
+:root { --ease-out-soft: cubic-bezier(0.22, 1, 0.36, 1); --stagger: 60ms; }
 
 @keyframes viewFadeIn { from { opacity: 0; } to { opacity: 1; } }
-@keyframes fadeSlideUp { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: none; } }
-@keyframes slideFromRight { from { opacity: 0; transform: translateX(18px); } to { opacity: 1; transform: none; } }
-@keyframes slideFromLeft { from { opacity: 0; transform: translateX(-18px); } to { opacity: 1; transform: none; } }
+@keyframes fadeSlideUp { from { opacity: 0; transform: translateY(12px); } to { opacity: 1; transform: none; } }
+@keyframes slideFromRight { from { opacity: 0; transform: translateX(28px); } to { opacity: 1; transform: none; } }
+@keyframes slideFromLeft { from { opacity: 0; transform: translateX(-28px); } to { opacity: 1; transform: none; } }
 
 /* 1. Page enter */
-.view.view-enter { animation: viewFadeIn 180ms ease-out both; }
+.view.view-enter { animation: viewFadeIn 320ms ease-out both; }
 
 /* 2. Staggered items (delay = index x --stagger) */
-.anim-enter { animation: fadeSlideUp 320ms var(--ease-out-soft) both; animation-delay: calc(var(--i, 0) * var(--stagger)); }
+.anim-enter { animation: fadeSlideUp 650ms var(--ease-out-soft) both; animation-delay: calc(var(--i, 0) * var(--stagger)); }
 
 /* 5. Direction-aware day / week switch */
-.anim-next { animation: slideFromRight 280ms var(--ease-out-soft) both; animation-delay: calc(var(--i, 0) * 25ms); }
-.anim-prev { animation: slideFromLeft 280ms var(--ease-out-soft) both; animation-delay: calc(var(--i, 0) * 25ms); }
+.anim-next { animation: slideFromRight 560ms var(--ease-out-soft) both; animation-delay: calc(var(--i, 0) * 50ms); }
+.anim-prev { animation: slideFromLeft 560ms var(--ease-out-soft) both; animation-delay: calc(var(--i, 0) * 50ms); }
 
 /* 4. Sliding sidebar indicator */
 .sidebar-nav { position: relative; }
@@ -944,14 +944,26 @@ span.flatpickr-weekday {
     position: absolute; top: 0; left: 0;
     width: 40px; height: 40px; border-radius: 100px;
     background-color: var(--cal-active-bg);
-    transition: transform 380ms var(--ease-out-soft);
+    transition: transform 450ms var(--ease-out-soft);
     pointer-events: none; z-index: 0;
 }
 .sidebar-nav.has-indicator .btn-icon.active,
 .sidebar-nav.has-indicator .btn-icon.active:hover { background-color: transparent; }
 
+/* Sliding pill for settings tabs and card/list toggle */
+.pill-indicator-host { position: relative; }
+.pill-indicator-host > button { position: relative; z-index: 1; }
+.pill-indicator {
+    position: absolute; top: 0; left: 0; width: 0; height: 0;
+    border-radius: 100px; background-color: var(--cal-active-bg);
+    transition: transform 450ms var(--ease-out-soft), width 450ms var(--ease-out-soft), height 450ms var(--ease-out-soft);
+    pointer-events: none; z-index: 0;
+}
+.pill-indicator-host.has-indicator > button.active,
+.pill-indicator-host.has-indicator > button.active:hover { background-color: transparent !important; }
+
 /* Respect the OS "reduce motion" setting */
 @media (prefers-reduced-motion: reduce) {
     .view.view-enter, .anim-enter, .anim-next, .anim-prev { animation: none !important; }
-    .nav-indicator { transition: none !important; }
+    .nav-indicator, .pill-indicator { transition: none !important; }
 }
