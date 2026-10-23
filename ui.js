@@ -1511,37 +1511,16 @@ function renderSettingsUI() {
         scHeaderWrapper.style.alignItems = 'center';
         
         const scHeaderInfo = document.createElement('div');
-        scHeaderInfo.innerHTML = '<h3 class="setting-cat-title" style="margin-bottom: 0;">Auto-Screenshots</h3><p class="help-text" style="margin-top: 4px; margin-bottom: 0;">Enable auto-screenshots to connect a window for 1-click capturing.</p>';
+        scHeaderInfo.innerHTML = '<h3 class="setting-cat-title" style="margin-bottom: 0;">Auto-Screenshots</h3><p class="help-text" style="margin-top: 4px; margin-bottom: 0;">Connect a window for 1-click capturing during this session.</p>';
         scHeaderWrapper.appendChild(scHeaderInfo);
-
-        if (appData.settings.autoScreenshotEnabled === undefined) {
-            appData.settings.autoScreenshotEnabled = false;
-        }
-
-        const isEnabled = appData.settings.autoScreenshotEnabled;
-        const scToggleBtn = document.createElement('button');
-        scToggleBtn.className = isEnabled ? 'btn-secondary btn-sm' : 'btn-primary btn-sm';
-        scToggleBtn.textContent = isEnabled ? 'Disable' : 'Enable';
-        scToggleBtn.onclick = () => {
-            appData.settings.autoScreenshotEnabled = !appData.settings.autoScreenshotEnabled;
-            onSettingsChange();
-            updateScreenshotBanner();
-            renderSettingsUI();
-        };
-        scHeaderWrapper.appendChild(scToggleBtn);
-        screenshotContainer.appendChild(scHeaderWrapper);
-
-        const missionControl = document.createElement('div');
-        missionControl.style.display = isEnabled ? 'block' : 'none';
-        missionControl.style.marginTop = '16px';
-        missionControl.style.paddingTop = '16px';
-        missionControl.style.borderTop = '1px solid var(--border-color)';
 
         const isConnected = (activeMediaStream && activeMediaStream.active);
         const scActionBtn = document.createElement('button');
-        scActionBtn.className = isConnected ? 'btn-danger' : 'btn-primary';
+        scActionBtn.className = isConnected ? 'btn-danger btn-sm' : 'btn-primary btn-sm';
         scActionBtn.textContent = isConnected ? 'Disconnect Window' : 'Connect Window';
-        missionControl.appendChild(scActionBtn);
+        
+        scHeaderWrapper.appendChild(scActionBtn);
+        screenshotContainer.appendChild(scHeaderWrapper);
 
         const previewContainer = document.createElement('div');
         previewContainer.className = 'stream-preview-container';
@@ -1561,8 +1540,7 @@ function renderSettingsUI() {
         }
         
         previewContainer.appendChild(videoWrapper);
-        missionControl.appendChild(previewContainer);
-        screenshotContainer.appendChild(missionControl);
+        screenshotContainer.appendChild(previewContainer);
         settingsContainer.appendChild(screenshotContainer);
 
         scActionBtn.onclick = async () => {
@@ -1570,6 +1548,8 @@ function renderSettingsUI() {
                 activeMediaStream.getTracks().forEach(track => track.stop());
                 activeMediaStream = null;
                 hiddenVideoElement.srcObject = null;
+                appData.settings.autoScreenshotEnabled = false;
+                onSettingsChange();
                 renderSettingsUI();
                 updateScreenshotBanner();
                 showToast('Window disconnected', 'info');
@@ -1663,6 +1643,9 @@ async function connectScreenshotWindow() {
             if (currentSettingsTab === 'screenshot') renderSettingsUI();
             updateScreenshotBanner();
         };
+        
+        appData.settings.autoScreenshotEnabled = true;
+        autoSave();
         
         if (currentSettingsTab === 'screenshot') renderSettingsUI();
         updateScreenshotBanner();

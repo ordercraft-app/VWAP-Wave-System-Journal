@@ -483,7 +483,7 @@ select.linear-input {
 
 .settings-content { display: flex; flex-direction: column; gap: 8px; padding-bottom: 60px; }
 .setting-category-card { background: var(--bg-panel); border: none; border-radius: 8px; padding: 24px; }
-.setting-cat-title { font-size: 14px; font-weight: 600; margin-bottom: 16px; text-transform: uppercase; letter-spacing: 0.5px; color: var(--text-muted); }
+.setting-cat-title { font-size: 14px; font-weight: 600; margin-bottom: 16px; text-transform: uppercase; letter-spacing: 0.5px; color: var(--text-main); }
 .setting-items-wrapper { display: flex; flex-direction: column; gap: 8px; }
 
 /* Level 1 Category Row (Draggable) */
