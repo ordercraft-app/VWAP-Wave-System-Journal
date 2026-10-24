@@ -825,169 +825,6 @@ async function renderDashboard() {
 
 // --- Trade Modal Dynamic Dropdowns (Elements instead of IDs) ---
 
-function populateSelectEl(selectEl, optionsArray, currentValue = null) {
-    selectEl.innerHTML = '';
-    let optionsToRender = [...(optionsArray || [])];
-    if (currentValue && !optionsToRender.includes(currentValue)) {
-        optionsToRender.unshift(currentValue); 
-    }
-
-    if(optionsToRender.length > 0) {
-        selectEl.disabled = false;
-        optionsToRender.forEach(opt => {
-            const option = document.createElement('option');
-            option.value = opt;
-            option.textContent = opt;
-            selectEl.appendChild(option);
-        });
-        if (currentValue) selectEl.value = currentValue;
-        else selectEl.selectedIndex = 0;
-    } else {
-        selectEl.disabled = true;
-    }
-}
-
-function updateDependentDropdowns(tradeData = {}) {
-    const sets = appData.settings;
-    populateSelectEl(document.getElementById('t-symbol'), sets.symbol, tradeData.symbol);
-    populateSelectEl(document.getElementById('t-market-cond'), sets.marketCondition, tradeData.marketCondition);
-    populateSelectEl(document.getElementById('t-setup'), sets.setup, tradeData.setup);
-    populateSelectEl(document.getElementById('t-direction'), sets.direction, tradeData.direction);
-    
-    populateSelectEl(document.getElementById('t-target'), Object.keys(sets.target || {}), tradeData.target);
-    const tgtVal = document.getElementById('t-target').value;
-    const tgtConfig = (sets.target || {})[tgtVal] || {sub1:[], sub2:[]};
-    populateSelectEl(document.getElementById('t-target-sub1'), tgtConfig.sub1, tradeData.targetSub1);
-    populateSelectEl(document.getElementById('t-target-sub2'), tgtConfig.sub2, tradeData.targetSub2);
-}
-
-function setupDropdownEvents() {
-    // Only static target dropdowns need global event hook now
-    document.getElementById('t-target').addEventListener('change', (e) => {
-        const val = e.target.value;
-        const config = (appData.settings.target || {})[val] || {sub1:[], sub2:[]};
-        populateSelectEl(document.getElementById('t-target-sub1'), config.sub1);
-        populateSelectEl(document.getElementById('t-target-sub2'), config.sub2);
-    });
-}
-
-// Dynamic Row Generators
-function updateRemoveButtonsState(container) {
-    const btns = container.querySelectorAll('.btn-remove-row');
-    const disable = btns.length <= 1;
-    btns.forEach(btn => {
-        btn.disabled = disable;
-    });
-}
-
-function addLocationRow(data = {}) {
-    const row = document.createElement('div');
-    row.className = 'dynamic-row loc-row';
-    
-    row.innerHTML = `
-        <select class="linear-input loc-primary"></select>
-        <select class="linear-input loc-sub1" disabled></select>
-        <select class="linear-input loc-sub2" disabled></select>
-        <button type="button" class="btn-remove-row" title="Remove Confluence">&times;</button>
-    `;
-    
-    const primarySel = row.querySelector('.loc-primary');
-    const sub1Sel = row.querySelector('.loc-sub1');
-    const sub2Sel = row.querySelector('.loc-sub2');
-    
-    populateSelectEl(primarySel, Object.keys(appData.settings.location || {}), data.primary);
-    
-    const updateSubs = (currData) => {
-        const val = primarySel.value;
-        const config = (appData.settings.location || {})[val] || {sub1:[], sub2:[]};
-        populateSelectEl(sub1Sel, config.sub1, currData ? currData.sub1 : null);
-        populateSelectEl(sub2Sel, config.sub2, currData ? currData.sub2 : null);
-    };
-    
-    primarySel.addEventListener('change', () => updateSubs(null));
-    updateSubs(data);
-    
-    row.querySelector('.btn-remove-row').addEventListener('click', () => {
-        if (locationContainer.children.length > 1) {
-            row.remove();
-            updateRemoveButtonsState(locationContainer);
-        }
-    });
-    
-    locationContainer.appendChild(row);
-    updateRemoveButtonsState(locationContainer);
-}
-
-function addEvidenceRow(data = {}) {
-    const row = document.createElement('div');
-    row.className = 'dynamic-row ev-row';
-    
-    row.innerHTML = `
-        <select class="linear-input ev-primary"></select>
-        <select class="linear-input ev-sub" disabled></select>
-        <button type="button" class="btn-remove-row" title="Remove Confluence">&times;</button>
-    `;
-    
-    const primarySel = row.querySelector('.ev-primary');
-    const subSel = row.querySelector('.ev-sub');
-    
-    populateSelectEl(primarySel, Object.keys(appData.settings.evidence || {}), data.primary);
-    
-    const updateSubs = (currData) => {
-        const val = primarySel.value;
-        const config = (appData.settings.evidence || {})[val] || [];
-        populateSelectEl(subSel, config, currData ? currData.sub : null);
-    };
-    
-    primarySel.addEventListener('change', () => updateSubs(null));
-    updateSubs(data);
-    
-    row.querySelector('.btn-remove-row').addEventListener('click', () => {
-        if (evidenceContainer.children.length > 1) {
-            row.remove();
-            updateRemoveButtonsState(evidenceContainer);
-        }
-    });
-    
-    evidenceContainer.appendChild(row);
-    updateRemoveButtonsState(evidenceContainer);
-}
-
-function addInvalidationRow(data = {}) {
-    const row = document.createElement('div');
-    row.className = 'dynamic-row ev-row'; // Reuse ev-row grid layout for 2-level
-    
-    row.innerHTML = `
-        <select class="linear-input inv-primary"></select>
-        <select class="linear-input inv-sub" disabled></select>
-        <button type="button" class="btn-remove-row" title="Remove Confluence">&times;</button>
-    `;
-    
-    const primarySel = row.querySelector('.inv-primary');
-    const subSel = row.querySelector('.inv-sub');
-    
-    populateSelectEl(primarySel, Object.keys(appData.settings.invalidation || {}), data.primary);
-    
-    const updateSubs = (currData) => {
-        const val = primarySel.value;
-        const config = (appData.settings.invalidation || {})[val] || [];
-        populateSelectEl(subSel, config, currData ? currData.sub : null);
-    };
-    
-    primarySel.addEventListener('change', () => updateSubs(null));
-    updateSubs(data);
-    
-    row.querySelector('.btn-remove-row').addEventListener('click', () => {
-        if (invalidationContainer.children.length > 1) {
-            row.remove();
-            updateRemoveButtonsState(invalidationContainer);
-        }
-    });
-    
-    invalidationContainer.appendChild(row);
-    updateRemoveButtonsState(invalidationContainer);
-}
-
 btnNewTrade.addEventListener('click', () => openTradeModal());
 btnCloseModal.addEventListener('click', closeModal);
 btnCancelModal.addEventListener('click', closeModal);
@@ -1001,9 +838,6 @@ async function openTradeModal(tradeId = null) {
     imageRemoved = false;
     showDropzone();
     
-    locationContainer.innerHTML = '';
-    evidenceContainer.innerHTML = '';
-    invalidationContainer.innerHTML = '';
 
     if (tradeId) {
         document.getElementById('modal-title').innerText = 'Edit Trade';
@@ -1013,21 +847,7 @@ async function openTradeModal(tradeId = null) {
         document.getElementById('trade-id').value = trade.id;
         window.fpTDate.setDate(trade.date);
         document.getElementById('t-number').value = trade.number;
-        document.getElementById('t-result').value = trade.result;
-        
-        
-        const locs = trade.locations && trade.locations.length > 0 ? trade.locations : [{}];
-        locs.forEach(l => addLocationRow(l));
-        
-        const evs = trade.evidences && trade.evidences.length > 0 ? trade.evidences : [{}];
-        evs.forEach(e => addEvidenceRow(e));
-        
-        const invs = trade.invalidations && trade.invalidations.length > 0 ? trade.invalidations : [{}];
-        invs.forEach(i => addInvalidationRow(i));
-        
-        currentPsychology = trade.psychology ? [...trade.psychology] : [];
-        renderPsychPills();
-        renderPsychDropdown();
+        tfInit(trade);
         document.getElementById('t-notes').value = trade.notes || '';
         
         if (trade.screenshot) {
@@ -1038,8 +858,6 @@ async function openTradeModal(tradeId = null) {
                 hideDropzone();
             }
         }
-        
-        updateDependentDropdowns(trade);
     } else {
         document.getElementById('modal-title').innerText = 'Add Trade';
         document.getElementById('trade-id').value = '';
@@ -1048,16 +866,8 @@ async function openTradeModal(tradeId = null) {
         const todayTrades = appData.trades.filter(t => t.date === datePicker.value);
         document.getElementById('t-number').value = todayTrades.length + 1;
         
-        addLocationRow();
-        addEvidenceRow();
-        addInvalidationRow();
-        
-        currentPsychology = [];
-        renderPsychPills();
-        renderPsychDropdown();
+        tfInit(null);
         document.getElementById('t-notes').value = '';
-        
-        updateDependentDropdowns({});
     }
 
     if(!appData.settings.features) appData.settings.features = {evidence:true, invalidation:true, target:true, psychology:true};
@@ -1079,7 +889,7 @@ async function openTradeModal(tradeId = null) {
         autoShotBtn.parentNode.replaceChild(newAutoShotBtn, autoShotBtn);
 
         newAutoShotBtn.addEventListener('click', async () => {
-            const symbol = document.getElementById('t-symbol').value || 'Unknown';
+            const symbol = (tfState && tfState.symbol) || 'Unknown';
             const originalText = newAutoShotBtn.innerHTML;
             newAutoShotBtn.innerHTML = 'Capturing...';
             newAutoShotBtn.disabled = true;
@@ -1142,6 +952,12 @@ btnSaveTrade.addEventListener('click', async (e) => {
     e.preventDefault();
     if(!document.getElementById('t-date').value) return alert('Date is required');
 
+    const missing = tfValidate();
+    if (missing.length) {
+        showToast(`Choose: ${missing.join(', ')}`, 'error');
+        return;
+    }
+
     const tradeId = document.getElementById('trade-id').value || crypto.randomUUID();
     
     let finalImageName = existingImageFilename;
@@ -1159,44 +975,13 @@ btnSaveTrade.addEventListener('click', async (e) => {
         await saveImageToDir(pendingImageBlob, finalImageName);
     }
     
-    // Gather dynamic arrays
-    const locations = Array.from(locationContainer.querySelectorAll('.loc-row')).map(row => ({
-        primary: row.querySelector('.loc-primary').value,
-        sub1: row.querySelector('.loc-sub1').value,
-        sub2: row.querySelector('.loc-sub2').value
-    })).filter(l => l.primary);
-
-    const evidences = Array.from(evidenceContainer.querySelectorAll('.ev-row')).map(row => ({
-        primary: row.querySelector('.ev-primary').value,
-        sub: row.querySelector('.ev-sub').value
-    })).filter(e => e.primary);
-
-    const invalidations = Array.from(invalidationContainer.querySelectorAll('.ev-row'))
-        .map(row => {
-            const p = row.querySelector('.inv-primary');
-            const s = row.querySelector('.inv-sub');
-            if(p && s) return { primary: p.value, sub: s.value };
-            return null;
-        }).filter(i => i && i.primary);
-
     const tradeData = {
         id: tradeId,
         date: document.getElementById('t-date').value,
         number: document.getElementById('t-number').value,
-        result: document.getElementById('t-result').value,
-        symbol: document.getElementById('t-symbol').value,
-        locations: locations, // New Array structure
-        marketCondition: document.getElementById('t-market-cond').value,
-        setup: document.getElementById('t-setup').value,
-        direction: document.getElementById('t-direction').value,
-        evidences: evidences, // New Array structure
-        invalidations: invalidations, // New Array structure
-        target: document.getElementById('t-target').value,
-        targetSub1: document.getElementById('t-target-sub1').value,
-        targetSub2: document.getElementById('t-target-sub2').value,
-        psychology: [...currentPsychology],
+        ...tfGetData(),
         notes: document.getElementById('t-notes').value,
-        screenshot: finalImageName 
+        screenshot: finalImageName
     };
 
     const existingIndex = appData.trades.findIndex(t => t.id === tradeId);

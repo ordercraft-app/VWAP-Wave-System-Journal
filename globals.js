@@ -81,9 +81,6 @@ const imageViewerModal = document.getElementById('image-viewer-modal');
 const imageViewerClose = document.getElementById('image-viewer-close');
 const enlargedImage = document.getElementById('enlarged-image');
 
-const locationContainer = document.getElementById('location-container');
-const evidenceContainer = document.getElementById('evidence-container');
-const invalidationContainer = document.getElementById('invalidation-container');
 
 function escapeHTML(str) {
     if (str === null || str === undefined) return '';

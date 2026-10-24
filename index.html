@@ -407,31 +407,32 @@
                 <form id="trade-form">
                     <input type="hidden" id="trade-id">
                     
-                    <!-- Date, Trade #, Result -->
-                    <div class="form-grid">
+                    <!-- Date, Trade # -->
+                    <div class="form-grid two-col">
                         <div class="form-group">
-                            <label>Date</label>
+                            <label for="t-date">Date</label>
                             <input type="date" id="t-date" required class="linear-input">
                         </div>
                         <div class="form-group">
-                            <label>Trade #</label>
+                            <label for="t-number">Trade #</label>
                             <input type="number" id="t-number" class="linear-input">
-                        </div>
-                        <div class="form-group">
-                            <label>Result</label>
-                            <select id="t-result" class="linear-input">
-                                <option value="WIN">WIN</option>
-                                <option value="LOST">LOST</option>
-                                <option value="B/E">B/E</option>
-                            </select>
                         </div>
                     </div>
 
-                    <!-- Symbol -->
-                    <div class="form-separator">Symbol</div>
-                    <div class="form-grid compact-grid single-col">
-                        <div class="form-group">
-                            <select id="t-symbol" class="linear-input"></select>
+                    <!-- Chip sections are filled from Settings by tradeform.js -->
+                    <div class="chip-section" id="tf-sec-symbol">
+                        <div class="chip-section-head"><span>Symbol</span><span class="chip-section-note" id="tf-note-symbol"></span></div>
+                        <div id="tf-symbol"></div>
+                    </div>
+
+                    <div class="chip-split">
+                        <div class="chip-section" id="tf-sec-marketCondition">
+                            <div class="chip-section-head"><span>Market Condition</span><span class="chip-section-note" id="tf-note-marketCondition"></span></div>
+                            <div id="tf-marketCondition"></div>
+                        </div>
+                        <div class="chip-section" id="tf-sec-result">
+                            <div class="chip-section-head"><span>Result</span></div>
+                            <div id="tf-result"></div>
                         </div>
                     </div>
 
@@ -453,78 +454,41 @@
                         </div>
                     </div>
 
-                                        <!-- Setup Parameters -->
-                    <div class="form-separator section-header">
-                        <span>Location</span>
-                        <button type="button" class="btn-secondary add-confluence-btn" id="btn-add-location">+ Add Confluence</button>
-                    </div>
-                    <div id="location-container" class="multi-container"></div>
-
-                    <div class="form-separator">Market Condition</div>
-                    <div class="form-grid compact-grid single-col">
-                        <div class="form-group">
-                            <select id="t-market-cond" class="linear-input"></select>
-                        </div>
+                    <div class="chip-section" id="tf-sec-location">
+                        <div class="chip-section-head"><span>Location</span></div>
+                        <div id="tf-location"></div>
                     </div>
 
-                    <div class="form-separator">Setup</div>
-                    <div class="form-grid compact-grid two-col">
-                        <div class="form-group">
-                            <select id="t-setup" class="linear-input"></select>
-                        </div>
-                        <div class="form-group">
-                            <select id="t-direction" class="linear-input"></select>
-                        </div>
+                    <div class="chip-section" id="tf-sec-setup">
+                        <div class="chip-section-head"><span>Setup</span></div>
+                        <div id="tf-setup"></div>
                     </div>
 
-                    <div id="section-evidence">
-                        <div class="form-separator section-header">
-                            <span>Evidence</span>
-                            <button type="button" class="btn-secondary add-confluence-btn" id="btn-add-evidence">+ Add Confluence</button>
-                        </div>
-                        <div id="evidence-container" class="multi-container"></div>
+                    <div class="chip-section" id="tf-sec-direction">
+                        <div class="chip-section-head"><span>Direction</span></div>
+                        <div id="tf-direction"></div>
                     </div>
 
-                    <div id="section-invalidation">
-                        <div class="form-separator section-header">
-                            <span>Invalidation</span>
-                            <button type="button" class="btn-secondary add-confluence-btn" id="btn-add-invalidation">+ Add Confluence</button>
-                        </div>
-                        <div id="invalidation-container" class="multi-container"></div>
+                    <div class="chip-section" id="section-evidence">
+                        <div class="chip-section-head"><span>Evidence</span></div>
+                        <div id="tf-evidences"></div>
                     </div>
 
-                    <div id="section-target">
-                        <div class="form-separator">Target</div>
-                        <div class="form-grid compact-grid">
-                            <div class="form-group">
-                                <select id="t-target" class="linear-input"></select>
-                            </div>
-                            <div class="form-group">
-                                <select id="t-target-sub1" class="linear-input" disabled></select>
-                            </div>
-                            <div class="form-group">
-                                <select id="t-target-sub2" class="linear-input" disabled></select>
-                            </div>
-                        </div>
+                    <div class="chip-section" id="section-invalidation">
+                        <div class="chip-section-head"><span>Invalidation</span></div>
+                        <div id="tf-invalidations"></div>
                     </div>
-                    
-                    <div id="section-psychology">
-                        <div class="form-separator">Psychology</div>
-                        <div class="form-grid compact-grid single-col">
-                            <div class="form-group custom-multi-select">
-                                <div class="multi-select-header linear-input" id="psych-select-header">
-                                    <div class="selected-pills" id="psych-selected-pills">
-                                        <span class="placeholder">Select psychology states...</span>
-                                    </div>
-                                    <span class="chevron"></span>
-                                </div>
-                                <div class="multi-select-dropdown" id="psych-dropdown">
-                                    <!-- Checkboxes injected via JS -->
-                                </div>
-                            </div>
-                        </div>
+
+                    <div class="chip-section" id="section-target">
+                        <div class="chip-section-head"><span>Target</span></div>
+                        <div id="tf-target"></div>
                     </div>
-                    
+
+                    <div class="chip-section" id="section-psychology">
+                        <div class="chip-section-head"><span>Psychology</span></div>
+                        <div id="tf-psychology"></div>
+                    </div>
+
                     <div class="form-separator">Notes</div>
                     <div class="form-grid compact-grid single-col">
                         <div class="form-group">
@@ -553,6 +517,7 @@
     <script src="globals.js"></script>
     <script src="storage.js"></script>
     <script src="ui.js"></script>
+    <script src="tradeform.js"></script>
     <script src="charts.js"></script>
     <script src="app.js"></script>
 </body>

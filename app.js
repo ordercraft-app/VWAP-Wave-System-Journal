@@ -19,7 +19,6 @@ document.addEventListener('DOMContentLoaded', async () => {
     
     alignWeekToDate(today);
     setupNavigation();
-    setupDropdownEvents();
     setupCalendarEvents();
     setupImageUploadEvents();
         setupImageViewer();
@@ -206,9 +205,6 @@ document.addEventListener('DOMContentLoaded', async () => {
         });
     }
     
-    document.getElementById('btn-add-location').addEventListener('click', () => addLocationRow());
-    document.getElementById('btn-add-evidence').addEventListener('click', () => addEvidenceRow());
-    document.getElementById('btn-add-invalidation').addEventListener('click', () => addInvalidationRow());
 
     try {
         const savedHandle = await getHandleFromDB();
