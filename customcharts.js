@@ -11,6 +11,7 @@ const CC_VIEWS = [
 ];
 const CC_METRICS = [
     { key: 'winRate', label: 'Win rate' },
+    { key: 'lossRate', label: 'Loss rate' },
     { key: 'count', label: 'Number of trades' }
 ];
 const CC_MIN_TRADES = [1, 3, 5, 10];
@@ -108,7 +109,7 @@ function ccNormalize(c) {
         id: c.id || ccNewId(),
         title: typeof c.title === 'string' ? c.title : '',
         view,
-        metric: CC_METRICS.some(m => m.key === c.metric) ? c.metric : 'winRate',
+        metric: !CC_METRICS.some(m => m.key === c.metric) || (view === 'heatmap' && c.metric === 'lossRate') ? 'winRate' : c.metric,
         groupBy: c.groupBy || '',
         rowsBy: c.rowsBy || '',
         colsBy: c.colsBy || '',
@@ -151,7 +152,7 @@ function ccProblem(c) {
 }
 
 function ccAutoTitle(c) {
-    const metric = c.metric === 'count' ? 'Trades' : 'Win rate';
+    const metric = c.metric === 'count' ? 'Trades' : (c.metric === 'lossRate' ? 'Loss rate' : 'Win rate');
     const label = k => (ccField(k) ? ccField(k).label : '…');
     if (c.view === 'bar') return `${metric} by ${c.groupBy ? label(c.groupBy) : '…'}`;
     if (c.view === 'heatmap') return `${metric} by ${c.rowsBy ? label(c.rowsBy) : '…'} and ${c.colsBy ? label(c.colsBy) : '…'}`;
@@ -183,11 +184,14 @@ function ccApplyFilters(trades, c) {
 
 function ccStats(trades) {
     const s = getWinRateData(trades);
-    return { wins: s.wins, losses: s.losses, be: s.be, total: s.total, winRate: parseFloat(s.winRate) || 0 };
+    const decided = s.wins + s.losses;
+    const lossRate = decided ? Math.round((s.losses / decided) * 1000) / 10 : 0;
+    return { wins: s.wins, losses: s.losses, be: s.be, total: s.total, winRate: parseFloat(s.winRate) || 0, lossRate };
 }
 
 function ccMetricValue(stats, c) {
-    return c.metric === 'count' ? stats.total : stats.winRate;
+    if (c.metric === 'count') return stats.total;
+    return c.metric === 'lossRate' ? stats.lossRate : stats.winRate;
 }
 
 function ccFormat(value, c) {
@@ -259,12 +263,14 @@ function ccRenderNumber(body, c, trades) {
     big.className = 'cc-number-value';
     big.textContent = ccFormat(ccMetricValue(s, c), c);
     if (c.metric === 'winRate') big.style.color = s.winRate >= 50 ? colors.win : colors.loss;
+    if (c.metric === 'lossRate') big.style.color = s.lossRate > 50 ? colors.loss : colors.win;
     wrap.appendChild(big);
 
     const sub = document.createElement('div');
     sub.className = 'cc-number-sub';
-    sub.textContent = c.metric === 'winRate'
-        ? `win rate over ${s.total} ${s.total === 1 ? 'trade' : 'trades'}`
+    const over = `over ${s.total} ${s.total === 1 ? 'trade' : 'trades'}`;
+    sub.textContent = c.metric === 'winRate' ? `win rate ${over}`
+        : c.metric === 'lossRate' ? `loss rate ${over}`
         : `${s.total === 1 ? 'trade matches' : 'trades match'} this chart`;
     wrap.appendChild(sub);
 
@@ -306,7 +312,12 @@ function ccRenderBar(body, c, trades, chartId) {
     });
     // A bar of 0 is invisible, so leave those values out (win rate 0% or only break-even trades)
     rows = rows.filter(r => r.value > 0);
-    if (!rows.length) return ccEmpty(body, c.metric === 'winRate' ? 'None of these trades are winners yet, so there is nothing to show.' : 'No trades to show.');
+    if (!rows.length) {
+        const msg = c.metric === 'winRate' ? 'None of these trades are winners yet, so there is nothing to show.'
+            : c.metric === 'lossRate' ? 'None of these trades are losers yet, so there is nothing to work on here.'
+            : 'No trades to show.';
+        return ccEmpty(body, msg);
+    }
     rows.sort((a, b) => (b.enough - a.enough) || (b.value - a.value) || (b.s.total - a.s.total));
     const hiddenCount = Math.max(0, rows.length - CC_MAX_BARS);
     rows = rows.slice(0, CC_MAX_BARS);
@@ -337,7 +348,7 @@ function ccRenderBar(body, c, trades, chartId) {
             labels: rows.map(r => r.label),
             datasets: [{
                 data: rows.map(r => r.value),
-                backgroundColor: rows.map(r => (r.enough ? (c.metric === 'winRate' ? colors.accent : colors.accent) : colors.muted)),
+                backgroundColor: rows.map(r => (r.enough ? (c.metric === 'lossRate' ? colors.loss : colors.accent) : colors.muted)),
                 borderRadius: 12,
                 borderSkipped: false,
                 maxBarThickness: 28
@@ -348,7 +359,7 @@ function ccRenderBar(body, c, trades, chartId) {
             maintainAspectRatio: false,
             indexAxis: 'y',
             scales: {
-                x: { display: false, beginAtZero: true, max: c.metric === 'winRate' ? 100 : undefined, grid: { display: false } },
+                x: { display: false, beginAtZero: true, max: c.metric === 'count' ? undefined : 100, grid: { display: false } },
                 y: { display: true, afterFit: alignTopChartRows, border: { display: false }, grid: { display: false } }
             },
             plugins: {
@@ -358,7 +369,9 @@ function ccRenderBar(body, c, trades, chartId) {
                         label: ctx => {
                             const r = rows[ctx.dataIndex];
                             const n = `${r.s.total} ${r.s.total === 1 ? 'trade' : 'trades'}`;
-                            return c.metric === 'winRate' ? ` Win rate ${ccFormat(r.value, c)} (${n})` : ` ${n}`;
+                            if (c.metric === 'winRate') return ` Win rate ${ccFormat(r.value, c)} (${n})`;
+                            if (c.metric === 'lossRate') return ` Loss rate ${ccFormat(r.value, c)} (${n})`;
+                            return ` ${n}`;
                         }
                     }
                 }
@@ -733,6 +746,7 @@ function ccRenderModal() {
             b.addEventListener('click', () => {
                 const patch = { view: v.key };
                 if (v.key === 'number') patch.size = 1;
+                if (v.key === 'heatmap' && c.metric === 'lossRate') patch.metric = 'winRate';
                 else if (c.size === 1) patch.size = 2;
                 ccChange(patch);
             });
@@ -742,7 +756,8 @@ function ccRenderModal() {
 
     // Metric
     tfRender('cc-metric', el => {
-        ccChipList(el, 'metric', CC_METRICS.map(m => ({ value: m.key, label: m.label })),
+        const metrics = CC_METRICS.filter(m => !(c.view === 'heatmap' && m.key === 'lossRate'));
+        ccChipList(el, 'metric', metrics.map(m => ({ value: m.key, label: m.label })),
             v => c.metric === v, v => ccChange({ metric: v }));
     });
 
