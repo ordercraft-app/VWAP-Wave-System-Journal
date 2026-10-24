@@ -110,6 +110,44 @@ function addDefaultCustomCharts() {
     sets.chartVisibility['custom:cc_default_symbol_setup'] = true;
 }
 
+// Target "Swing" (High / Low) became "Price Action" (Swing High / Swing Low,
+// plus Higher High and Lower Low). Renamed in settings, trades and custom charts.
+const SWING_SUB_RENAMES = { 'HIgh': 'Swing High', 'High': 'Swing High', 'Low': 'Swing Low' };
+
+function migrateTargetPriceAction() {
+    const sets = appData.settings;
+    const target = sets.target;
+    if (!target || typeof target !== 'object' || Array.isArray(target)) return;
+    if (!target.Swing || target['Price Action']) return; // user changed it already, leave it alone
+
+    const renamed = {};
+    Object.keys(target).forEach(key => {
+        if (key !== 'Swing') { renamed[key] = target[key]; return; }
+        const old = target.Swing || {};
+        const sub1 = (old.sub1 || []).map(v => SWING_SUB_RENAMES[v] || v);
+        ['Higher High', 'Lower Low'].forEach(v => { if (!sub1.includes(v)) sub1.push(v); });
+        renamed['Price Action'] = { sub1: [...new Set(sub1)], sub2: old.sub2 || [] };
+    });
+    sets.target = renamed;
+
+    appData.trades.forEach(t => {
+        if (t.target !== 'Swing') return;
+        t.target = 'Price Action';
+        if (t.targetSub1) t.targetSub1 = SWING_SUB_RENAMES[t.targetSub1] || t.targetSub1;
+    });
+
+    (sets.customCharts || []).forEach(c => (c.filters || []).forEach(f => {
+        if (f.field !== 'target' || !Array.isArray(f.values)) return;
+        f.values = f.values.map(v => {
+            const parts = String(v).split(' › ');
+            if (parts[0] !== 'Swing') return v;
+            parts[0] = 'Price Action';
+            if (parts[1]) parts[1] = SWING_SUB_RENAMES[parts[1]] || parts[1];
+            return parts.join(' › ');
+        });
+    }));
+}
+
 function migrateSettings() {
     const sets = appData.settings;
     if (Array.isArray(sets.setup)) {
@@ -130,6 +168,10 @@ function migrateSettings() {
         sets.migrations.setupTitleCase = true;
     }
     // Runs after the rename above, so the setup names already match
+    if (!sets.migrations.targetPriceAction) {
+        migrateTargetPriceAction();
+        sets.migrations.targetPriceAction = true;
+    }
     if (!sets.migrations.defaultCustomCharts) {
         addDefaultCustomCharts();
         sets.migrations.defaultCustomCharts = true;

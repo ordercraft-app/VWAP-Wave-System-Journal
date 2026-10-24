@@ -185,7 +185,7 @@ document.addEventListener('DOMContentLoaded', async () => {
                   "VWAP": { "sub1": ["Globex", "RTH", "Weekly", "Monthly"], "sub2": ["Upper band", "VWAP", "Lower band"] },
                   "Volume profile": { "sub1": ["Globex", "RTH", "Composite"], "sub2": ["VAH", "POC", "VAL", "LVN", "HVN", "Other side of value"] },
                   "IB": { "sub1": ["Current", "Previous"], "sub2": ["High", "Mid", "Low", "High +50%", "High +100%", "High +200%", "Low -50%", "Low -100%", "Low -200%"] },
-                  "Swing": { "sub1": ["HIgh", "Low"], "sub2": [] },
+                  "Price Action": { "sub1": ["Swing High", "Swing Low", "Higher High", "Lower Low"], "sub2": [] },
                   "RR": { "sub1": ["1/1", "1/2", "1/3", "1/4", "1/5"], "sub2": [] }
                 },
                 "psychology": [

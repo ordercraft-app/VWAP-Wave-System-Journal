@@ -556,7 +556,13 @@ function renderStatsDashboard() {
         const sortedLocBE = locArray.map(item => parseFloat(item.bePct.toFixed(1)));
         
         destroyChart('locationChart');
-        chartInstances['locationChart'] = new Chart(document.getElementById('locationChart'), {
+        // Fixed row height with a small gap; the chart grows with the number of locations
+        const locCanvas = document.getElementById('locationChart');
+        const locWrap = locCanvas.parentElement;
+        locWrap.style.flex = 'none';
+        locWrap.style.minHeight = '0';
+        locWrap.style.height = `${sortedLocLabels.length * 42 + 56}px`;
+        chartInstances['locationChart'] = new Chart(locCanvas, {
             type: 'bar',
             data: {
                 labels: sortedLocLabels,
@@ -568,6 +574,7 @@ function renderStatsDashboard() {
             },
             options: { 
                 clip: false, maintainAspectRatio: false, indexAxis: 'y', 
+                datasets: { bar: { categoryPercentage: 1, barPercentage: 0.8 } },
                 scales: { x: { stacked: true, max: 100, display: false }, y: { stacked: true, border: { display: false }, grid: { display: false } } },
                 plugins: { 
                     legend: { position: 'bottom', labels: { color: '#888', usePointStyle: true, pointStyle: 'circle' } },

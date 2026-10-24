@@ -544,10 +544,12 @@ async function renderDashboard() {
                 "Low -200%"
             ]
         },
-        "Swing": {
+        "Price Action": {
             "sub1": [
-                "HIgh",
-                "Low"
+                "Swing High",
+                "Swing Low",
+                "Higher High",
+                "Lower Low"
             ],
             "sub2": []
         },
