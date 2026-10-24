@@ -576,7 +576,7 @@ select.linear-input {
 }
 .stats-add-chart { margin-left: auto; }
 .stat-card.is-orderable { cursor: grab; }
-.stat-card.is-orderable .card-title { display: flex; align-items: center; gap: 6px; }
+.stat-card.is-orderable .card-title { display: flex; align-items: center; gap: 10px; }
 .card-drag-handle { margin-left: -4px; font-size: 13px; letter-spacing: -2px; color: var(--text-muted); opacity: 0.7; user-select: none; }
 .stat-card.is-orderable:hover .card-drag-handle { opacity: 1; color: var(--text-main); }
 .stat-card.is-orderable:active { cursor: grabbing; }
