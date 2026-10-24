@@ -474,9 +474,20 @@ function ccEnsureStatsCards() {
             card = document.createElement('div');
             card.className = 'stat-card cc-card';
             card.dataset.chartKey = key;
-            card.innerHTML = '<h3 class="card-title"></h3><div class="cc-filters"></div><div class="cc-body"></div>';
+            card.innerHTML = `
+                <div class="cc-card-head">
+                    <h3 class="card-title"></h3>
+                    <button type="button" class="cc-edit-btn" title="Edit chart">
+                        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 20h9"/><path d="M16.5 3.5a2.1 2.1 0 0 1 3 3L7 19l-4 1 1-4Z"/></svg>
+                    </button>
+                </div>
+                <div class="cc-filters"></div>
+                <div class="cc-body"></div>`;
+            card.querySelector('.cc-edit-btn').addEventListener('click', () => openCustomChartModal(card.dataset.chartId));
             grid.appendChild(card);
         }
+        card.dataset.chartId = c.id;
+        card.querySelector('.cc-edit-btn').setAttribute('aria-label', `Edit chart: ${ccTitle(c)}`);
         card.classList.remove('chart-span-2', 'chart-span-3');
         if (c.size === 2) card.classList.add('chart-span-2');
         if (c.size === 3) card.classList.add('chart-span-3');
@@ -883,6 +894,12 @@ function ccViewIcon(key) {
     return `<svg ${common}><rect x="4" y="4" width="6" height="6" rx="1.5" fill="currentColor"/><rect x="11" y="4" width="6" height="6" rx="1.5" fill="currentColor" opacity=".4"/><rect x="18" y="4" width="6" height="6" rx="1.5" fill="currentColor" opacity=".7"/><rect x="4" y="11" width="6" height="6" rx="1.5" fill="currentColor" opacity=".55"/><rect x="11" y="11" width="6" height="6" rx="1.5" fill="currentColor"/><rect x="18" y="11" width="6" height="6" rx="1.5" fill="currentColor" opacity=".3"/><rect x="4" y="18" width="6" height="6" rx="1.5" fill="currentColor" opacity=".3"/><rect x="11" y="18" width="6" height="6" rx="1.5" fill="currentColor" opacity=".7"/><rect x="18" y="18" width="6" height="6" rx="1.5" fill="currentColor"/></svg>`;
 }
 
+// After saving or deleting, redraw the page the user is on
+function ccRefreshViews() {
+    if (typeof viewStats !== 'undefined' && viewStats.classList.contains('active')) renderStatsDashboard();
+    if (typeof viewSettings !== 'undefined' && viewSettings.classList.contains('active') && currentSettingsTab === 'chart') renderSettingsUI();
+}
+
 async function ccSave() {
     const c = ccState;
     const problem = ccProblem({ ...c, filters: c.filters });
@@ -912,7 +929,7 @@ async function ccSave() {
     ccDirty = false;
     ccClose();
     await autoSave();
-    if (currentSettingsTab === 'chart') renderSettingsUI();
+    ccRefreshViews();
     showToast(idx >= 0 ? 'Chart updated' : 'Chart added to your Stats page', 'success');
 }
 
@@ -928,6 +945,6 @@ async function ccDelete() {
     ccClose();
     ccEnsureStatsCards();
     await autoSave();
-    if (currentSettingsTab === 'chart') renderSettingsUI();
+    ccRefreshViews();
     showToast('Chart deleted', 'info');
 }
