@@ -1509,7 +1509,8 @@ function renderSettingsUI() {
 
         // Sort rows by the saved chart order (settings.json -> chartOrder)
         const order = getChartOrder();
-        const sortedConfig = [...chartsConfig].sort((a, b) => order.indexOf(a.key) - order.indexOf(b.key));
+        const allConfig = [...chartsConfig, ...ccSettingsRows()];
+        const sortedConfig = allConfig.sort((a, b) => order.indexOf(a.key) - order.indexOf(b.key));
         let draggedChartKey = null;
 
         sortedConfig.forEach(c => {
@@ -1565,6 +1566,18 @@ function renderSettingsUI() {
 
             leftDiv.appendChild(dragHandle);
             leftDiv.appendChild(label);
+            if (c.custom) {
+                const tag = document.createElement('span');
+                tag.className = 'chart-custom-tag';
+                tag.textContent = 'Custom';
+                leftDiv.appendChild(tag);
+            }
+            if (c.note) {
+                const note = document.createElement('span');
+                note.className = 'chart-toggle-note';
+                note.textContent = c.note;
+                leftDiv.appendChild(note);
+            }
 
             const btn = document.createElement('button');
             const isEnabled = appData.settings.chartVisibility[c.key] !== false; 
@@ -1577,9 +1590,27 @@ function renderSettingsUI() {
             };
             
             row.appendChild(leftDiv);
-            row.appendChild(btn);
+            if (c.custom) {
+                const actions = document.createElement('div');
+                actions.className = 'chart-toggle-actions';
+                const editBtn = document.createElement('button');
+                editBtn.className = 'btn-secondary btn-sm';
+                editBtn.textContent = 'Edit';
+                editBtn.onclick = () => openCustomChartModal(c.id);
+                actions.appendChild(editBtn);
+                actions.appendChild(btn);
+                row.appendChild(actions);
+            } else {
+                row.appendChild(btn);
+            }
             chartsWrapper.appendChild(row);
         });
+
+        const addChartBtn = document.createElement('button');
+        addChartBtn.className = 'btn-secondary btn-sm add-level-1-btn';
+        addChartBtn.textContent = '+ Add Custom Chart';
+        addChartBtn.onclick = () => openCustomChartModal();
+        chartsWrapper.appendChild(addChartBtn);
         
         settingsContainer.appendChild(chartsWrapper);
     }

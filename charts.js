@@ -209,9 +209,10 @@ const CHART_CANVAS_IDS = {
 
 // Returns a complete, valid order: saved keys first, any missing (new) charts appended
 function getChartOrder() {
+    const allKeys = [...DEFAULT_CHART_ORDER, ...(typeof ccCustomKeys === 'function' ? ccCustomKeys() : [])];
     const saved = Array.isArray(appData.settings.chartOrder) ? appData.settings.chartOrder : [];
-    const order = saved.filter(k => DEFAULT_CHART_ORDER.includes(k));
-    DEFAULT_CHART_ORDER.forEach(k => { if (!order.includes(k)) order.push(k); });
+    const order = saved.filter((k, i) => allKeys.includes(k) && saved.indexOf(k) === i);
+    allKeys.forEach(k => { if (!order.includes(k)) order.push(k); });
     return order;
 }
 
@@ -219,9 +220,15 @@ function getChartOrder() {
 function applyChartOrder() {
     const grid = document.querySelector('.stats-grid');
     if (!grid) return;
+    if (typeof ccEnsureStatsCards === 'function') ccEnsureStatsCards();
     getChartOrder().forEach(key => {
-        const canvas = document.getElementById(CHART_CANVAS_IDS[key]);
-        const card = canvas ? canvas.closest('.stat-card') : null;
+        let card = null;
+        if (key.startsWith('custom:')) {
+            card = grid.querySelector(`.cc-card[data-chart-key="${CSS.escape(key)}"]`);
+        } else {
+            const canvas = document.getElementById(CHART_CANVAS_IDS[key]);
+            card = canvas ? canvas.closest('.stat-card') : null;
+        }
         if (card) grid.appendChild(card);
     });
 }
@@ -569,4 +576,7 @@ function renderStatsDashboard() {
             }
         });
     });
+
+    // 12. Custom charts (customcharts.js), drawn on the same filtered trades
+    if (typeof ccRenderStatsCards === 'function') ccRenderStatsCards(trades);
 }
