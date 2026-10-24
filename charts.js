@@ -40,6 +40,32 @@ function progressiveLineAnimation(pointCount, totalDuration = 1000) {
     };
 }
 
+// Long category labels (setups, locations, ...) wrap over several lines
+// instead of being clipped. Applies to every chart with a category axis;
+// tooltips keep showing the full label on one line.
+function wrapChartLabel(label, maxChars = 16) {
+    const words = String(label ?? '').split(' ');
+    const lines = [];
+    let line = '';
+    words.forEach(word => {
+        const next = line ? `${line} ${word}` : word;
+        if (next.length > maxChars && line) {
+            lines.push(line);
+            line = word;
+        } else {
+            line = next;
+        }
+    });
+    if (line) lines.push(line);
+    return lines.length > 1 ? lines : (lines[0] || '');
+}
+
+if (window.Chart && Chart.defaults.scales && Chart.defaults.scales.category) {
+    Chart.defaults.scales.category.ticks.callback = function (value) {
+        return wrapChartLabel(this.getLabelForValue(value));
+    };
+}
+
 function getWinRateData(tradesArray) {
     const wins = tradesArray.filter(t => t.result === 'WIN').length;
     const losses = tradesArray.filter(t => t.result === 'LOST').length;
@@ -361,7 +387,8 @@ function renderStatsDashboard() {
             if (b.winRate !== a.winRate) return b.winRate - a.winRate;
             return b.total - a.total;
         });
-        const top5Setups = setupStats.slice(0, 5);
+        // Only setups that actually won trades belong in an effectiveness ranking
+        const top5Setups = setupStats.filter(s => s.winRate > 0).slice(0, 5);
         
         destroyChart('setupChart');
         chartInstances['setupChart'] = new Chart(document.getElementById('setupChart'), {
