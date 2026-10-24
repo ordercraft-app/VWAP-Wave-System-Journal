@@ -988,6 +988,8 @@ span.flatpickr-weekday {
 .chip-split .chip-section { display: flex; flex-direction: column; }
 .chip-split .chip-box { flex: 1; }
 .chip-box { padding: 14px; border: 1px solid var(--border-color); border-radius: 14px; background: var(--bg-panel); }
+#trade-form .dropzone, #trade-form .image-preview-container { background-color: var(--bg-panel); border-radius: 14px; }
+#trade-form .dropzone:hover, #trade-form .dropzone.dragover { background-color: color-mix(in srgb, var(--accent) 6%, var(--bg-panel)); }
 [data-theme="light"] .chip-box { --chip-bg: var(--bg-main); --chip-hover: var(--bg-disabled); }
 
 .chip-row { display: flex; flex-wrap: wrap; gap: 8px; }

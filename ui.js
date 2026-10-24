@@ -1410,8 +1410,9 @@ function renderSettingsUI() {
         settingsContainer.appendChild(banner);
 
         settingsContainer.appendChild(renderSimpleSetting('Symbol', appData.settings.symbol, onSettingsChange));
-        settingsContainer.appendChild(renderComplexSetting('Location', appData.settings.location, '3-level', onSettingsChange));
+        // Same order as the add/edit trade form
         settingsContainer.appendChild(renderSimpleSetting('Market Condition', appData.settings.marketCondition, onSettingsChange));
+        settingsContainer.appendChild(renderComplexSetting('Location', appData.settings.location, '3-level', onSettingsChange));
         settingsContainer.appendChild(renderComplexSetting('Setup', appData.settings.setup, '2-level', onSettingsChange));
         settingsContainer.appendChild(renderSimpleSetting('Direction', appData.settings.direction, onSettingsChange));
         settingsContainer.appendChild(renderComplexSetting('Evidence', appData.settings.evidence, '2-level', onSettingsChange, 'evidence'));
