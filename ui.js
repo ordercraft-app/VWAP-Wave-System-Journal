@@ -1513,6 +1513,13 @@ function renderSettingsUI() {
         const sortedConfig = allConfig.sort((a, b) => order.indexOf(a.key) - order.indexOf(b.key));
         let draggedChartKey = null;
 
+        // Add button sits at the top of the list
+        const addChartBtn = document.createElement('button');
+        addChartBtn.className = 'btn-secondary btn-sm add-level-1-btn';
+        addChartBtn.textContent = '+ Add Custom Chart';
+        addChartBtn.onclick = () => openCustomChartModal();
+        chartsWrapper.appendChild(addChartBtn);
+
         sortedConfig.forEach(c => {
             if (c.depends && !appData.settings.features[c.depends]) return;
 
@@ -1606,11 +1613,6 @@ function renderSettingsUI() {
             chartsWrapper.appendChild(row);
         });
 
-        const addChartBtn = document.createElement('button');
-        addChartBtn.className = 'btn-secondary btn-sm add-level-1-btn';
-        addChartBtn.textContent = '+ Add Custom Chart';
-        addChartBtn.onclick = () => openCustomChartModal();
-        chartsWrapper.appendChild(addChartBtn);
         
         settingsContainer.appendChild(chartsWrapper);
     }
