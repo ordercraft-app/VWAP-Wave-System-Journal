@@ -63,7 +63,7 @@
 }
 
 [data-theme="light"] {
-    --bg-main: #F4F5F7;
+    --bg-main: #EBECEF;
     --bg-panel: #FFFFFF;
     --bg-input: #FFFFFF;
     --border-color: #E2E4E9;
@@ -71,10 +71,10 @@
     --text-muted: #6E727A;
     
     --cal-bg-default: #FFFFFF;
-    --cal-bg-active: #F4F5F7;
+    --cal-bg-active: #EBECEF;
     --cal-text-dim: #888888;
     
-    --bg-hover: #F4F5F7;
+    --bg-hover: #EBECEF;
     --bg-disabled: #E2E4E9;
     --border-hover: #C1C8D1;
     --cal-active-bg: #E2E4E9;
@@ -784,7 +784,7 @@ span.flatpickr-weekday {
 
 /* Theme Toggle Button Specifics */
 #btn-theme-toggle {
-    background-color: #F4F5F7 !important;
+    background-color: #EBECEF !important;
     color: #141517 !important;
     border-color: transparent !important;
 }
@@ -987,7 +987,7 @@ span.flatpickr-weekday {
 .chip-split { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: 16px; }
 .chip-split .chip-section { display: flex; flex-direction: column; }
 .chip-split .chip-box { flex: 1; }
-.chip-box { padding: 14px; border: 1px solid var(--border-color); border-radius: 14px; background: var(--bg-panel); }
+.chip-box { padding: 14px; border-radius: 14px; background: var(--bg-panel); }
 #trade-form .dropzone, #trade-form .image-preview-container { background-color: var(--bg-panel); border-radius: 14px; }
 #trade-form .dropzone:hover, #trade-form .dropzone.dragover { background-color: color-mix(in srgb, var(--accent) 6%, var(--bg-panel)); }
 [data-theme="light"] .chip-box { --chip-bg: var(--bg-main); --chip-hover: var(--bg-disabled); }
