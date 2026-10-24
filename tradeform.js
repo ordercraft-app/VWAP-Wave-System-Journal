@@ -16,6 +16,7 @@ function tfEmptyState() {
         marketCondition: '',
         result: '',
         setup: '',
+        setupCategory: '',
         direction: '',
         locations: [],
         locPath: { primary: '', sub1: '' },
@@ -38,6 +39,7 @@ function tfInit(trade = null) {
         tfState.marketCondition = trade.marketCondition || '';
         tfState.result = trade.result || '';
         tfState.setup = trade.setup || '';
+        tfState.setupCategory = trade.setupCategory || tfFindSetupCategory(tfState.setup);
         tfState.direction = trade.direction || '';
         tfState.locations = (trade.locations || [])
             .filter(l => l && l.primary)
@@ -86,10 +88,13 @@ function tfApplySmartDefaults() {
     });
 
     // A list with a single option needs no tap
-    ['setup', 'direction'].forEach(field => {
-        const options = sets[field] || [];
-        if (options.length === 1) tfState[field] = options[0];
-    });
+    const directions = sets.direction || [];
+    if (directions.length === 1) tfState.direction = directions[0];
+    const setups = tfAllSetups();
+    if (setups.length === 1) {
+        tfState.setup = setups[0].item;
+        tfState.setupCategory = setups[0].cat;
+    }
 }
 
 function tfGetData() {
@@ -100,6 +105,7 @@ function tfGetData() {
         locations: st.locations.map(l => ({ ...l })),
         marketCondition: st.marketCondition,
         setup: st.setup,
+        setupCategory: st.setup ? st.setupCategory : '',
         direction: st.direction,
         evidences: st.evidences.map(e => ({ ...e })),
         invalidations: st.invalidations.map(i => ({ ...i })),
@@ -115,7 +121,8 @@ function tfValidate() {
     const sets = appData.settings;
     const labels = { symbol: 'Symbol', marketCondition: 'Market Condition', result: 'Result', setup: 'Setup', direction: 'Direction' };
     const missing = TF_REQUIRED.filter(field => {
-        const hasOptions = field === 'result' || (sets[field] || []).length > 0;
+        const hasOptions = field === 'result'
+            || (field === 'setup' ? tfAllSetups().length > 0 : (sets[field] || []).length > 0);
         return hasOptions && !tfState[field];
     });
 
@@ -273,6 +280,70 @@ function tfUpdateNote(field) {
     const note = document.getElementById(`tf-note-${field}`);
     if (!note) return;
     note.textContent = tfState.carried[field] ? 'From previous trade' : '';
+}
+
+// ---------- Setup: grouped, single choice ----------
+// settings shape: { Category: [setup, setup] }; the trade stores the setup
+// name (as before) plus setupCategory.
+
+function tfSetupConfig() {
+    const cfg = appData.settings.setup;
+    return cfg && !Array.isArray(cfg) ? cfg : {};
+}
+
+function tfAllSetups() {
+    const cfg = tfSetupConfig();
+    return Object.keys(cfg).flatMap(cat => (Array.isArray(cfg[cat]) ? cfg[cat] : []).map(item => ({ cat, item })));
+}
+
+function tfFindSetupCategory(name) {
+    if (!name) return '';
+    const hit = tfAllSetups().find(s => s.item === name);
+    return hit ? hit.cat : '';
+}
+
+function tfRenderSetup() {
+    tfRender('tf-setup', el => {
+        const cfg = tfSetupConfig();
+        const st = tfState;
+        const cats = Object.keys(cfg).filter(cat => Array.isArray(cfg[cat]) && cfg[cat].length);
+
+        // A stored setup that is no longer in settings stays visible
+        const known = st.setup && tfAllSetups().some(s => s.item === st.setup && (!st.setupCategory || s.cat === st.setupCategory));
+        const legacyCat = st.setup && !known ? (st.setupCategory || 'Not in settings') : '';
+        if (legacyCat && !cats.includes(legacyCat)) cats.push(legacyCat);
+
+        if (!cats.length) {
+            tfEmptyHint(el, 'Add setups in Settings.');
+            return;
+        }
+
+        cats.forEach(cat => {
+            const group = document.createElement('div');
+            group.className = 'chip-group';
+            const label = document.createElement('span');
+            label.className = 'chip-group-label';
+            label.textContent = cat;
+            group.appendChild(label);
+
+            const items = Array.isArray(cfg[cat]) ? cfg[cat] : [];
+            const legacyValues = cat === legacyCat ? [st.setup] : [];
+            tfChipRow(group, `setup::${cat}`, items,
+                item => st.setup === item && (st.setupCategory === cat || (!st.setupCategory && cat === legacyCat) || (!st.setupCategory && !legacyCat)),
+                item => {
+                    const same = st.setup === item && st.setupCategory === cat;
+                    st.setup = same ? '' : item;
+                    st.setupCategory = same ? '' : cat;
+                    tfMarkDirty();
+                    tfClearMissing('setup');
+                    tfRenderSetup();
+                },
+                tfRenderSetup,
+                { legacyValues }
+            );
+            el.appendChild(group);
+        });
+    });
 }
 
 // ---------- Multi-choice: psychology ----------
@@ -542,7 +613,7 @@ function tfRenderAll() {
     tfRenderSingle('marketCondition');
     tfRenderSingle('result', TF_RESULTS, v => TF_RESULT_TONES[v] || '');
     tfRenderLocation();
-    tfRenderSingle('setup');
+    tfRenderSetup();
     tfRenderSingle('direction');
     tfRenderGrouped('evidences', 'evidence');
     tfRenderGrouped('invalidations', 'invalidation');

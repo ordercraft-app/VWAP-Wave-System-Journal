@@ -9,7 +9,7 @@ let appData = {
         symbol: ["NQ", "ES", "GC", "CL", "BTC"],
         location: { "VWAP": { sub1: [], sub2: [] } },
         marketCondition: [],
-        setup: [],
+        setup: {},
         direction: [],
         evidence: {},
         invalidation: {},

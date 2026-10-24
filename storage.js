@@ -48,6 +48,50 @@ async function verifyPermission(dirHandle, readWrite = true) {
 
 // --- Data Loading ---
 
+// Setup used to be one flat list; it is now grouped in categories
+// (like Evidence). Known core setups go to "Core setup", the rest to "Advanced setup".
+const CORE_SETUP_NAMES = ['price discovery continuation', 'fade value area extremes', 'return to value', 'vwap bounce'];
+
+// Setup names in American title case. Old spellings are renamed in the
+// settings and in every saved trade, so stats keep counting them together.
+const SETUP_RENAMES = {
+    'Fade value area extremes': 'Fade Value Area Extremes',
+    'Return to value': 'Return to Value',
+    'VWAP/POC Scalpes in balance': 'VWAP/POC Scalps in Balance',
+    'Inside HTF balance fades': 'Inside HTF Balance Fades',
+    'IB Extension fades': 'IB Extension Fades'
+};
+
+function renameSetups() {
+    const rename = name => SETUP_RENAMES[name] || name;
+    const cfg = appData.settings.setup;
+    if (cfg && !Array.isArray(cfg)) {
+        Object.keys(cfg).forEach(cat => {
+            if (!Array.isArray(cfg[cat])) return;
+            // Rename and drop duplicates if both spellings existed
+            cfg[cat] = cfg[cat].map(rename).filter((v, i, arr) => arr.indexOf(v) === i);
+        });
+    }
+    appData.trades.forEach(t => {
+        if (t.setup) t.setup = rename(t.setup);
+    });
+}
+
+function migrateSettings() {
+    const sets = appData.settings;
+    if (Array.isArray(sets.setup)) {
+        const core = sets.setup.filter(x => CORE_SETUP_NAMES.includes(String(x).trim().toLowerCase()));
+        const advanced = sets.setup.filter(x => !core.includes(x));
+        const grouped = {};
+        if (core.length) grouped['Core setup'] = core;
+        if (advanced.length) grouped['Advanced setup'] = advanced;
+        sets.setup = grouped;
+    } else if (!sets.setup || typeof sets.setup !== 'object') {
+        sets.setup = {};
+    }
+    renameSetups();
+}
+
 async function loadDataFromFile() {
     try {
         // Load settings first
@@ -126,6 +170,8 @@ async function loadDataFromFile() {
             console.error("Error loading vwap-journal.json:", e);
         }
         
+        migrateSettings();
+
         // Force save to ensure both files exist in the new format
         await autoSave();
         renderDashboard();

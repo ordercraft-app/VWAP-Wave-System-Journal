@@ -56,17 +56,21 @@
     "Balance",
     "Imbalance"
   ],
-  "setup": [
-    "Price Discovery Continuation",
-    "Fade value area extremes",
-    "Return to value",
-    "VWAP Bounce",
-    "Madonna",
-    "VWAP/POC Scalpes in balance",
-    "Late Entry Continuation",
-    "Inside HTF balance fades",
-    "IB Extension fades"
-  ],
+  "setup": {
+    "Core setup": [
+      "Price Discovery Continuation",
+      "Fade Value Area Extremes",
+      "Return to Value",
+      "VWAP Bounce"
+    ],
+    "Advanced setup": [
+      "Madonna",
+      "VWAP/POC Scalps in Balance",
+      "Late Entry Continuation",
+      "Inside HTF Balance Fades",
+      "IB Extension Fades"
+    ]
+  },
   "direction": [
     "Long",
     "Short"

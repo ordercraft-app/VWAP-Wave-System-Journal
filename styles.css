@@ -978,21 +978,25 @@ span.flatpickr-weekday {
 }
 
 /* --- Chip-based trade form (tradeform.js) --- */
-.chip-section { margin-top: 22px; }
+.chip-section { margin-top: 24px; }
 .chip-section-head { display: flex; justify-content: space-between; align-items: baseline; gap: 12px; margin-bottom: 10px; font-size: 11px; text-transform: uppercase; letter-spacing: 0.5px; color: var(--text-muted); }
 .chip-section-note { font-size: 11px; text-transform: none; letter-spacing: 0; color: var(--text-muted); }
 .chip-section.is-missing .chip-section-head > span:first-child { color: var(--danger); }
 .chip-section.is-missing .chip-section-head > span:first-child::after { content: ' (required)'; text-transform: none; letter-spacing: 0; }
 
 .chip-split { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: 16px; }
+.chip-split .chip-section { display: flex; flex-direction: column; }
+.chip-split .chip-box { flex: 1; }
+.chip-box { padding: 14px; border: 1px solid var(--border-color); border-radius: 14px; background: var(--bg-panel); }
+[data-theme="light"] .chip-box { --chip-bg: var(--bg-main); --chip-hover: var(--bg-disabled); }
 
 .chip-row { display: flex; flex-wrap: wrap; gap: 8px; }
 .chip-row.is-sub { position: relative; padding-left: 24px; }
 .chip-row.is-sub::before { content: ''; position: absolute; left: 9px; top: 0; width: 10px; height: 18px; border-left: 1px solid var(--border-hover); border-bottom: 1px solid var(--border-hover); border-bottom-left-radius: 6px; }
 .chip-cascade { display: flex; flex-direction: column; gap: 10px; }
 
-.chip { position: relative; height: 34px; padding: 0 14px; border-radius: 100px; border: 1px solid var(--border-color); background: var(--bg-input); color: var(--text-main); font-family: inherit; font-size: 13px; line-height: 1; white-space: nowrap; cursor: pointer; transition: background-color 0.15s, border-color 0.15s; }
-.chip:hover { background: var(--bg-hover); border-color: var(--border-hover); }
+.chip { position: relative; height: 34px; padding: 0 14px; border-radius: 100px; border: 1px solid var(--border-color); background: var(--chip-bg, var(--bg-input)); color: var(--text-main); font-family: inherit; font-size: 13px; line-height: 1; white-space: nowrap; cursor: pointer; transition: background-color 0.15s, border-color 0.15s; }
+.chip:hover { background: var(--chip-hover, var(--bg-hover)); border-color: var(--border-hover); }
 .chip:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
 .chip.is-selected { background: color-mix(in srgb, var(--accent) 18%, var(--bg-input)); border-color: var(--accent); }
 .chip.chip-win.is-selected { background: var(--bg-win); border-color: var(--color-win); }

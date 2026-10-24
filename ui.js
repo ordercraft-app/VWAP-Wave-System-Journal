@@ -1142,33 +1142,6 @@ function createPillBox(dataArray, onChange) {
     return wrapper;
 }
 
-function renderSetupCombined(onChange) {
-    const container = document.createElement('div');
-    container.className = 'setting-category-card';
-    
-    const header = document.createElement('h3');
-    header.textContent = 'Setup';
-    header.className = 'setting-cat-title';
-    container.appendChild(header);
-
-    const subsDiv = document.createElement('div');
-    subsDiv.className = 'setting-subs';
-    
-    const setupLabel = document.createElement('label');
-    setupLabel.textContent = 'Setup';
-    subsDiv.appendChild(setupLabel);
-    subsDiv.appendChild(createPillBox(appData.settings.setup, onChange));
-    
-    const dirLabel = document.createElement('label');
-    dirLabel.textContent = 'Direction';
-    dirLabel.style.marginTop = '16px'; 
-    subsDiv.appendChild(dirLabel);
-    subsDiv.appendChild(createPillBox(appData.settings.direction, onChange));
-
-    container.appendChild(subsDiv);
-    return container;
-}
-
 function renderComplexSetting(title, configObj, type, onChange, toggleKey = null) {
     const container = document.createElement('div');
     container.className = 'setting-category-card';
@@ -1439,7 +1412,8 @@ function renderSettingsUI() {
         settingsContainer.appendChild(renderSimpleSetting('Symbol', appData.settings.symbol, onSettingsChange));
         settingsContainer.appendChild(renderComplexSetting('Location', appData.settings.location, '3-level', onSettingsChange));
         settingsContainer.appendChild(renderSimpleSetting('Market Condition', appData.settings.marketCondition, onSettingsChange));
-        settingsContainer.appendChild(renderSetupCombined(onSettingsChange));
+        settingsContainer.appendChild(renderComplexSetting('Setup', appData.settings.setup, '2-level', onSettingsChange));
+        settingsContainer.appendChild(renderSimpleSetting('Direction', appData.settings.direction, onSettingsChange));
         settingsContainer.appendChild(renderComplexSetting('Evidence', appData.settings.evidence, '2-level', onSettingsChange, 'evidence'));
         settingsContainer.appendChild(renderComplexSetting('Invalidation', appData.settings.invalidation, '2-level', onSettingsChange, 'invalidation'));
         settingsContainer.appendChild(renderComplexSetting('Target', appData.settings.target, '3-level', onSettingsChange, 'target'));
