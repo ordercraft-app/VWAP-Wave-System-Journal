@@ -250,11 +250,7 @@ function addCardDragHandle(card) {
     text.textContent = title.textContent;
     const handle = document.createElement('span');
     handle.className = 'card-drag-handle';
-    // Six dots as a small SVG, so it looks the same on every system and font
-    handle.innerHTML = '<svg width="8" height="12" viewBox="0 0 8 12" fill="currentColor" aria-hidden="true">'
-        + '<circle cx="1.5" cy="1.5" r="1.1"/><circle cx="6.5" cy="1.5" r="1.1"/>'
-        + '<circle cx="1.5" cy="6" r="1.1"/><circle cx="6.5" cy="6" r="1.1"/>'
-        + '<circle cx="1.5" cy="10.5" r="1.1"/><circle cx="6.5" cy="10.5" r="1.1"/></svg>';
+    handle.innerHTML = DRAG_ICON_SVG;
     handle.title = 'Drag to reorder';
     handle.setAttribute('aria-hidden', 'true');
     title.textContent = '';

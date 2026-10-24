@@ -501,6 +501,8 @@ select.linear-input {
 .setting-level-1 { flex: 0 0 220px; display: flex; gap: 8px; align-items: center; }
 .row-drag-handle { color: var(--text-muted); cursor: grab; padding: 4px; font-size: 16px; user-select: none; display: flex; align-items: center; }
 .row-drag-handle:hover { color: var(--text-main); }
+.row-drag-handle .drag-icon { width: 10px; height: 15px; }
+.inline-drag-icon { display: inline-flex; vertical-align: -1px; margin: 0 2px; color: var(--text-main); }
 .level-1-input { font-weight: 600; }
 .delete-level-1 { color: var(--danger); font-size: 18px; padding: 6px; }
 .setting-subs { flex: 1; display: flex; flex-direction: column; gap: 12px; }

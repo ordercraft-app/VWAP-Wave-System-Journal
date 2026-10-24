@@ -1042,7 +1042,7 @@ function renderComplexSetting(title, configObj, type, onChange, toggleKey = null
             level1Div.className = 'setting-level-1';
             
             const dragHandle = document.createElement('div');
-            dragHandle.innerHTML = '&#8942;&#8942;';
+            dragHandle.innerHTML = DRAG_ICON_SVG;
             dragHandle.className = 'row-drag-handle';
             dragHandle.title = "Drag to reorder category";
             
@@ -1314,7 +1314,7 @@ function renderSettingsContent() {
         
         const banner = document.createElement('div');
         banner.className = 'info-banner';
-        banner.innerHTML = `<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"></circle><line x1="12" y1="16" x2="12" y2="12"></line><line x1="12" y1="8" x2="12.01" y2="8"></line></svg><span><strong>Tip:</strong> Drag a chart by its <strong>&#8942;&#8942;</strong> handle to change the order on the Stats page.</span>`;
+        banner.innerHTML = `<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"></circle><line x1="12" y1="16" x2="12" y2="12"></line><line x1="12" y1="8" x2="12.01" y2="8"></line></svg><span><strong>Tip:</strong> Drag a chart by its <span class="inline-drag-icon">${DRAG_ICON_SVG}</span> handle to change the order on the Stats page.</span>`;
         settingsContainer.appendChild(banner);
 
         // Wrap inside a container with an 8px gap
@@ -1376,7 +1376,7 @@ function renderSettingsContent() {
             leftDiv.className = 'chart-toggle-left';
 
             const dragHandle = document.createElement('div');
-            dragHandle.innerHTML = '&#8942;&#8942;';
+            dragHandle.innerHTML = DRAG_ICON_SVG;
             dragHandle.className = 'row-drag-handle';
             dragHandle.title = 'Drag to reorder chart';
             dragHandle.onmousedown = () => { row.draggable = true; };

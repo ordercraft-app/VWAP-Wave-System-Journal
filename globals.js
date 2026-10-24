@@ -297,3 +297,7 @@ function getDefaultSettings() {
         ]
     };
 }
+
+// Drag handle icon (six dots) used everywhere something can be reordered.
+// An SVG instead of the "⋮⋮" characters, so it looks the same on every system.
+const DRAG_ICON_SVG = '<svg class="drag-icon" width="8" height="12" viewBox="0 0 8 12" fill="currentColor" aria-hidden="true"><circle cx="1.5" cy="1.5" r="1.1"/><circle cx="6.5" cy="1.5" r="1.1"/><circle cx="1.5" cy="6" r="1.1"/><circle cx="6.5" cy="6" r="1.1"/><circle cx="1.5" cy="10.5" r="1.1"/><circle cx="6.5" cy="10.5" r="1.1"/></svg>';
