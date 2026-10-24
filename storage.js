@@ -148,7 +148,59 @@ function migrateTargetPriceAction() {
     }));
 }
 
+// Clean up trades so every part of the app can rely on the same shape:
+// lists are always arrays, without empty entries. Runs on every load and
+// only removes values that could never be shown (null, missing primary).
+function normalizeTrades() {
+    if (!Array.isArray(appData.trades)) appData.trades = [];
+    const pathList = list => (Array.isArray(list) ? list : [])
+        .filter(x => x && typeof x === 'object' && x.primary)
+        .map(x => ({ ...x, primary: String(x.primary) }));
+    appData.trades = appData.trades.filter(t => t && typeof t === 'object').map(t => {
+        const n = { ...t };
+        n.locations = pathList(t.locations);
+        n.evidences = pathList(t.evidences);
+        n.invalidations = pathList(t.invalidations);
+        n.psychology = (Array.isArray(t.psychology) ? t.psychology : []).filter(x => typeof x === 'string' && x.trim());
+        ['symbol', 'marketCondition', 'setup', 'direction', 'target', 'targetSub1', 'targetSub2', 'notes'].forEach(k => {
+            if (n[k] === undefined || n[k] === null) n[k] = '';
+        });
+        if (!n.id) n.id = (crypto.randomUUID ? crypto.randomUUID() : 'id_' + Math.random().toString(36).slice(2));
+        return n;
+    });
+}
+
+// Make sure every list the app reads exists with the right type, so a
+// hand-edited or older settings.json can't break the Settings page or forms.
+function ensureSettingsShape() {
+    if (!appData.settings || typeof appData.settings !== 'object' || Array.isArray(appData.settings)) appData.settings = {};
+    const sets = appData.settings;
+    ['symbol', 'marketCondition', 'direction', 'psychology'].forEach(k => {
+        if (!Array.isArray(sets[k])) sets[k] = [];
+    });
+    ['location', 'evidence', 'invalidation', 'target'].forEach(k => {
+        if (!sets[k] || typeof sets[k] !== 'object' || Array.isArray(sets[k])) sets[k] = {};
+    });
+    ['location', 'target'].forEach(k => {
+        Object.keys(sets[k]).forEach(cat => {
+            const v = sets[k][cat];
+            sets[k][cat] = {
+                sub1: Array.isArray(v && v.sub1) ? v.sub1 : [],
+                sub2: Array.isArray(v && v.sub2) ? v.sub2 : []
+            };
+        });
+    });
+    ['evidence', 'invalidation'].forEach(k => {
+        Object.keys(sets[k]).forEach(cat => { if (!Array.isArray(sets[k][cat])) sets[k][cat] = []; });
+    });
+    if (!sets.features || typeof sets.features !== 'object') sets.features = {};
+    ['evidence', 'invalidation', 'target', 'psychology'].forEach(k => {
+        if (typeof sets.features[k] !== 'boolean') sets.features[k] = true;
+    });
+}
+
 function migrateSettings() {
+    ensureSettingsShape();
     const sets = appData.settings;
     if (Array.isArray(sets.setup)) {
         const core = sets.setup.filter(x => CORE_SETUP_NAMES.includes(String(x).trim().toLowerCase()));
@@ -188,10 +240,13 @@ async function loadDataFromFile() {
             if(settingsContents) {
                 appData.settings = JSON.parse(settingsContents);
                 if (!appData.settings.symbol) appData.settings.symbol = ["NQ", "ES", "GC", "CL", "BTC"];
+            } else {
+                appData.settings = { ...getDefaultSettings(), theme: appData.settings.theme };
             }
         } catch(e) {
-            // Settings file might not exist yet, that's fine, we use default appData.settings
+            // No settings.json yet (new folder): start with the full default settings
             console.log("No existing settings.json found, using defaults.");
+            appData.settings = { ...getDefaultSettings(), theme: appData.settings.theme };
         }
 
         // Load trades
@@ -205,7 +260,8 @@ async function loadDataFromFile() {
                 if (parsedTrades.trades) {
                    appData.trades = parsedTrades.trades;
                    // Only migrate settings from old journal if we didn't just load a dedicated settings.json
-                   if(parsedTrades.settings && Object.keys(appData.settings.location.VWAP.sub1).length === 0) {
+                   const vwap = appData.settings.location && appData.settings.location.VWAP;
+                   if(parsedTrades.settings && (!vwap || !(vwap.sub1 || []).length)) {
                         appData.settings = parsedTrades.settings;
                    }
                 } else if (Array.isArray(parsedTrades)) {
@@ -257,6 +313,7 @@ async function loadDataFromFile() {
         }
         
         migrateSettings();
+        normalizeTrades();
 
         // Force save to ensure both files exist in the new format
         await autoSave();
