@@ -379,6 +379,21 @@ function ccHeatColor(value, c, maxCount, faded = false) {
     return 'var(--cc-cell-bg)';
 }
 
+// Heatmap label: win rate in green cells, loss rate as a negative number in red cells
+function ccHeatLabel(s, value, c) {
+    if (c.metric !== 'winRate') return ccFormat(value, c);
+    if (s.wins + s.losses === 0) return 'B/E';
+    if (value < 50) return `−${ccFormat(100 - value, c)}`;
+    return ccFormat(value, c);
+}
+
+function ccHeatTitle(s, c) {
+    const n = `${s.total} ${s.total === 1 ? 'trade' : 'trades'}`;
+    if (c.metric !== 'winRate') return n;
+    if (s.wins + s.losses === 0) return `${n}, only break-even`;
+    return `${n}: win rate ${ccFormat(s.winRate, c)}, loss rate ${ccFormat(100 - s.winRate, c)}`;
+}
+
 function ccRenderHeatmap(body, c, trades) {
     const rowField = ccField(c.rowsBy);
     const colField = ccField(c.colsBy);
@@ -435,13 +450,13 @@ function ccRenderHeatmap(body, c, trades) {
             } else if (s.total < c.minTrades) {
                 td.className = 'is-low';
                 td.style.background = ccHeatColor(value, c, maxCount, true);
-                td.innerHTML = `<span class="cc-heat-val">${escapeHTML(ccFormat(value, c))}</span><span class="cc-heat-n">${s.total}</span>`;
-                td.title = `${s.total} ${s.total === 1 ? 'trade' : 'trades'}, fewer than ${c.minTrades}`;
+                td.innerHTML = `<span class="cc-heat-val">${escapeHTML(ccHeatLabel(s, value, c))}</span><span class="cc-heat-n">${s.total}</span>`;
+                td.title = `${ccHeatTitle(s, c)} (fewer than ${c.minTrades})`;
             } else {
                 td.className = 'is-tinted';
                 td.style.background = ccHeatColor(value, c, maxCount);
-                td.innerHTML = `<span class="cc-heat-val">${escapeHTML(ccFormat(value, c))}</span><span class="cc-heat-n">${s.total}</span>`;
-                td.title = `${r} / ${col}: ${s.total} ${s.total === 1 ? 'trade' : 'trades'}`;
+                td.innerHTML = `<span class="cc-heat-val">${escapeHTML(ccHeatLabel(s, value, c))}</span><span class="cc-heat-n">${s.total}</span>`;
+                td.title = `${r} / ${col}: ${ccHeatTitle(s, c)}`;
             }
             tr.appendChild(td);
         });
@@ -453,7 +468,8 @@ function ccRenderHeatmap(body, c, trades) {
 
     const note = document.createElement('p');
     note.className = 'cc-note';
-    note.textContent = `Small number = trades in that cell. Faded cells have fewer than ${c.minTrades}.${cut ? ` Showing the first ${CC_MAX_HEAT} rows and columns.` : ''}`;
+    const legend = c.metric === 'winRate' ? 'Green shows the win rate, red the loss rate. ' : '';
+    note.textContent = `${legend}Small number = trades in that cell. Faded cells have fewer than ${c.minTrades}.${cut ? ` Showing the first ${CC_MAX_HEAT} rows and columns.` : ''}`;
     body.appendChild(note);
 }
 
