@@ -39,7 +39,10 @@ function tfInit(trade = null) {
         tfState.marketCondition = trade.marketCondition || '';
         tfState.result = trade.result || '';
         tfState.setup = trade.setup || '';
-        tfState.setupCategory = trade.setupCategory || tfFindSetupCategory(tfState.setup);
+        // Use the stored category, unless the setup was moved to another one in Settings
+        const storedCat = trade.setupCategory || '';
+        const stillThere = storedCat && (tfSetupConfig()[storedCat] || []).includes(tfState.setup);
+        tfState.setupCategory = stillThere ? storedCat : (tfFindSetupCategory(tfState.setup) || storedCat);
         tfState.direction = trade.direction || '';
         tfState.locations = (trade.locations || [])
             .filter(l => l && l.primary)

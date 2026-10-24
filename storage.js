@@ -89,7 +89,13 @@ function migrateSettings() {
     } else if (!sets.setup || typeof sets.setup !== 'object') {
         sets.setup = {};
     }
-    renameSetups();
+
+    // One-time migrations: run once, then never override the user's own choices
+    if (!sets.migrations) sets.migrations = {};
+    if (!sets.migrations.setupTitleCase) {
+        renameSetups();
+        sets.migrations.setupTitleCase = true;
+    }
 }
 
 async function loadDataFromFile() {
