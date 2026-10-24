@@ -1112,3 +1112,27 @@ span.flatpickr-weekday {
 @media (prefers-reduced-motion: reduce) {
     .cc-view-tile { transition: none; }
 }
+
+/* --- Folder connection popup (gate.js) --- */
+.gate-overlay { position: fixed; inset: 0; z-index: 300; display: none; align-items: center; justify-content: center; padding: 24px; background: var(--modal-overlay); backdrop-filter: blur(2px); overflow-y: auto; }
+.gate-overlay.active { display: flex; }
+.gate-card { width: 100%; max-width: 480px; max-height: calc(100vh - 48px); overflow-y: auto; padding: 32px; border-radius: 20px; background: var(--bg-panel); border: 1px solid var(--border-color); box-shadow: 0 24px 60px var(--shadow-md); text-align: left; outline: none; }
+.gate-icon { width: 44px; height: 44px; border-radius: 12px; display: flex; align-items: center; justify-content: center; margin-bottom: 18px; background: color-mix(in srgb, var(--accent) 16%, transparent); color: var(--accent); }
+.gate-card h2 { font-size: 20px; font-weight: 600; letter-spacing: -0.4px; color: var(--text-main); margin-bottom: 10px; }
+.gate-lead { font-size: 14px; line-height: 1.55; color: var(--text-muted); margin-bottom: 18px; }
+.gate-lead strong, .gate-steps strong { color: var(--text-main); }
+.gate-steps { margin: 0 0 20px 18px; font-size: 13px; line-height: 1.7; color: var(--text-muted); }
+.gate-primary { width: 100%; height: 44px; font-size: 14px; }
+.gate-link { display: block; margin: 12px auto 0; padding: 4px 8px; border: none; background: none; color: var(--text-muted); font-family: inherit; font-size: 13px; text-decoration: underline; cursor: pointer; }
+.gate-link:hover { color: var(--text-main); }
+.gate-error { min-height: 0; margin-top: 10px; font-size: 13px; color: var(--danger); }
+.gate-error:empty { display: none; }
+.gate-note { display: flex; align-items: flex-start; gap: 10px; margin-top: 18px; padding: 12px 14px; border-radius: 12px; background: var(--bg-input); font-size: 13px; line-height: 1.5; color: var(--text-muted); }
+.gate-note svg { flex: none; color: var(--accent); margin-top: 1px; }
+.gate-url { margin: 4px 0 4px; padding: 12px 14px; border-radius: 12px; background: var(--bg-input); color: var(--text-main); font-size: 14px; font-weight: 500; word-break: break-all; user-select: all; }
+.gate-more { margin-top: 12px; border-top: 1px solid var(--divider-bg); padding-top: 12px; }
+.gate-more summary { cursor: pointer; font-size: 13px; font-weight: 500; color: var(--text-main); list-style-position: inside; }
+.gate-more summary:focus-visible, .gate-link:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; border-radius: 4px; }
+.gate-more p { margin: 10px 0 12px; font-size: 13px; line-height: 1.55; color: var(--text-muted); }
+.gate-more code { font-size: 12px; }
+.gate-img { width: 100%; border-radius: 8px; margin-top: 4px; }

@@ -345,73 +345,9 @@ async function renderDashboard() {
     tradesList.innerHTML = '';
     if(dashboardToolbar) dashboardToolbar.style.display = 'none';
     
-    if (dirHandle && !fileConnected) {
-        tradesList.innerHTML = `
-            <div class="empty-state" style="max-width: 400px; margin: 40px auto; padding: 32px; border: 1px solid var(--border-color); border-radius: 16px; background: var(--bg-panel); box-shadow: 0 12px 24px rgba(0,0,0,0.2);">
-                <h3 style="color: var(--text-main); margin-bottom: 12px; font-size: 18px; letter-spacing: -0.4px;">Welcome back! 👋</h3>
-                <p style="color: var(--text-muted); font-size: 13px; line-height: 1.5; margin-bottom: 24px;">Ready to start journaling? Re-connect your folder to pick up right where you left off.</p>
-                <button id="btn-restore-conn" class="btn-primary" style="width: 100%;">Connect Folder</button>
-            </div>`;
-        document.getElementById('btn-restore-conn').addEventListener('click', async () => {
-            if (await verifyPermission(dirHandle, true)) {
-                fileConnected = true;
-                await loadDataFromFile();
-            }
-        });
-        return;
-    }
-
-    if (!dirHandle) {
-        tradesList.innerHTML = `
-            <div class="empty-state" style="max-width: 440px; margin: 40px auto; padding: 32px; border: 1px solid var(--border-color); border-radius: 16px; background: var(--bg-panel); box-shadow: 0 12px 24px rgba(0,0,0,0.2);">
-                <h3 style="color: var(--text-main); margin-bottom: 12px; font-size: 18px; letter-spacing: -0.4px;">Welcome to VWAP Wave System Journal</h3>
-                <p style="color: var(--text-muted); font-size: 13px; line-height: 1.5; margin-bottom: 24px;">To get started, you need to set up a local folder on your computer to store your trades and images securely.</p>
-                
-                <div style="background: var(--bg-card); border: 1px solid var(--border-color); padding: 16px; border-radius: 8px; margin-bottom: 16px; text-align: left;">
-                    <div style="font-weight: 600; font-size: 13px; color: var(--text-main); margin-bottom: 4px;">Step 1: Get Your Starter File</div>
-                    <p style="color: var(--text-muted); font-size: 12px; margin-bottom: 12px; line-height: 1.4;">First, create an empty folder on your computer (e.g., 'VWAP Journal'). Then, click below to download your starter file and save it into that folder.</p>
-                    <button id="btn-download-template" class="btn-secondary" style="width: 100%;">Download Starter file</button>
-                </div>
-
-                <div style="background: var(--bg-card); border: 1px solid var(--border-color); padding: 16px; border-radius: 8px; text-align: left;">
-                    <div style="font-weight: 600; font-size: 13px; color: var(--text-main); margin-bottom: 4px;">Step 2: Connect Your Folder</div>
-                    <p style="color: var(--text-muted); font-size: 12px; margin-bottom: 12px; line-height: 1.4;">Give the app secure access to the folder you just created so it can save your trades and settings locally.</p>
-                    <button id="btn-initial-load" class="btn-primary" style="width: 100%;">Connect Folder</button>
-                </div>
-
-                <div style="background: var(--bg-card); border: 1px solid var(--border-color); padding: 16px; border-radius: 8px; text-align: left; margin-top: 16px;">
-                    <div style="font-weight: 600; font-size: 13px; color: var(--text-main); margin-bottom: 4px;">Step 3: Install Desktop App (Optional)</div>
-                    <p style="color: var(--text-muted); font-size: 12px; margin-bottom: 12px; line-height: 1.4;">Click the Chrome menu (3 dots) top right ➔ <b>Cast, save and share</b> ➔ <b>Install page as app...</b> to use this as a standalone desktop app.</p>
-                    <img src="install-guide.png" alt="Install instructions" style="width: 100%; border-radius: 6px;">
-                </div>
-            </div>`;
-            
-        document.getElementById('btn-download-template').addEventListener('click', async () => {
-            const defaultSettings = getDefaultSettings();
-            
-            // Trigger download of settings.json
-            const blobSettings = new Blob([JSON.stringify(defaultSettings, null, 2)], { type: "application/json" });
-            const urlSettings = URL.createObjectURL(blobSettings);
-            const aSettings = document.createElement('a');
-            aSettings.href = urlSettings;
-            aSettings.download = 'settings.json';
-            document.body.appendChild(aSettings);
-            aSettings.click();
-            document.body.removeChild(aSettings);
-            URL.revokeObjectURL(urlSettings);
-        });
-
-        document.getElementById('btn-initial-load').addEventListener('click', async () => {
-            try {
-                const newHandle = await window.showDirectoryPicker({ mode: 'readwrite' });
-                dirHandle = newHandle;
-                fileConnected = true;
-                await saveHandleToDB(dirHandle);
-                await loadDataFromFile();
-            } catch (err) {}
-        });
-        return;
-    }
+    // No folder (or no permission yet): the connection popup locks the app
+    updateConnectionGate();
+    if (!dirHandle || !fileConnected) return;
 
     const selectedDate = datePicker.value;
     const tradesForDate = appData.trades.filter(t => t.date === selectedDate);

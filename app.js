@@ -59,6 +59,8 @@ document.addEventListener('DOMContentLoaded', async () => {
 
     // --- Hotkeys ---
     document.addEventListener('keydown', (e) => {
+        // No shortcuts while the folder connection popup is open
+        if (typeof isGateOpen === 'function' && isGateOpen()) return;
         const isInputFocused = ['INPUT', 'TEXTAREA', 'SELECT'].includes(document.activeElement.tagName) || document.activeElement.isContentEditable;
         const isModalOpen = document.getElementById('trade-modal').classList.contains('active');
         const isDashboardOpen = document.getElementById('view-dashboard').classList.contains('active');
