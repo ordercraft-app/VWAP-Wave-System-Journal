@@ -304,6 +304,9 @@ function ccRenderBar(body, c, trades, chartId) {
         const s = ccStats(ts);
         return { label, s, value: ccMetricValue(s, c), enough: s.total >= c.minTrades };
     });
+    // A bar of 0 is invisible, so leave those values out (win rate 0% or only break-even trades)
+    rows = rows.filter(r => r.value > 0);
+    if (!rows.length) return ccEmpty(body, c.metric === 'winRate' ? 'None of these trades are winners yet, so there is nothing to show.' : 'No trades to show.');
     rows.sort((a, b) => (b.enough - a.enough) || (b.value - a.value) || (b.s.total - a.s.total));
     const hiddenCount = Math.max(0, rows.length - CC_MAX_BARS);
     rows = rows.slice(0, CC_MAX_BARS);
