@@ -364,15 +364,18 @@ function ccRenderBar(body, c, trades, chartId) {
     });
 }
 
-function ccHeatColor(value, c, maxCount) {
+// Win rate: green above 50%, red below 50%, stronger the further from 50%.
+// Cells with too few trades keep their color direction but much lighter.
+function ccHeatColor(value, c, maxCount, faded = false) {
+    const soften = faded ? 0.4 : 1;
     if (c.metric === 'count') {
-        const a = maxCount ? 0.12 + 0.5 * (value / maxCount) : 0.12;
-        return `color-mix(in srgb, #386af5 ${Math.round(a * 100)}%, transparent)`;
+        const a = (maxCount ? 0.12 + 0.5 * (value / maxCount) : 0.12) * soften;
+        return `color-mix(in srgb, #386af5 ${Math.round(a * 100)}%, var(--cc-cell-bg))`;
     }
     const strength = Math.min(1, Math.abs(value - 50) / 50);
-    const pct = Math.round(10 + strength * 45);
-    if (value > 50) return `color-mix(in srgb, #44BD1E ${pct}%, transparent)`;
-    if (value < 50) return `color-mix(in srgb, #ee354e ${pct}%, transparent)`;
+    const pct = Math.round((10 + strength * 45) * soften);
+    if (value > 50) return `color-mix(in srgb, #44BD1E ${pct}%, var(--cc-cell-bg))`;
+    if (value < 50) return `color-mix(in srgb, #ee354e ${pct}%, var(--cc-cell-bg))`;
     return 'var(--cc-cell-bg)';
 }
 
@@ -431,6 +434,7 @@ function ccRenderHeatmap(body, c, trades) {
                 td.title = 'No trades';
             } else if (s.total < c.minTrades) {
                 td.className = 'is-low';
+                td.style.background = ccHeatColor(value, c, maxCount, true);
                 td.innerHTML = `<span class="cc-heat-val">${escapeHTML(ccFormat(value, c))}</span><span class="cc-heat-n">${s.total}</span>`;
                 td.title = `${s.total} ${s.total === 1 ? 'trade' : 'trades'}, fewer than ${c.minTrades}`;
             } else {
@@ -478,9 +482,7 @@ function ccEnsureStatsCards() {
             card.innerHTML = `
                 <div class="cc-card-head">
                     <h3 class="card-title"></h3>
-                    <button type="button" class="cc-edit-btn" title="Edit chart">
-                        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 20h9"/><path d="M16.5 3.5a2.1 2.1 0 0 1 3 3L7 19l-4 1 1-4Z"/></svg>
-                    </button>
+                    <button type="button" class="btn-secondary btn-sm cc-edit-btn">Edit</button>
                 </div>
                 <div class="cc-filters"></div>
                 <div class="cc-body"></div>`;
