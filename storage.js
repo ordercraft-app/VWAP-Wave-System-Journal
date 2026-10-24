@@ -77,6 +77,39 @@ function renameSetups() {
     });
 }
 
+// Starter custom chart every user gets once. If they delete it, it stays gone.
+// Setup values are only used when they exist in the user's own setup list.
+const DEFAULT_SETUPS_FOR_HEATMAP = ['Price Discovery Continuation', 'Fade Value Area Extremes', 'Return to Value', 'VWAP Bounce'];
+
+function addDefaultCustomCharts() {
+    const sets = appData.settings;
+    if (!Array.isArray(sets.customCharts)) sets.customCharts = [];
+    if (sets.customCharts.some(c => c && c.id === 'cc_default_symbol_setup')) return;
+
+    const setupCfg = sets.setup && !Array.isArray(sets.setup) ? sets.setup : {};
+    const known = Object.values(setupCfg).flat();
+    const setups = DEFAULT_SETUPS_FOR_HEATMAP.filter(s => known.includes(s));
+
+    const filters = [];
+    if (setups.length) filters.push({ field: 'setup', exclude: false, values: setups });
+    filters.push({ field: 'symbol', exclude: true, values: ['BTC', 'CL'] });
+
+    sets.customCharts.push({
+        id: 'cc_default_symbol_setup',
+        title: '',
+        view: 'heatmap',
+        metric: 'winRate',
+        groupBy: '',
+        rowsBy: 'symbol',
+        colsBy: 'setup',
+        filters,
+        minTrades: 3,
+        size: 3
+    });
+    if (!sets.chartVisibility) sets.chartVisibility = {};
+    sets.chartVisibility['custom:cc_default_symbol_setup'] = true;
+}
+
 function migrateSettings() {
     const sets = appData.settings;
     if (Array.isArray(sets.setup)) {
@@ -95,6 +128,11 @@ function migrateSettings() {
     if (!sets.migrations.setupTitleCase) {
         renameSetups();
         sets.migrations.setupTitleCase = true;
+    }
+    // Runs after the rename above, so the setup names already match
+    if (!sets.migrations.defaultCustomCharts) {
+        addDefaultCustomCharts();
+        sets.migrations.defaultCustomCharts = true;
     }
 }
 

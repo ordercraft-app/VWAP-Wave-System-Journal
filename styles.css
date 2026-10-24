@@ -1081,13 +1081,16 @@ span.flatpickr-weekday {
 .cc-split-legend { font-size: 12px; color: var(--text-muted); }
 
 .cc-heat-scroll { overflow-x: auto; }
-.cc-heat { width: 100%; border-collapse: separate; border-spacing: 4px; font-size: 12px; }
+.cc-heat { --cc-cell-bg: var(--bg-input); width: 100%; border-collapse: separate; border-spacing: 4px; font-size: 12px; }
+[data-theme="light"] .cc-heat { --cc-cell-bg: var(--bg-main); }
+[data-theme="light"] .cc-card .cc-filter-tag { background: var(--bg-main); }
 .cc-heat th { font-weight: 400; color: var(--text-muted); padding: 4px 6px; text-align: center; white-space: nowrap; }
 .cc-heat thead th { vertical-align: bottom; }
 .cc-heat tbody th { text-align: right; max-width: 160px; white-space: normal; }
-.cc-heat td { min-width: 64px; padding: 8px 6px; border-radius: 8px; background: var(--bg-input); text-align: center; color: var(--text-main); }
+.cc-heat td { min-width: 64px; padding: 8px 6px; border-radius: 8px; background: var(--cc-cell-bg); text-align: center; color: var(--text-main); }
 .cc-heat td.is-empty { color: var(--text-muted); background: transparent; border: 1px dashed var(--border-color); }
-.cc-heat td.is-low { color: var(--text-muted); opacity: 0.75; }
+.cc-heat td.is-low { color: var(--text-muted); }
+.cc-heat td.is-tinted .cc-heat-n { color: var(--text-main); }
 .cc-heat-val { display: block; font-weight: 500; }
 .cc-heat-n { display: block; font-size: 10px; color: var(--text-muted); margin-top: 2px; }
 

@@ -373,7 +373,7 @@ function ccHeatColor(value, c, maxCount) {
     const pct = Math.round(10 + strength * 45);
     if (value > 50) return `color-mix(in srgb, #44BD1E ${pct}%, transparent)`;
     if (value < 50) return `color-mix(in srgb, #ee354e ${pct}%, transparent)`;
-    return 'var(--bg-input)';
+    return 'var(--cc-cell-bg)';
 }
 
 function ccRenderHeatmap(body, c, trades) {
@@ -434,6 +434,7 @@ function ccRenderHeatmap(body, c, trades) {
                 td.innerHTML = `<span class="cc-heat-val">${escapeHTML(ccFormat(value, c))}</span><span class="cc-heat-n">${s.total}</span>`;
                 td.title = `${s.total} ${s.total === 1 ? 'trade' : 'trades'}, fewer than ${c.minTrades}`;
             } else {
+                td.className = 'is-tinted';
                 td.style.background = ccHeatColor(value, c, maxCount);
                 td.innerHTML = `<span class="cc-heat-val">${escapeHTML(ccFormat(value, c))}</span><span class="cc-heat-n">${s.total}</span>`;
                 td.title = `${r} / ${col}: ${s.total} ${s.total === 1 ? 'trade' : 'trades'}`;
