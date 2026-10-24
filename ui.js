@@ -1365,7 +1365,15 @@ function renderSimpleSetting(title, dataArray, onChange, toggleKey = null) {
     return container;
 }
 
+// Re-rendering rebuilds the whole settings page. Keep the scroll position so
+// toggling a category (Enable/Disable) doesn't throw you back to the top.
 function renderSettingsUI() {
+    const scrollY = viewSettings.scrollTop;
+    renderSettingsContent();
+    viewSettings.scrollTop = scrollY;
+}
+
+function renderSettingsContent() {
     settingsContainer.innerHTML = '';
     
     if (!appData.settings.chartVisibility) {

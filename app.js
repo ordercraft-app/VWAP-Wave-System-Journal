@@ -276,12 +276,19 @@ function setActiveNav(activeBtn) {
     if (!wasActive) playViewEnter(document.querySelector('.view.active'));
 }
 
+// Pages opened from the sidebar always start at the top, so the title is visible
+function startViewAtTop(view) {
+    view.scrollTop = 0;
+    requestAnimationFrame(() => { view.scrollTop = 0; });
+}
+
 function setupNavigation() {
     btnNavSettings.addEventListener('click', () => {
         [viewDashboard, viewStats, viewHelp].forEach(v => v.classList.remove('active'));
         viewSettings.classList.add('active');
         setActiveNav(btnNavSettings);
         renderSettingsUI();
+        startViewAtTop(viewSettings);
     });
 
     btnNavStats.addEventListener('click', () => {
@@ -289,6 +296,7 @@ function setupNavigation() {
         viewStats.classList.add('active');
         setActiveNav(btnNavStats);
         renderStatsDashboard();
+        startViewAtTop(viewStats);
     });
 
     btnNavDashboard.addEventListener('click', () => {
@@ -296,12 +304,14 @@ function setupNavigation() {
         viewDashboard.classList.add('active');
         setActiveNav(btnNavDashboard);
         renderDashboard();
+        startViewAtTop(viewDashboard);
     });
     
     btnNavHelp.addEventListener('click', () => {
         [viewDashboard, viewStats, viewSettings].forEach(v => v.classList.remove('active'));
         viewHelp.classList.add('active');
         setActiveNav(btnNavHelp);
+        startViewAtTop(viewHelp);
     });
 
     if (btnViewCard) {
