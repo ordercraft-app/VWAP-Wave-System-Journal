@@ -730,10 +730,11 @@ span.flatpickr-weekday {
 }
 
 /* Custom Scrollbars */
-::-webkit-scrollbar { width: 8px; height: 8px; }
-::-webkit-scrollbar-track { background: var(--bg-main); }
-::-webkit-scrollbar-thumb { background: var(--scrollbar-thumb); border-radius: 4px; }
-::-webkit-scrollbar-thumb:hover { background: var(--scrollbar-hover); }
+/* Scrollbars are hidden everywhere, so pages don't shift sideways when a
+   scrollbar appears or disappears. Scrolling with wheel, trackpad, keys
+   and touch keeps working. */
+* { scrollbar-width: none; -ms-overflow-style: none; }
+::-webkit-scrollbar { display: none; width: 0; height: 0; }
 
 /* Settings Tabs */
 .settings-tabs { display: flex; gap: 8px; margin-bottom: 24px; }
