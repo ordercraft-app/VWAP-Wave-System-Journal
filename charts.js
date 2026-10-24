@@ -66,6 +66,26 @@ if (window.Chart && Chart.defaults.scales && Chart.defaults.scales.category) {
     };
 }
 
+// Top 5 charts always reserve 5 rows, so every bar has the same height and
+// starts at the same spot in each card, even when there are fewer items.
+const TOP_CHART_SLOTS = 5;
+function padChartSlots(labels, values, slots = TOP_CHART_SLOTS) {
+    const l = [...labels];
+    const v = [...values];
+    while (l.length < slots) {
+        l.push('');
+        v.push(null);
+    }
+    return { labels: l, values: v };
+}
+
+// Two-line labels make Chart.js add extra padding at the top or bottom of the
+// axis, which shifts the bars. Fixing that padding keeps the rows aligned.
+function alignTopChartRows(scale) {
+    scale.paddingTop = 10;
+    scale.paddingBottom = 10;
+}
+
 function getWinRateData(tradesArray) {
     const wins = tradesArray.filter(t => t.result === 'WIN').length;
     const losses = tradesArray.filter(t => t.result === 'LOST').length;
@@ -390,14 +410,15 @@ function renderStatsDashboard() {
         // Only setups that actually won trades belong in an effectiveness ranking
         const top5Setups = setupStats.filter(s => s.winRate > 0).slice(0, 5);
         
+        const setupSlots = padChartSlots(top5Setups.map(s => s.setup), top5Setups.map(s => s.winRate));
         destroyChart('setupChart');
         chartInstances['setupChart'] = new Chart(document.getElementById('setupChart'), {
             type: 'bar',
             data: {
-                labels: top5Setups.map(s => s.setup),
-                datasets: [{ label: 'Win Rate %', data: top5Setups.map(s => s.winRate), backgroundColor: colors.accent, borderRadius: {topLeft: 12, topRight: 12, bottomLeft: 12, bottomRight: 12}, borderSkipped: false }]
+                labels: setupSlots.labels,
+                datasets: [{ label: 'Win Rate %', data: setupSlots.values, backgroundColor: colors.accent, borderRadius: {topLeft: 12, topRight: 12, bottomLeft: 12, bottomRight: 12}, borderSkipped: false }]
             },
-            options: { clip: false, maintainAspectRatio: false, indexAxis: 'y', scales: { x: { display: false, beginAtZero: true, max: 100, border: { display: false }, grid: { display: false } }, y: { display: true, border: { display: false }, grid: { display: false } } }, plugins: { legend: { display: false } } }
+            options: { clip: false, maintainAspectRatio: false, indexAxis: 'y', scales: { x: { display: false, beginAtZero: true, max: 100, border: { display: false }, grid: { display: false } }, y: { display: true, afterFit: alignTopChartRows, border: { display: false }, grid: { display: false } } }, plugins: { legend: { display: false } } }
         });
     });
 
@@ -426,14 +447,15 @@ function renderStatsDashboard() {
         psychStats.sort((a, b) => b.total - a.total);
         const top5Psych = psychStats.slice(0, 5);
         
+        const psychSlots = padChartSlots(top5Psych.map(s => s.psych), top5Psych.map(s => s.total));
         destroyChart('psychologyChart');
         chartInstances['psychologyChart'] = new Chart(document.getElementById('psychologyChart'), {
             type: 'bar',
             data: {
-                labels: top5Psych.map(s => s.psych),
-                datasets: [{ label: 'Count', data: top5Psych.map(s => s.total), backgroundColor: colors.accent, borderRadius: {topLeft: 12, topRight: 12, bottomLeft: 12, bottomRight: 12}, borderSkipped: false }]
+                labels: psychSlots.labels,
+                datasets: [{ label: 'Count', data: psychSlots.values, backgroundColor: colors.accent, borderRadius: {topLeft: 12, topRight: 12, bottomLeft: 12, bottomRight: 12}, borderSkipped: false }]
             },
-            options: { clip: false, maintainAspectRatio: false, indexAxis: 'y', scales: { x: { display: false, beginAtZero: true, border: { display: false }, grid: { display: false } }, y: { display: true, border: { display: false }, grid: { display: false } } }, plugins: { legend: { display: false } } }
+            options: { clip: false, maintainAspectRatio: false, indexAxis: 'y', scales: { x: { display: false, beginAtZero: true, border: { display: false }, grid: { display: false } }, y: { display: true, afterFit: alignTopChartRows, border: { display: false }, grid: { display: false } } }, plugins: { legend: { display: false } } }
         });
     });
 
@@ -444,14 +466,15 @@ function renderStatsDashboard() {
         lostTrades.forEach(t => { (t.invalidations || []).forEach(inv => { const invName = inv.sub ? inv.sub : (inv.primary || inv); invCounts[invName] = (invCounts[invName] || 0) + 1; }); });
         const sortedInvs = Object.entries(invCounts).sort((a, b) => b[1] - a[1]).slice(0, 5);
         
+        const invSlots = padChartSlots(sortedInvs.map(i => i[0]), sortedInvs.map(i => i[1]));
         destroyChart('invalidationChart');
         chartInstances['invalidationChart'] = new Chart(document.getElementById('invalidationChart'), {
             type: 'bar',
             data: {
-                labels: sortedInvs.map(i => i[0]),
-                datasets: [{ label: 'Loss Count', data: sortedInvs.map(i => i[1]), backgroundColor: colors.loss, borderRadius: {topLeft: 12, topRight: 12, bottomLeft: 12, bottomRight: 12}, borderSkipped: false }]
+                labels: invSlots.labels,
+                datasets: [{ label: 'Loss Count', data: invSlots.values, backgroundColor: colors.loss, borderRadius: {topLeft: 12, topRight: 12, bottomLeft: 12, bottomRight: 12}, borderSkipped: false }]
             },
-            options: { clip: false, maintainAspectRatio: false, indexAxis: 'y', scales: { x: { display: false }, y: { display: true, border: { display: false }, grid: { display: false } } }, plugins: { legend: { display: false } } }
+            options: { clip: false, maintainAspectRatio: false, indexAxis: 'y', scales: { x: { display: false }, y: { display: true, afterFit: alignTopChartRows, border: { display: false }, grid: { display: false } } }, plugins: { legend: { display: false } } }
         });
     });
 
