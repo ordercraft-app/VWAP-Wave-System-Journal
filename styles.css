@@ -645,10 +645,11 @@ select.linear-input {
 .faq-icon { transition: transform 0.3s; color: var(--text-muted); }
 .faq-item.open .faq-icon { transform: rotate(180deg); }
 .faq-answer { padding: 0 20px; max-height: 0; overflow: hidden; transition: max-height 0.3s ease-out, padding 0.3s ease; font-size: 13px; color: var(--text-muted); line-height: 1.6; }
-.faq-item.open .faq-answer { padding: 0 20px 16px 20px; max-height: 500px; }
+.faq-item.open .faq-answer { padding: 0 20px 16px 20px; max-height: 1200px; }
 .faq-answer strong { color: var(--text-main); }
-.faq-answer ul { padding-left: 20px; margin-top: 8px; margin-bottom: 8px; }
+.faq-answer ul, .faq-answer ol { padding-left: 20px; margin-top: 8px; margin-bottom: 8px; }
 .faq-answer li { margin-bottom: 4px; }
+.faq-answer p + p { margin-top: 8px; }
 
 /* Flatpickr Overrides for VWAP Theme */
 .flatpickr-input {
