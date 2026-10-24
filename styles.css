@@ -570,9 +570,14 @@ select.linear-input {
 .stats-filters {
     display: flex;
     flex-wrap: wrap;
+    align-items: center;
     gap: 12px;
     margin-bottom: 24px;
 }
+.stats-add-chart { margin-left: auto; }
+.stat-card.is-orderable { cursor: grab; }
+.stat-card.is-orderable:active { cursor: grabbing; }
+.stat-card.is-dragging { opacity: 0.4; outline: 2px dashed var(--accent); outline-offset: -2px; }
 .pill-select {
     background-color: var(--bg-panel);
     border: 1px solid var(--border-color);

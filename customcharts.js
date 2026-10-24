@@ -967,3 +967,9 @@ async function ccDelete() {
     ccRefreshViews();
     showToast('Chart deleted', 'info');
 }
+
+// "+ Add Custom Chart" next to the filters on the Stats page
+(function () {
+    const btn = document.getElementById('btn-stats-add-chart');
+    if (btn) btn.addEventListener('click', () => openCustomChartModal());
+})();

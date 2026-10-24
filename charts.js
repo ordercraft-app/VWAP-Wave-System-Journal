@@ -229,7 +229,63 @@ function applyChartOrder() {
             const canvas = document.getElementById(CHART_CANVAS_IDS[key]);
             card = canvas ? canvas.closest('.stat-card') : null;
         }
-        if (card) grid.appendChild(card);
+        if (card) {
+            card.dataset.chartKey = key;
+            card.draggable = true;
+            card.classList.add('is-orderable');
+            grid.appendChild(card);
+        }
+    });
+    setupStatsDragAndDrop(grid);
+}
+
+// Drag & drop chart cards on the Stats page. The new order is saved in
+// settings.chartOrder, the same list the Settings > Chart page uses.
+let statsDraggedCard = null;
+
+function setupStatsDragAndDrop(grid) {
+    if (grid.dataset.dndReady) return;
+    grid.dataset.dndReady = '1';
+
+    grid.addEventListener('dragstart', e => {
+        const card = e.target.closest && e.target.closest('.stat-card.is-orderable');
+        if (!card || e.target.closest('button, a, input, select, textarea')) return;
+        statsDraggedCard = card;
+        e.dataTransfer.effectAllowed = 'move';
+        try { e.dataTransfer.setData('text/plain', card.dataset.chartKey); } catch (err) {}
+        requestAnimationFrame(() => card.classList.add('is-dragging'));
+    });
+
+    grid.addEventListener('dragover', e => {
+        if (!statsDraggedCard) return;
+        e.preventDefault();
+        e.dataTransfer.dropEffect = 'move';
+        const target = e.target.closest('.stat-card.is-orderable');
+        if (!target || target === statsDraggedCard) return;
+        const r = target.getBoundingClientRect();
+        // Wide cards: decide by height. Others: by left or right half.
+        const wide = r.width > grid.clientWidth * 0.7;
+        const before = wide ? e.clientY < r.top + r.height / 2 : e.clientX < r.left + r.width / 2;
+        const ref = before ? target : target.nextSibling;
+        if (ref !== statsDraggedCard && statsDraggedCard.nextSibling !== ref) grid.insertBefore(statsDraggedCard, ref);
+    });
+
+    grid.addEventListener('drop', e => {
+        if (!statsDraggedCard) return;
+        e.preventDefault();
+    });
+
+    grid.addEventListener('dragend', async () => {
+        if (!statsDraggedCard) return;
+        statsDraggedCard.classList.remove('is-dragging');
+        statsDraggedCard = null;
+        const newOrder = [...grid.querySelectorAll('.stat-card.is-orderable')].map(c => c.dataset.chartKey).filter(Boolean);
+        const old = getChartOrder();
+        appData.settings.chartOrder = [...newOrder, ...old.filter(k => !newOrder.includes(k))];
+        if (JSON.stringify(old) !== JSON.stringify(appData.settings.chartOrder)) {
+            Object.values(chartInstances).forEach(ch => { try { ch.resize(); } catch (err) {} });
+            await autoSave();
+        }
     });
 }
 
