@@ -531,7 +531,8 @@ function ccRenderStatsCards(trades) {
             destroyChart(`cc-${key}`);
             return;
         }
-        card.querySelector('.card-title').textContent = ccTitle(c);
+        const titleEl = card.querySelector('.card-title-text') || card.querySelector('.card-title');
+        titleEl.textContent = ccTitle(c);
         const filters = card.querySelector('.cc-filters');
         filters.innerHTML = '';
         ccFilterSummary(c).forEach(text => {

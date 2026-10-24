@@ -233,10 +233,29 @@ function applyChartOrder() {
             card.dataset.chartKey = key;
             card.draggable = true;
             card.classList.add('is-orderable');
+            addCardDragHandle(card);
             grid.appendChild(card);
         }
     });
     setupStatsDragAndDrop(grid);
+}
+
+// Drag icon in front of the card title, same symbol as in Settings.
+// The title text moves into .card-title-text so it can be updated separately.
+function addCardDragHandle(card) {
+    const title = card.querySelector('.card-title');
+    if (!title || title.querySelector('.card-drag-handle')) return;
+    const text = document.createElement('span');
+    text.className = 'card-title-text';
+    text.textContent = title.textContent;
+    const handle = document.createElement('span');
+    handle.className = 'card-drag-handle';
+    handle.innerHTML = '&#8942;&#8942;';
+    handle.title = 'Drag to reorder';
+    handle.setAttribute('aria-hidden', 'true');
+    title.textContent = '';
+    title.appendChild(handle);
+    title.appendChild(text);
 }
 
 // Drag & drop chart cards on the Stats page. The new order is saved in
