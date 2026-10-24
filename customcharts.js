@@ -318,7 +318,13 @@ function ccRenderBar(body, c, trades, chartId) {
             : 'No trades to show.';
         return ccEmpty(body, msg);
     }
-    rows.sort((a, b) => (b.enough - a.enough) || (b.value - a.value) || (b.s.total - a.s.total));
+    // Values with fewer trades than the minimum are left out: one or two trades say too little
+    const tooFew = rows.filter(r => !r.enough).length;
+    rows = rows.filter(r => r.enough);
+    if (!rows.length) {
+        return ccEmpty(body, `Not enough trades yet: every value has fewer than ${c.minTrades}. Log more trades or lower the minimum.`);
+    }
+    rows.sort((a, b) => (b.value - a.value) || (b.s.total - a.s.total));
     const hiddenCount = Math.max(0, rows.length - CC_MAX_BARS);
     rows = rows.slice(0, CC_MAX_BARS);
 
@@ -335,10 +341,10 @@ function ccRenderBar(body, c, trades, chartId) {
         more.textContent = `${hiddenCount} more not shown. Add a filter to narrow it down.`;
         body.appendChild(more);
     }
-    if (rows.some(r => !r.enough)) {
+    if (tooFew) {
         const note = document.createElement('p');
         note.className = 'cc-note';
-        note.textContent = `Grey bars have fewer than ${c.minTrades} trades.`;
+        note.textContent = `${tooFew} more hidden: fewer than ${c.minTrades} trades.`;
         body.appendChild(note);
     }
 
@@ -348,7 +354,7 @@ function ccRenderBar(body, c, trades, chartId) {
             labels: rows.map(r => r.label),
             datasets: [{
                 data: rows.map(r => r.value),
-                backgroundColor: rows.map(r => (r.enough ? (c.metric === 'lossRate' ? colors.loss : colors.accent) : colors.muted)),
+                backgroundColor: c.metric === 'lossRate' ? colors.loss : colors.accent,
                 borderRadius: 12,
                 borderSkipped: false,
                 maxBarThickness: 28
