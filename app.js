@@ -81,7 +81,14 @@ document.addEventListener('DOMContentLoaded', async () => {
             if (isModalOpen) {
                 if (e.code === 'KeyS') {
                     e.preventDefault();
-                    document.getElementById('btn-save-trade').click();
+                    const saveBtn = document.getElementById('btn-save-trade');
+                    if (saveBtn.disabled) {
+                        // Too early: show what's still missing instead of doing nothing
+                        const missing = tfValidate();
+                        if (missing.length) showToast(`Still needed: ${missing.join(', ')}`, 'error');
+                    } else {
+                        saveBtn.click();
+                    }
                     return;
                 }
                 if (e.code === 'KeyC') {

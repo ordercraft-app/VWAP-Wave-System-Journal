@@ -6,7 +6,9 @@
 const TF_RESULTS = ['WIN', 'LOST', 'B/E'];
 const TF_RESULT_TONES = { 'WIN': 'win', 'LOST': 'loss', 'B/E': 'be' };
 const TF_COLLAPSE_AFTER = 12; // chips shown before a "+ more" chip appears
-const TF_REQUIRED = ['symbol', 'marketCondition', 'result', 'setup', 'direction'];
+// Minimum a trade needs before it can be saved (in form order)
+const TF_REQUIRED = ['symbol', 'marketCondition', 'result', 'location', 'setup', 'direction'];
+const TF_REQUIRED_LABELS = { symbol: 'Symbol', marketCondition: 'Market Condition', result: 'Result', location: 'Location', setup: 'Setup', direction: 'Direction' };
 
 let tfState = null;
 
@@ -68,6 +70,7 @@ function tfInit(trade = null) {
 
     tfClearAllMissing();
     tfRenderAll();
+    tfUpdateSaveState();
 }
 
 // Symbol and market condition rarely change within a session:
@@ -120,26 +123,44 @@ function tfGetData() {
 }
 
 // Returns the list of missing required sections (empty = valid)
-function tfValidate() {
+// Required fields that are still empty. A field only counts when the user's
+// settings actually offer options for it, so an emptied list never blocks saving.
+function tfMissing() {
+    if (!tfState) return [];
     const sets = appData.settings;
-    const labels = { symbol: 'Symbol', marketCondition: 'Market Condition', result: 'Result', setup: 'Setup', direction: 'Direction' };
-    const missing = TF_REQUIRED.filter(field => {
-        const hasOptions = field === 'result'
-            || (field === 'setup' ? tfAllSetups().length > 0 : (sets[field] || []).length > 0);
-        return hasOptions && !tfState[field];
+    return TF_REQUIRED.filter(field => {
+        if (field === 'result') return !tfState.result;
+        if (field === 'setup') return tfAllSetups().length > 0 && !tfState.setup;
+        if (field === 'location') return Object.keys(sets.location || {}).length > 0 && !tfState.locations.length;
+        return (sets[field] || []).length > 0 && !tfState[field];
     });
+}
 
+// Save stays disabled until the minimum is filled in; the hint says what's left
+function tfUpdateSaveState() {
+    const btn = document.getElementById('btn-save-trade');
+    const hint = document.getElementById('tf-save-hint');
+    const missing = tfMissing();
+    if (btn) {
+        btn.disabled = missing.length > 0;
+        btn.title = missing.length ? `Still needed: ${missing.map(f => TF_REQUIRED_LABELS[f]).join(', ')}` : '';
+    }
+    if (hint) hint.textContent = missing.length ? `Still needed: ${missing.map(f => TF_REQUIRED_LABELS[f]).join(', ')}` : '';
+}
+
+// Highlights what's missing (used when Alt+S is pressed too early)
+function tfValidate() {
+    const missing = tfMissing();
     tfClearAllMissing();
     missing.forEach(field => {
         const sec = document.getElementById(`tf-sec-${field}`);
         if (sec) sec.classList.add('is-missing');
     });
-
     if (missing.length) {
         const first = document.getElementById(`tf-sec-${missing[0]}`);
         if (first) first.scrollIntoView({ behavior: 'smooth', block: 'center' });
     }
-    return missing.map(f => labels[f]);
+    return missing.map(f => TF_REQUIRED_LABELS[f]);
 }
 
 function tfClearMissing(field) {
@@ -155,6 +176,7 @@ function tfClearAllMissing() {
 
 function tfMarkDirty() {
     isFormDirty = true;
+    tfUpdateSaveState();
 }
 
 function tfChip({ id, label, selected = false, tone = '', legacy = false, hasPicks = false, extraClass = '', onClick }) {
@@ -450,6 +472,7 @@ function tfRenderLocation() {
                 ? st.locations.filter(l => !sameLoc(l, p, s1, s2))
                 : [...st.locations, { primary: p, sub1: s1, sub2: s2 }];
             tfMarkDirty();
+            tfClearMissing('location');
             tfRenderLocation();
         };
 
