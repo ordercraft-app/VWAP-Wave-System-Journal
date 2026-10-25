@@ -1118,7 +1118,8 @@ span.flatpickr-weekday {
 .gate-overlay.active { display: flex; }
 .gate-card { width: 100%; max-width: 480px; max-height: calc(100vh - 48px); overflow-y: auto; padding: 32px; border-radius: 20px; background: var(--bg-panel); border: 1px solid var(--border-color); box-shadow: 0 24px 60px var(--shadow-md); text-align: left; outline: none; }
 .gate-icon { width: 44px; height: 44px; border-radius: 12px; display: flex; align-items: center; justify-content: center; margin-bottom: 18px; background: color-mix(in srgb, var(--accent) 16%, transparent); color: var(--accent); }
-.gate-card h2 { font-size: 20px; font-weight: 600; letter-spacing: -0.4px; color: var(--text-main); margin-bottom: 10px; }
+.gate-eyebrow { margin-bottom: 6px; font-size: 11px; font-weight: 600; letter-spacing: 0.08em; text-transform: uppercase; color: var(--accent); }
+.gate-card h2 { font-size: 24px; font-weight: 600; letter-spacing: -0.4px; color: var(--text-main); margin-bottom: 10px; }
 .gate-lead { font-size: 14px; line-height: 1.55; color: var(--text-muted); margin-bottom: 18px; }
 .gate-lead strong, .gate-steps strong { color: var(--text-main); }
 .gate-steps { margin: 0 0 20px 18px; font-size: 13px; line-height: 1.7; color: var(--text-muted); }

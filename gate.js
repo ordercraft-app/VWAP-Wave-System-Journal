@@ -52,7 +52,7 @@ function gateContent(variant) {
             <div class="gate-icon">${gateIcon('monitor')}</div>
             <h2 id="connect-gate-title">Open this page in Chrome or Edge</h2>
             <p class="gate-lead">The VWAP Wave System Journal saves your trades in a folder on your computer. That only works in Google Chrome or Microsoft Edge on a desktop or laptop, not in Safari, Firefox or on a phone.</p>
-            <div class="gate-url">ordercraft-app.github.io/VWAP-Wave-System-Journal</div>
+            <div class="gate-url">vwsjournal.com</div>
             ${privacy}`;
     }
 
@@ -70,8 +70,9 @@ function gateContent(variant) {
 
     return `
         <div class="gate-icon">${gateIcon('folder')}</div>
-        <h2 id="connect-gate-title">Welcome to the VWAP Wave System Journal</h2>
-        <p class="gate-lead">Choose a folder on your computer where your journal will be saved. That's all you need to start logging your VWAP Wave System trades.</p>
+        <p class="gate-eyebrow">VWAP Wave System Journal</p>
+        <h2 id="connect-gate-title">Set up your journal</h2>
+        <p class="gate-lead">Pick a folder on your computer. Every trade you log is saved there, so you're ready in under a minute.</p>
         <ol class="gate-steps">
             <li>Create an empty folder, for example <strong>VWAP Journal</strong>.</li>
             <li>Click <strong>Connect Folder</strong>, select that folder and allow access.</li>
