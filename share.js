@@ -12,6 +12,7 @@ const SHARE_MAX_TRADES = 15;
 const SHARE_OWNER_EXTRA_DAYS = 9; // reviews stay fetchable for the owner 9 days after the link expires
 const SHARE_DAY_MS = 24 * 60 * 60 * 1000;
 const SHARE_IMAGE_MAX_WIDTH = 1920;
+const SHARE_MAX_NAME = 40;
 
 // Optional parts of a trade the user can leave out. featureKey = switch in Settings.
 const SHARE_OPTIONAL = [
@@ -37,6 +38,7 @@ function defaultShareState() {
     return {
         version: 1,
         selection: [],
+        ownerName: '',         // shown to reviewers as "shared by"
         include: { evidence: true, invalidation: true, target: true, psychology: false, notes: false },
         active: null,          // { id, key, link, createdAt, expiresAt, tradeIds }
         past: [],              // ended shares whose reviews can still be fetched
@@ -56,6 +58,7 @@ async function loadShareState() {
         if (saved && typeof saved === 'object') {
             shareState.selection = Array.isArray(saved.selection) ? saved.selection.filter(x => typeof x === 'string') : [];
             shareState.include = { ...shareState.include, ...(saved.include || {}) };
+            shareState.ownerName = typeof saved.ownerName === 'string' ? saved.ownerName.slice(0, SHARE_MAX_NAME) : '';
             shareState.active = saved.active && saved.active.id ? saved.active : null;
             shareState.past = Array.isArray(saved.past) ? saved.past.filter(p => p && p.id && p.key) : [];
             shareState.removedReviewIds = Array.isArray(saved.removedReviewIds) ? saved.removedReviewIds : [];
@@ -415,6 +418,21 @@ function reviewCountForShare(shareId) {
     return appData.trades.reduce((n, t) => n + (t.reviews || []).filter(r => r.shareId === shareId).length, 0);
 }
 
+function shareBlockedReason(tradeCount) {
+    if (shareState.active) return 'You can share again when your active share has expired or is cancelled.';
+    if (!tradeCount) return 'Add trades to share them.';
+    if (!shareState.ownerName.trim()) return 'Add your name so reviewers know whose trades these are.';
+    return '';
+}
+
+function updateShareSubmitState() {
+    const reason = shareBlockedReason(getSelectedTrades().length);
+    const btn = document.getElementById('btn-do-share');
+    const note = document.getElementById('share-blocked');
+    if (btn && !shareBusy) btn.disabled = !!reason;
+    if (note) { note.textContent = reason; note.hidden = !reason; }
+}
+
 async function renderShareView() {
     const container = document.getElementById('share-view-content');
     if (!container) return;
@@ -434,7 +452,7 @@ async function renderShareView() {
                     <h2>Active share</h2>
                     <span class="share-countdown">${escapeHTML(timeLeftLabel(active.expiresAt))}</span>
                 </div>
-                <p class="share-active-meta">${plural(active.tradeIds.length, 'trade')} shared, ${plural(reviews, 'review')} so far.</p>
+                <p class="share-active-meta">${plural(active.tradeIds.length, 'trade')} shared${active.ownerName ? ` as ${escapeHTML(active.ownerName)}` : ''}, ${plural(reviews, 'review')} so far.</p>
                 <div class="share-link-row">
                     <input type="text" class="linear-input share-link-input" id="share-link-input" value="${escapeHTML(active.link)}" readonly aria-label="Share link">
                     <button type="button" class="btn-primary" id="btn-copy-share-link">Copy link</button>
@@ -471,9 +489,7 @@ async function renderShareView() {
             <span>${o.label}</span>
         </label>`).join('');
 
-    const blockedReason = active
-        ? 'You can share again when your active share has expired or is cancelled.'
-        : (!trades.length ? 'Add trades to share them.' : '');
+    const blockedReason = shareBlockedReason(trades.length);
 
     container.innerHTML = `
         ${activeHtml}
@@ -487,13 +503,17 @@ async function renderShareView() {
         </section>
         <section class="setting-category-card share-section">
             <div class="share-section-head"><h2>What to share</h2></div>
+            <div class="share-name-row">
+                <label for="share-owner-name">Your name</label>
+                <input type="text" id="share-owner-name" class="linear-input" maxlength="${SHARE_MAX_NAME}" placeholder="Shown to reviewers" value="${escapeHTML(shareState.ownerName)}" autocomplete="name">
+            </div>
             <p class="help-text share-always">Always shared: date, symbol, direction, setup, location, market condition, result and screenshot.</p>
             ${togglesHtml ? `<p class="share-also-label">Also share</p><div class="share-toggles">${togglesHtml}</div>` : ''}
         </section>
         <section class="share-submit">
             <p class="help-text">The link works for 5 days. Anyone with the link can see these trades and leave a review.</p>
             <div class="share-submit-actions">
-                ${blockedReason ? `<span class="share-blocked">${escapeHTML(blockedReason)}</span>` : ''}
+                <span class="share-blocked" id="share-blocked" ${blockedReason ? '' : 'hidden'}>${escapeHTML(blockedReason)}</span>
                 <button type="button" class="btn-secondary" id="btn-preview-share" ${trades.length ? '' : 'disabled'}>Preview</button>
                 <button type="button" class="btn-primary" id="btn-do-share" ${blockedReason || shareBusy ? 'disabled' : ''}>${shareBusy ? 'Sharing…' : 'Share'}</button>
             </div>
@@ -524,6 +544,17 @@ function bindShareViewEvents(container) {
         shareState.include[box.dataset.include] = box.checked;
         saveShareState();
     }));
+    const nameInput = container.querySelector('#share-owner-name');
+    if (nameInput) {
+        nameInput.addEventListener('input', () => {
+            shareState.ownerName = nameInput.value.slice(0, SHARE_MAX_NAME);
+            updateShareSubmitState();
+        });
+        nameInput.addEventListener('change', () => {
+            shareState.ownerName = nameInput.value.trim().slice(0, SHARE_MAX_NAME);
+            saveShareState();
+        });
+    }
     const preview = container.querySelector('#btn-preview-share');
     if (preview) preview.addEventListener('click', openPreviewDialog);
     const doShare = container.querySelector('#btn-do-share');
@@ -606,7 +637,7 @@ async function openPreviewDialog() {
     openShareDialog({
         title: 'Preview',
         wide: true,
-        bodyHtml: `<p class="share-dialog-lead">This is what reviewers see. Each trade also gets a review form.</p>${parts.join('')}`,
+        bodyHtml: `<p class="share-dialog-lead">This is what reviewers see${shareState.ownerName.trim() ? `, shared by ${escapeHTML(shareState.ownerName.trim())}` : ''}. Each trade also gets a review form.</p>${parts.join('')}`,
         footerHtml: `<span></span><div class="share-dialog-actions"><button type="button" class="btn-secondary" data-close>Close</button></div>`
     });
 }
@@ -656,7 +687,10 @@ function setShareProgress(text) {
 async function createShare() {
     if (shareBusy || shareState.active) return;
     const trades = getSelectedTrades();
+    const ownerName = shareState.ownerName.trim().slice(0, SHARE_MAX_NAME);
     if (!trades.length) return;
+    if (!ownerName) { updateShareSubmitState(); return; }
+    shareState.ownerName = ownerName;
     shareBusy = true;
     let started = null;
     try {
@@ -686,7 +720,7 @@ async function createShare() {
         await shareFetch(`/shares/${started.id}`, {
             method: 'PUT',
             headers: { ...auth, 'Content-Type': 'application/json' },
-            body: JSON.stringify({ version: 1, trades: shared })
+            body: JSON.stringify({ version: 1, sharedBy: ownerName, trades: shared })
         });
 
         const link = new URL(`review/#${started.id}`, window.location.href).href;
@@ -696,6 +730,7 @@ async function createShare() {
             link,
             createdAt: started.createdAt,
             expiresAt: started.expiresAt,
+            ownerName,
             tradeIds: trades.map(t => t.id)
         };
         shareState.selection = [];

@@ -1291,3 +1291,9 @@ span.flatpickr-weekday {
     .app-header #date-picker,
     .app-header #btn-today { display: none; }
 }
+
+/* Name of the trader on the share page */
+.share-name-row { display: flex; align-items: center; gap: 12px; }
+.share-name-row label { font-size: 13px; font-weight: 600; white-space: nowrap; }
+.share-name-row input { max-width: 320px; }
+.share-blocked[hidden] { display: none; }

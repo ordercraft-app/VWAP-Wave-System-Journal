@@ -149,9 +149,11 @@
         const trades = share.trades || [];
         countdown.textContent = timeLeft(share.expiresAt);
         countdown.hidden = false;
+        const sharedBy = String(share.sharedBy || '').trim().slice(0, MAX_NAME);
+        if (sharedBy) document.title = `Trades from ${sharedBy} - VWAP Wave System Journal`;
         main.innerHTML = `
             <section class="review-intro">
-                <h1>${plural(trades.length, 'trade')} shared for review</h1>
+                <h1>${sharedBy ? `${esc(sharedBy)} shared ${plural(trades.length, 'trade')} for review` : `${plural(trades.length, 'trade')} shared for review`}</h1>
                 <p>Look at each trade and say whether it follows the VWAP Wave System. A short comment on why helps the trader most. Everyone with this link can see the reviews.</p>
             </section>
             <div class="review-name-row">
