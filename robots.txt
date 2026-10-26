@@ -1,0 +1,6 @@
+# VWAP Wave System Journal
+# Search engines and AI assistants are welcome to read this site.
+User-agent: *
+Allow: /
+
+Sitemap: https://vwsjournal.com/sitemap.xml

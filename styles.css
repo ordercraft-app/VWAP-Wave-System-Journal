@@ -1355,3 +1355,11 @@ a.gate-link { text-align: center; width: fit-content; }
     .card-image-area { flex: 0 0 auto; width: 100%; }
     .trade-screenshot-thumb { height: auto; max-height: 420px; aspect-ratio: auto; }
 }
+
+/* Intro for visitors without JavaScript (see <noscript> in index.html) */
+.noscript-intro { position: fixed; inset: 0; z-index: 1000; overflow: auto; background: var(--bg-main); color: var(--text-main); padding: 64px 24px; }
+.noscript-intro > * { max-width: 640px; margin-left: auto; margin-right: auto; }
+.noscript-intro h1 { font-size: 32px; line-height: 1.15; margin-bottom: 16px; }
+.noscript-intro p, .noscript-intro li { font-size: 16px; line-height: 1.6; color: var(--text-muted); margin-bottom: 12px; }
+.noscript-intro ul { padding-left: 20px; margin-bottom: 16px; }
+.noscript-intro strong { color: var(--text-main); }
