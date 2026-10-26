@@ -1313,6 +1313,9 @@ html.share-off #view-share { display: none !important; }
 /* Trade cards: bigger screenshot on wide screens. The image takes the space
    left after the six detail blocks fit on one row (about 980 px), min 220, max 520 */
 .card-image-area { flex-basis: clamp(220px, calc(100% - 980px), 520px); }
+@media (min-width: 1024px) {
+    .card-image-area { flex-basis: clamp(300px, calc(100% - 980px), 520px); }
+}
 
 /* "Enlarge" hint on the screenshot */
 .img-enlarge-hint {
