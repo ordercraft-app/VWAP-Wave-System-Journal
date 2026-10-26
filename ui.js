@@ -634,14 +634,10 @@ async function openTradeModal(tradeId = null) {
 
         const autoShotBtn = document.getElementById('btn-auto-screenshot');
     if (autoShotBtn) {
-        if (activeMediaStream && activeMediaStream.active) {
-            autoShotBtn.style.display = 'block';
-        } else {
-            autoShotBtn.style.display = 'none';
-        }
-
         const newAutoShotBtn = autoShotBtn.cloneNode(true);
         autoShotBtn.parentNode.replaceChild(newAutoShotBtn, autoShotBtn);
+        // Auto-Capture when a window is connected, otherwise Connect Window in the same spot
+        updateModalCaptureButtons();
 
         newAutoShotBtn.addEventListener('click', async () => {
             const symbol = (tfState && tfState.symbol) || 'Unknown';
@@ -1410,6 +1406,23 @@ function showToast(message, type = 'info') {
 }
 
 
+// Trade popup: show Auto-Capture when a window is connected, otherwise Connect Window
+function updateModalCaptureButtons() {
+    const autoBtn = document.getElementById('btn-auto-screenshot');
+    const connectBtn = document.getElementById('btn-connect-window');
+    if (!autoBtn || !connectBtn) return;
+    const supported = !!(navigator.mediaDevices && navigator.mediaDevices.getDisplayMedia);
+    const connected = !!(activeMediaStream && activeMediaStream.active);
+    autoBtn.style.display = connected ? 'block' : 'none';
+    connectBtn.style.display = (!connected && supported) ? 'block' : 'none';
+    connectBtn.onclick = async () => {
+        connectBtn.disabled = true;
+        await connectScreenshotWindow();
+        connectBtn.disabled = false;
+        updateModalCaptureButtons();
+    };
+}
+
 async function connectScreenshotWindow() {
     try {
         activeMediaStream = await navigator.mediaDevices.getDisplayMedia({
@@ -1424,6 +1437,7 @@ async function connectScreenshotWindow() {
             hiddenVideoElement.srcObject = null;
             if (currentSettingsTab === 'screenshot') renderSettingsUI();
             updateScreenshotBanner();
+            updateModalCaptureButtons();
         };
         
         appData.settings.autoScreenshotEnabled = true;
