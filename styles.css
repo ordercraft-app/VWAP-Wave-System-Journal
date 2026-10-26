@@ -1350,7 +1350,7 @@ html.share-off #view-share { display: none !important; }
 a.gate-link { text-align: center; width: fit-content; }
 
 /* Narrow windows: screenshot on top, full width of the card, content below */
-@media (max-width: 770px) {
+@media (max-width: 800px) {
     .trade-card { flex-direction: column; gap: 16px; }
     .card-image-area { flex: 0 0 auto; width: 100%; }
     .trade-screenshot-thumb { height: auto; max-height: 420px; aspect-ratio: auto; }
