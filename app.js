@@ -280,6 +280,7 @@ function setupNavigation() {
         viewDashboard.classList.add('active');
         setActiveNav(btnNavDashboard);
         renderDashboard();
+        if (typeof syncReviewsSoon === 'function') syncReviewsSoon();
         startViewAtTop(viewDashboard);
     });
     

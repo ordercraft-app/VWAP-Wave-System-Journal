@@ -229,7 +229,7 @@ function playViewEnter(view) {
     // Microtask: runs after the synchronous render of the page, before the browser paints
     queueMicrotask(() => {
         const selectors = {
-            'view-dashboard': '#screenshot-connect-banner, #weekly-calendar-widget',
+            'view-dashboard': '#screenshot-connect-banner, #share-active-banner, #weekly-calendar-widget',
             'view-stats': '.view-header, .stats-filters, .kpi-card, .stats-grid > .stat-card',
             'view-settings': '.view-header, .settings-tabs, #settings-ui-container > .info-banner, .setting-category-card, .chart-toggle-row',
             'view-help': '.view-header, .faq-item, .help-contact-card'
@@ -337,7 +337,10 @@ async function renderDashboard() {
     if (lastRenderedDate && renderDate !== lastRenderedDate && !pendingTradesAnimation) {
         pendingTradesAnimation = renderDate > lastRenderedDate ? 'next' : 'prev';
     }
+    // Other day picked: check for new reviews on shared trades
+    if (lastRenderedDate && renderDate !== lastRenderedDate && typeof syncReviewsSoon === 'function') syncReviewsSoon();
     lastRenderedDate = renderDate;
+    if (typeof updateShareBanner === 'function') updateShareBanner();
     lastRenderedWeek = renderWeek;
     const tradesAnimation = pendingTradesAnimation;
     pendingTradesAnimation = null;
@@ -436,6 +439,7 @@ async function renderDashboard() {
                         <span class="row-secondary" title="${subLoc}">${subLoc}</span>
                     </div>
                     <div class="row-col-res" style="margin-left: auto; display: flex; align-items: center; gap: 10px;">
+                        ${sharedLabelHtml(trade)}
                         ${shareToggleButtonHtml(trade)}
                         <span class="badge ${resultClass}">${escapeHTML(trade.result || '-')}</span>
                     </div>
@@ -502,6 +506,7 @@ async function renderDashboard() {
                             ${shareReviewsButtonHtml(trade)}
                         </div>
                         <div class="card-header-actions">
+                            ${sharedLabelHtml(trade)}
                             ${shareToggleButtonHtml(trade)}
                             <span class="badge ${resultClass}">${escapeHTML(trade.result || '-')}</span>
                         </div>

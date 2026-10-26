@@ -278,6 +278,37 @@ function shareToggleButtonHtml(trade) {
     return `<button type="button" class="trade-text-btn ${selected ? 'is-selected' : ''}" data-share-action="toggle" data-trade-id="${escapeHTML(trade.id)}" aria-pressed="${selected}">${selected ? 'Remove from shares' : 'Add to shares'}</button>`;
 }
 
+// Small label on trades that are part of the active share
+function sharedLabelHtml(trade) {
+    const a = shareState.active;
+    if (!a || a.expiresAt <= Date.now() || !a.tradeIds.includes(trade.id)) return '';
+    return '<span class="shared-label">Shared</span>';
+}
+
+// Banner on the dashboard while a share is live
+function updateShareBanner() {
+    const banner = document.getElementById('share-active-banner');
+    if (!banner) return;
+    retireExpiredShare();
+    const a = shareState.active;
+    if (!a || !dirHandle || !fileConnected) {
+        banner.hidden = true;
+        banner.innerHTML = '';
+        return;
+    }
+    const reviews = reviewCountForShare(a.id);
+    banner.innerHTML = `
+        <span class="share-banner-status">Live share</span>
+        <span class="share-banner-text">${plural(a.tradeIds.length, 'trade')} shared, ${plural(reviews, 'review')}, ${escapeHTML(timeLeftLabel(a.expiresAt).toLowerCase())}.</span>
+        <span class="share-banner-actions">
+            <button type="button" class="btn-secondary btn-sm" data-banner="copy">Copy link</button>
+            <button type="button" class="btn-secondary btn-sm" data-banner="open">View share</button>
+        </span>`;
+    banner.hidden = false;
+    banner.querySelector('[data-banner="copy"]').addEventListener('click', copyShareLink);
+    banner.querySelector('[data-banner="open"]').addEventListener('click', openShareView);
+}
+
 // Handle those buttons before the card's own click (which opens the trade)
 function setupShareCardClicks() {
     tradesList.addEventListener('click', e => {
@@ -294,6 +325,7 @@ function setupShareCardClicks() {
 // Update buttons in place, without re-rendering the whole dashboard
 function refreshShareUI() {
     updateSharesButton();
+    updateShareBanner();
     document.querySelectorAll('[data-share-action="toggle"]').forEach(btn => {
         const selected = isTradeSelected(btn.dataset.tradeId);
         btn.classList.toggle('is-selected', selected);
@@ -670,6 +702,8 @@ async function createShare() {
         await saveShareState();
         shareBusy = false;
         refreshShareUI();
+        pendingTradesAnimation = null;
+        renderDashboard();
         showToast('Shared. Copy the link and send it to your reviewers.', 'success');
     } catch (err) {
         shareBusy = false;
@@ -698,15 +732,17 @@ async function cancelActiveShare() {
     shareState.past = shareState.past.filter(p => p.id !== active.id);
     await saveShareState();
     refreshShareUI();
+    pendingTradesAnimation = null;
+    renderDashboard();
     showToast('Share cancelled. The link no longer works.', 'success');
 }
 
 // ---------- reviews ----------
 
 // Copy new reviews from the share service into the trades of the journal
-async function syncReviews(force = false) {
+async function syncReviews(force = false, minGapMs = 60 * 1000) {
     if (!dirHandle || !fileConnected) return;
-    if (!force && Date.now() - lastShareSync < 60 * 1000) return;
+    if (!force && Date.now() - lastShareSync < minGapMs) return;
     lastShareSync = Date.now();
     retireExpiredShare();
 
@@ -758,7 +794,13 @@ async function syncReviews(force = false) {
             renderDashboard();
         }
         if (isShareViewOpen()) renderShareView();
+        updateShareBanner();
     }
+}
+
+// Dashboard opened or other day picked: check soon, but not more than every 15 seconds
+function syncReviewsSoon() {
+    syncReviews(false, 15 * 1000);
 }
 
 function formatReviewTime(ms) {

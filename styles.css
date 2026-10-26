@@ -1178,7 +1178,7 @@ span.flatpickr-weekday {
 .sidebar-nav.no-active .nav-indicator { opacity: 0; }
 
 /* "Your shares" page */
-.share-view-content { display: flex; flex-direction: column; gap: 16px; max-width: 920px; padding-bottom: 40px; }
+.share-view-content { display: flex; flex-direction: column; gap: 16px; padding-bottom: 40px; }
 .share-section { display: flex; flex-direction: column; gap: 16px; }
 .share-section-head { display: flex; align-items: center; gap: 12px; }
 .share-section-head h2 { font-size: 15px; font-weight: 600; }
@@ -1275,4 +1275,19 @@ span.flatpickr-weekday {
 }
 @media (prefers-reduced-motion: reduce) {
     .share-dialog { transition: none; transform: none; }
+}
+
+/* Live share on the dashboard */
+.share-banner { margin-bottom: 16px; flex-wrap: wrap; }
+.share-banner[hidden] { display: none; }
+.share-banner-status { font-size: 11px; font-weight: 600; color: var(--accent); background: rgba(56, 106, 245, 0.12); padding: 3px 8px; border-radius: 100px; white-space: nowrap; }
+.share-banner-text { flex: 1; min-width: 180px; color: var(--text-main); }
+.share-banner-actions { display: flex; gap: 8px; }
+.shared-label { font-size: 11px; font-weight: 600; color: var(--accent); white-space: nowrap; }
+
+/* Header on smaller screens: date picker and Today button hide, the calendar strip stays */
+@media (max-width: 860px) {
+    .app-header .header-divider,
+    .app-header #date-picker,
+    .app-header #btn-today { display: none; }
 }
