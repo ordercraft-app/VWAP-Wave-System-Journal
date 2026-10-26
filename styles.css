@@ -1159,9 +1159,9 @@ span.flatpickr-weekday {
 .trade-text-btn:focus-visible, .shares-header-btn:focus-visible, .share-toggle input:focus-visible + span { outline: 2px solid var(--accent); outline-offset: 2px; }
 .trade-text-btn:disabled { opacity: 0.45; cursor: not-allowed; }
 .trade-text-btn.is-selected { color: var(--accent); border-color: var(--accent); background: rgba(56, 106, 245, 0.08); }
-.trade-text-btn.reviews-btn { margin-left: 10px; }
-.trade-text-btn.reviews-btn.has-new { color: var(--text-main); border-color: var(--accent); }
-.trade-text-btn.reviews-btn.has-new::after { content: ''; display: inline-block; width: 6px; height: 6px; border-radius: 50%; background: var(--accent); margin-left: 6px; vertical-align: middle; }
+.trade-text-btn.reviews-btn { margin-left: 10px; background: var(--accent); border-color: var(--accent); color: #fff; }
+.trade-text-btn.reviews-btn:hover:not(:disabled) { background: var(--accent-hover); border-color: var(--accent-hover); color: #fff; }
+.trade-text-btn.reviews-btn.has-new::after { content: ''; display: inline-block; width: 6px; height: 6px; border-radius: 50%; background: #fff; margin-left: 6px; vertical-align: middle; }
 .row-col-id .trade-text-btn.reviews-btn { margin-left: 2px; }
 .card-header-actions { display: flex; align-items: center; gap: 10px; }
 

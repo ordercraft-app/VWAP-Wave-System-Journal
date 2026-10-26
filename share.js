@@ -1,5 +1,5 @@
 // --- Sharing trades for review ---
-// The user collects up to 15 trades (each with a screenshot) in "Your shares",
+// The user collects up to 10 trades (each with a screenshot) in "Your shares",
 // then shares them with one link. The link works for 5 days. Anyone with the
 // link can leave a review; reviews are copied into the trade in the journal,
 // so they stay after the link has expired.
@@ -8,7 +8,7 @@
 // because people pass settings files around and this one holds secret keys).
 
 const SHARE_API = 'https://api.vwsjournal.com';
-const SHARE_MAX_TRADES = 15;
+const SHARE_MAX_TRADES = 10;
 const SHARE_OWNER_EXTRA_DAYS = 9; // reviews stay fetchable for the owner 9 days after the link expires
 const SHARE_DAY_MS = 24 * 60 * 60 * 1000;
 const SHARE_IMAGE_MAX_WIDTH = 1920;
