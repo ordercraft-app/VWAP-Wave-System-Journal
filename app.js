@@ -8,7 +8,7 @@ document.addEventListener('DOMContentLoaded', async () => {
         dateFormat: "Y-m-d",
         disableMobile: true,
         onChange: function(selectedDates, dateStr) {
-            alignWeekToDate(new Date(dateStr));
+            alignWeekToDate(parseLocalDate(dateStr) || new Date());
             renderDashboard();
         }
     });
@@ -120,7 +120,7 @@ document.addEventListener('DOMContentLoaded', async () => {
                     document.getElementById('cal-next-week').click();
                 } else {
                     const picker = document.getElementById('date-picker');
-                    let d = new Date(picker.value);
+                    let d = parseLocalDate(picker.value) || new Date();
                     d.setDate(d.getDate() + 1);
                     const dStr = d.toLocaleDateString('en-CA');
                     window.fpDatePicker.setDate(dStr);
@@ -135,7 +135,7 @@ document.addEventListener('DOMContentLoaded', async () => {
                     document.getElementById('cal-prev-week').click();
                 } else {
                     const picker = document.getElementById('date-picker');
-                    let d = new Date(picker.value);
+                    let d = parseLocalDate(picker.value) || new Date();
                     d.setDate(d.getDate() - 1);
                     const dStr = d.toLocaleDateString('en-CA');
                     window.fpDatePicker.setDate(dStr);
@@ -152,7 +152,7 @@ document.addEventListener('DOMContentLoaded', async () => {
         btnToday.addEventListener('click', () => {
             const tStr = new Date().toLocaleDateString('en-CA');
             window.fpDatePicker.setDate(tStr);
-            alignWeekToDate(new Date(tStr));
+            alignWeekToDate(parseLocalDate(tStr) || new Date());
             renderDashboard();
         });
     }

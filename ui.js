@@ -135,15 +135,31 @@ function alignWeekToDate(dateObj) {
     currentWeekStartDate = getMonday(dateObj);
 }
 
+// "2026-10-26" -> local date at noon (new Date("2026-10-26") is UTC midnight,
+// which is the previous day for users west of UTC, e.g. in the US)
+function parseLocalDate(dateStr) {
+    const d = new Date(`${dateStr}T12:00:00`);
+    return isNaN(d) ? null : d;
+}
+
+// Go to the previous/next week and keep the same weekday selected
+// (Monday this week -> Monday last week), so the trades of that day show
+function shiftWeek(delta) {
+    const selected = parseLocalDate(datePicker.value);
+    currentWeekStartDate.setDate(currentWeekStartDate.getDate() + 7 * delta);
+    if (selected) {
+        const weekdayIndex = (selected.getDay() + 6) % 7; // Monday = 0
+        const target = new Date(currentWeekStartDate);
+        target.setDate(target.getDate() + weekdayIndex);
+        window.fpDatePicker.setDate(target.toLocaleDateString('en-CA'));
+        alignWeekToDate(target);
+    }
+    renderDashboard();
+}
+
 function setupCalendarEvents() {
-    btnPrevWeek.addEventListener('click', () => {
-        currentWeekStartDate.setDate(currentWeekStartDate.getDate() - 7);
-        renderDashboard();
-    });
-    btnNextWeek.addEventListener('click', () => {
-        currentWeekStartDate.setDate(currentWeekStartDate.getDate() + 7);
-        renderDashboard();
-    });
+    btnPrevWeek.addEventListener('click', () => shiftWeek(-1));
+    btnNextWeek.addEventListener('click', () => shiftWeek(1));
 }
 
 function renderWeeklyCalendar() {
@@ -751,7 +767,7 @@ btnSaveTrade.addEventListener('click', async (e) => {
     isFormDirty = false;
     closeModal();
     window.fpDatePicker.setDate(tradeData.date);
-    alignWeekToDate(new Date(tradeData.date));
+    alignWeekToDate(parseLocalDate(tradeData.date) || new Date());
     await renderDashboard();
     
     await autoSave();

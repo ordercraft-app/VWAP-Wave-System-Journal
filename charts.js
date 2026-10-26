@@ -319,7 +319,7 @@ function renderStatsDashboard() {
 
     const trades = appData.trades.filter(t => {
         if(!t.date) return false;
-        const d = new Date(t.date);
+        const d = parseLocalDate(t.date) || new Date(t.date);
         const tY = d.getFullYear();
         const tM = d.getMonth() + 1;
         const tD = d.getDate();
@@ -564,7 +564,7 @@ function renderStatsDashboard() {
     handleChartRender('dayOfWeekChart', 'dayOfWeek', () => {
         const daysMap = { 0: 'Sun', 1: 'Mon', 2: 'Tue', 3: 'Wed', 4: 'Thu', 5: 'Fri', 6: 'Sat' };
         const dayGroups = { 'Mon':[], 'Tue':[], 'Wed':[], 'Thu':[], 'Fri':[], 'Sat':[], 'Sun':[] };
-        trades.forEach(t => { const day = daysMap[new Date(t.date).getDay()]; if(dayGroups[day]) dayGroups[day].push(t); });
+        trades.forEach(t => { const day = daysMap[(parseLocalDate(t.date) || new Date(t.date)).getDay()]; if(dayGroups[day]) dayGroups[day].push(t); });
         const dayLabels = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'];
         const dayWinRates = dayLabels.map(d => dayGroups[d].length > 0 ? getWinRateData(dayGroups[d]).winRate : 0);
         
