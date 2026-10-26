@@ -1,3 +1,13 @@
+// Date picker theme (files in vendor/, see index.html)
+const FLATPICKR_THEMES = {
+    dark: 'vendor/flatpickr-4.6.13/themes/dark.css',
+    light: 'vendor/flatpickr-4.6.13/themes/light.css'
+};
+function setFlatpickrTheme(name) {
+    if (!flatpickrTheme || !FLATPICKR_THEMES[name]) return;
+    if (flatpickrTheme.getAttribute('href') !== FLATPICKR_THEMES[name]) flatpickrTheme.setAttribute('href', FLATPICKR_THEMES[name]);
+}
+
 // --- Initialization ---
 document.addEventListener('DOMContentLoaded', async () => {
     const today = new Date();
@@ -227,11 +237,11 @@ function applyTheme(theme) {
     if (theme === 'light') {
         if(iconSun) iconSun.style.display = 'none';
         if(iconMoon) iconMoon.style.display = 'block';
-        if (flatpickrTheme) flatpickrTheme.href = 'https://cdn.jsdelivr.net/npm/flatpickr/dist/themes/light.css';
+        setFlatpickrTheme('light');
     } else {
         if(iconSun) iconSun.style.display = 'block';
         if(iconMoon) iconMoon.style.display = 'none';
-        if (flatpickrTheme) flatpickrTheme.href = 'https://cdn.jsdelivr.net/npm/flatpickr/dist/themes/dark.css';
+        setFlatpickrTheme('dark');
     }
     
     if (typeof renderStatsDashboard === 'function' && document.getElementById('view-stats').classList.contains('active')) {
