@@ -68,7 +68,7 @@ Day and week shortcuts work on the dashboard when you are not typing in a field.
 
 ## Project structure
 
-The journal is a static web app: plain HTML, CSS and JavaScript, hosted on GitHub Pages. There is no build step.
+The journal is a static web app: plain HTML, CSS and JavaScript, hosted on GitHub Pages. There is no build step and nothing is loaded from other websites at runtime, apart from privacy-friendly Cloudflare Web Analytics.
 
 | File | Purpose |
 | --- | --- |
@@ -83,7 +83,7 @@ The journal is a static web app: plain HTML, CSS and JavaScript, hosted on GitHu
 | `customcharts.js` | Custom charts |
 | `app.js` | Start-up, navigation and keyboard shortcuts |
 | `settings.json` | Default settings |
-
+| `vendor/` | Chart.js 4.5.1 and Flatpickr 4.6.13, stored in the repo at a fixed version |
 
 ## Support
 
