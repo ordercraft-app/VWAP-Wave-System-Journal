@@ -425,6 +425,7 @@ async function renderDashboard() {
                     <div class="row-col row-col-id" style="flex-direction: row; align-items: center; gap: 8px;">
                         <span class="row-primary">${escapeHTML(trade.number || '-')}</span>
                         ${trade.symbol ? `<span class="symbol-tag" style="margin:0;">${escapeHTML(trade.symbol)}</span>` : ''}
+                        ${shareReviewsButtonHtml(trade)}
                     </div>
                     <div class="row-col row-col-setup">
                         <span class="row-primary" title="${escapeHTML(trade.setup || '-')}">${escapeHTML(trade.setup || '-')}</span>
@@ -434,7 +435,8 @@ async function renderDashboard() {
                         <span class="row-primary">${primaryLoc}</span>
                         <span class="row-secondary" title="${subLoc}">${subLoc}</span>
                     </div>
-                    <div class="row-col-res" style="margin-left: auto; display: flex; align-items: center;">
+                    <div class="row-col-res" style="margin-left: auto; display: flex; align-items: center; gap: 10px;">
+                        ${shareToggleButtonHtml(trade)}
                         <span class="badge ${resultClass}">${escapeHTML(trade.result || '-')}</span>
                     </div>
                 </div>
@@ -497,8 +499,12 @@ async function renderDashboard() {
                         <div class="card-trade-id">
                             ${escapeHTML(trade.number || '-')}
                             ${trade.symbol ? `<span class="symbol-tag">${escapeHTML(trade.symbol)}</span>` : ''}
+                            ${shareReviewsButtonHtml(trade)}
                         </div>
-                        <span class="badge ${resultClass}">${escapeHTML(trade.result || '-')}</span>
+                        <div class="card-header-actions">
+                            ${shareToggleButtonHtml(trade)}
+                            <span class="badge ${resultClass}">${escapeHTML(trade.result || '-')}</span>
+                        </div>
                     </div>
                     <div class="card-body">
                         <div class="card-group">
@@ -719,13 +725,17 @@ btnSaveTrade.addEventListener('click', async (e) => {
         await saveImageToDir(pendingImageBlob, finalImageName);
     }
     
+    // Reviews come from shared links; editing the trade must not drop them
+    const previousTrade = appData.trades.find(t => t.id === tradeId);
+
     const tradeData = {
         id: tradeId,
         date: document.getElementById('t-date').value,
         number: document.getElementById('t-number').value,
         ...tfGetData(),
         notes: document.getElementById('t-notes').value,
-        screenshot: finalImageName
+        screenshot: finalImageName,
+        reviews: previousTrade && Array.isArray(previousTrade.reviews) ? previousTrade.reviews : undefined
     };
 
     const existingIndex = appData.trades.findIndex(t => t.id === tradeId);

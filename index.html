@@ -56,6 +56,7 @@
                     <button class="btn-secondary" id="btn-today">Today</button>
                 </div>
                 <div class="header-right">
+                    <button class="btn-secondary shares-header-btn" id="btn-your-shares">Your shares <span class="shares-badge" id="shares-badge">0/15</span></button>
                     <button class="btn-primary" id="btn-new-trade" style="white-space: nowrap;">Add Trade</button>
                 </div>
             </header>
@@ -85,6 +86,8 @@
 
                                         <div class="dashboard-toolbar" id="dashboard-toolbar" style="display: none; justify-content: space-between; align-items: center; margin-bottom: 16px;">
                         <h1 style="margin: 0;">Journal</h1>
+                        <div class="toolbar-right">
+                        <button class="btn-secondary" id="btn-share-day">Share day</button>
                         <div class="view-toggle">
                             <button class="btn-icon active" id="btn-view-card" title="Card View">
                                 <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect><line x1="3" y1="9" x2="21" y2="9"></line><line x1="9" y1="21" x2="9" y2="9"></line></svg>
@@ -93,10 +96,20 @@
                                 <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="8" y1="6" x2="21" y2="6"></line><line x1="8" y1="12" x2="21" y2="12"></line><line x1="8" y1="18" x2="21" y2="18"></line><line x1="3" y1="6" x2="3.01" y2="6"></line><line x1="3" y1="12" x2="3.01" y2="12"></line><line x1="3" y1="18" x2="3.01" y2="18"></line></svg>
                             </button>
                         </div>
+                        </div>
                     </div>
                     <div class="trades-list" id="trades-list">
                         <!-- Trade cards or empty state injected here -->
                     </div>
+                </section>
+
+                <!-- Your shares View -->
+                <section id="view-share" class="view">
+                    <header class="view-header" style="margin-bottom: 16px;">
+                        <h1>Your shares</h1>
+                        <p class="help-text" style="margin-top:4px;">Pick up to 15 trades with a screenshot and share them for review with one link.</p>
+                    </header>
+                    <div id="share-view-content" class="share-view-content"></div>
                 </section>
 
                 <!-- Settings View -->
@@ -559,6 +572,7 @@
     <script src="storage.js"></script>
     <script src="ui.js"></script>
     <script src="tradeform.js"></script>
+    <script src="share.js"></script>
     <script src="customcharts.js"></script>
     <script src="gate.js"></script>
     <script src="charts.js"></script>

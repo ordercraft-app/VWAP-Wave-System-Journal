@@ -245,6 +245,7 @@ function setActiveNav(activeBtn) {
     const wasActive = activeBtn.classList.contains('active');
     [btnNavDashboard, btnNavStats, btnNavSettings, btnNavHelp].forEach(b => b.classList.remove('active'));
     activeBtn.classList.add('active');
+    if (typeof closeShareViewState === 'function') closeShareViewState();
 
     // Motion: slide the sidebar indicator and play the page-enter animation
     moveNavIndicator(activeBtn, true);
@@ -259,7 +260,7 @@ function startViewAtTop(view) {
 
 function setupNavigation() {
     btnNavSettings.addEventListener('click', () => {
-        [viewDashboard, viewStats, viewHelp].forEach(v => v.classList.remove('active'));
+        [viewDashboard, viewStats, viewHelp, document.getElementById('view-share')].forEach(v => v.classList.remove('active'));
         viewSettings.classList.add('active');
         setActiveNav(btnNavSettings);
         renderSettingsUI();
@@ -267,7 +268,7 @@ function setupNavigation() {
     });
 
     btnNavStats.addEventListener('click', () => {
-        [viewDashboard, viewSettings, viewHelp].forEach(v => v.classList.remove('active'));
+        [viewDashboard, viewSettings, viewHelp, document.getElementById('view-share')].forEach(v => v.classList.remove('active'));
         viewStats.classList.add('active');
         setActiveNav(btnNavStats);
         renderStatsDashboard();
@@ -275,7 +276,7 @@ function setupNavigation() {
     });
 
     btnNavDashboard.addEventListener('click', () => {
-        [viewSettings, viewStats, viewHelp].forEach(v => v.classList.remove('active'));
+        [viewSettings, viewStats, viewHelp, document.getElementById('view-share')].forEach(v => v.classList.remove('active'));
         viewDashboard.classList.add('active');
         setActiveNav(btnNavDashboard);
         renderDashboard();
@@ -283,7 +284,7 @@ function setupNavigation() {
     });
     
     btnNavHelp.addEventListener('click', () => {
-        [viewDashboard, viewStats, viewSettings].forEach(v => v.classList.remove('active'));
+        [viewDashboard, viewStats, viewSettings, document.getElementById('view-share')].forEach(v => v.classList.remove('active'));
         viewHelp.classList.add('active');
         setActiveNav(btnNavHelp);
         startViewAtTop(viewHelp);

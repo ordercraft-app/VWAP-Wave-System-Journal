@@ -1,0 +1,62 @@
+/* Review page: opened from a shared link, works on any browser and phone */
+body.review-page { height: auto; min-height: 100vh; overflow: auto; }
+
+.review-top { position: sticky; top: 0; z-index: 20; display: flex; align-items: center; justify-content: space-between; gap: 16px; padding: 18px 24px; background: var(--bg-main); border-bottom: 1px solid var(--border-color); }
+.review-brand { text-decoration: none; display: flex; flex-direction: column; gap: 4px; }
+
+.review-main { max-width: 900px; margin: 0 auto; padding: 28px 24px 64px; display: flex; flex-direction: column; gap: 20px; }
+.review-loading { color: var(--text-muted); font-size: 14px; padding: 40px 0; text-align: center; }
+
+.review-intro { display: flex; flex-direction: column; gap: 8px; }
+.review-intro h1 { font-size: 22px; font-weight: 600; letter-spacing: -0.2px; }
+.review-intro p { font-size: 14px; color: var(--text-muted); line-height: 1.55; max-width: 62ch; }
+
+.review-name-row { display: flex; align-items: center; gap: 12px; background: var(--bg-panel); border-radius: 16px; padding: 14px 16px; }
+.review-name-row label { font-size: 13px; font-weight: 600; white-space: nowrap; }
+.review-name-row input { flex: 1; min-width: 0; max-width: 320px; }
+.review-name-row .help-text { margin: 0; }
+
+.review-trade { background: var(--bg-panel); border-radius: 16px; padding: 18px; display: flex; flex-direction: column; gap: 16px; scroll-margin-top: 90px; }
+.review-shot-btn { padding: 0; border: none; background: none; border-radius: 10px; cursor: zoom-in; display: block; width: 100%; }
+.review-shot-btn img { width: 100%; display: block; border-radius: 10px; }
+.review-shot-btn:focus-visible { outline: 2px solid var(--accent); outline-offset: 3px; }
+.review-trade .card-header { flex-wrap: wrap; gap: 8px; }
+.review-date { font-size: 12px; font-weight: 400; color: var(--text-muted); margin-left: 10px; }
+
+.review-block { display: flex; flex-direction: column; gap: 10px; border-top: 1px solid var(--border-color); padding-top: 16px; }
+.review-block-title { font-size: 13px; font-weight: 600; }
+.review-none { font-size: 13px; color: var(--text-muted); }
+
+.review-form { display: flex; flex-direction: column; gap: 10px; }
+.review-verdicts { display: flex; flex-wrap: wrap; gap: 8px; }
+.verdict-btn { background: var(--bg-input); border: 1px solid var(--border-color); color: var(--text-main); }
+.verdict-btn:hover { border-color: var(--border-hover); }
+.verdict-btn[aria-pressed="true"].follows { border-color: var(--color-win); background: var(--bg-win); color: var(--color-win); }
+.verdict-btn[aria-pressed="true"].not-follows { border-color: var(--danger); background: rgba(238, 53, 78, 0.12); color: var(--danger); }
+.verdict-btn:focus-visible, .review-post:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+.review-form textarea { width: 100%; min-height: 76px; resize: vertical; font-family: inherit; font-size: 13px; line-height: 1.5; }
+.review-form-foot { display: flex; align-items: center; justify-content: space-between; gap: 12px; }
+.review-chars { font-size: 12px; color: var(--text-muted); font-variant-numeric: tabular-nums; }
+.review-post:disabled { opacity: 0.5; cursor: not-allowed; }
+.review-form-error { font-size: 12px; color: var(--danger); min-height: 0; }
+
+.review-message { text-align: center; padding: 72px 20px; display: flex; flex-direction: column; gap: 10px; align-items: center; }
+.review-message h1 { font-size: 20px; font-weight: 600; }
+.review-message p { color: var(--text-muted); font-size: 14px; line-height: 1.55; max-width: 46ch; }
+
+.review-viewer { position: fixed; inset: 0; z-index: 100; background: rgba(0, 0, 0, 0.85); display: flex; align-items: center; justify-content: center; padding: 24px; }
+.review-viewer[hidden] { display: none; }
+.review-viewer img { max-width: 100%; max-height: 100%; border-radius: 8px; }
+.review-viewer-close { position: absolute; top: 16px; right: 20px; font-size: 30px; color: #fff; }
+
+@media (max-width: 640px) {
+    .review-top { padding: 14px 16px; }
+    .review-main { padding: 20px 12px 48px; gap: 14px; }
+    .review-trade { padding: 14px; }
+    .review-name-row { flex-wrap: wrap; }
+    .review-name-row input { max-width: none; flex-basis: 100%; }
+    .review-trade .card-body .card-group { flex: 1 1 calc(50% - 6px); min-width: 0; }
+    .review-trade .card-body .psych-group { flex-basis: 100%; }
+}
+.review-page .review-item-head { padding-right: 0; }
+.review-page .review-item { background: var(--group-bg); border: 1px solid var(--group-border); }

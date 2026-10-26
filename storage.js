@@ -315,6 +315,9 @@ async function loadDataFromFile() {
         migrateSettings();
         normalizeTrades();
 
+        // Shared trades and their reviews (share.json)
+        if (typeof loadShareState === 'function') await loadShareState();
+
         // Force save to ensure both files exist in the new format
         await autoSave();
         renderDashboard();

@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="robots" content="noindex">
+    <title>Trade review - VWAP Wave System Journal</title>
+    <link rel="icon" type="image/png" href="../favicon.png">
+    <link rel="stylesheet" href="../styles.css">
+    <link rel="stylesheet" href="review.css">
+    <script>
+        // Same theme as the journal, otherwise follow the device
+        (function () {
+            var t = null;
+            try { t = localStorage.getItem('vwap-theme'); } catch (e) {}
+            if (!t) t = window.matchMedia && window.matchMedia('(prefers-color-scheme: light)').matches ? 'light' : 'dark';
+            document.documentElement.setAttribute('data-theme', t);
+        })();
+    </script>
+</head>
+<body class="review-page">
+    <header class="review-top">
+        <a class="app-title review-brand" href="../">
+            <span class="title-brand">VWAP WAVE SYSTEM</span>
+            <span class="title-main">Trade review</span>
+        </a>
+        <span class="share-countdown" id="review-countdown" hidden></span>
+    </header>
+
+    <main class="review-main" id="review-main" aria-live="polite">
+        <p class="review-loading">Loading shared trades…</p>
+    </main>
+
+    <div class="review-viewer" id="review-viewer" hidden>
+        <button type="button" class="close-btn review-viewer-close" aria-label="Close">&times;</button>
+        <img id="review-viewer-img" src="" alt="Screenshot, enlarged">
+    </div>
+
+    <div class="toast-container" id="toast-container"></div>
+    <script src="review.js"></script>
+</body>
+</html>
