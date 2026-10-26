@@ -1302,3 +1302,9 @@ span.flatpickr-weekday {
 .row-id-main { display: flex; align-items: center; gap: 8px; width: 80px; flex-shrink: 0; }
 .row-reviews-slot { display: flex; align-items: center; width: 96px; flex-shrink: 0; }
 .row-col-res .badge { min-width: 46px; }
+
+/* Sharing switched off (see SHARE_FEATURE_ENABLED in share.js) */
+#btn-your-shares[hidden], #btn-share-day[hidden] { display: none !important; }
+html.share-off .row-reviews-slot,
+html.share-off #share-active-banner,
+html.share-off #view-share { display: none !important; }

@@ -7,6 +7,34 @@
 // Share state lives in share.json in the journal folder (not in settings.json,
 // because people pass settings files around and this one holds secret keys).
 
+// ---------- Release switch ----------
+// false = sharing is hidden for everyone (all buttons and entry points),
+//         but everything still exists and works behind the scenes.
+// true  = sharing is visible for everyone.
+const SHARE_FEATURE_ENABLED = false;
+
+// For testing while hidden: open the app once with ?share=on (or ?share=off).
+// This browser remembers the choice; other people see nothing.
+const SHARE_FEATURE_KEY = 'vws-share-feature';
+const shareFeatureOn = (() => {
+    let override = null;
+    try {
+        const params = new URLSearchParams(window.location.search);
+        const asked = (params.get('share') || '').toLowerCase();
+        if (asked === 'on' || asked === 'off') {
+            localStorage.setItem(SHARE_FEATURE_KEY, asked);
+            params.delete('share');
+            const rest = params.toString();
+            history.replaceState(null, '', window.location.pathname + (rest ? `?${rest}` : '') + window.location.hash);
+        }
+        override = localStorage.getItem(SHARE_FEATURE_KEY);
+    } catch (e) { /* storage blocked: use the default */ }
+    if (override === 'on') return true;
+    if (override === 'off') return false;
+    return SHARE_FEATURE_ENABLED;
+})();
+document.documentElement.classList.toggle('share-off', !shareFeatureOn);
+
 const SHARE_API = 'https://api.vwsjournal.com';
 const SHARE_MAX_TRADES = 10;
 const SHARE_OWNER_EXTRA_DAYS = 9; // reviews stay fetchable for the owner 9 days after the link expires
@@ -149,6 +177,7 @@ function plural(n, word) {
 
 // "Share day": add the trades of the date picked in the calendar
 function shareDay() {
+    if (!shareFeatureOn) return;
     const date = datePicker.value;
     const dayTrades = appData.trades.filter(t => t.date === date);
     const withShot = dayTrades.filter(shareableTrade);
@@ -267,6 +296,7 @@ function resultClassFor(result) {
 
 // Called from renderDashboard (ui.js)
 function shareReviewsButtonHtml(trade) {
+    if (!shareFeatureOn) return '';
     const reviews = Array.isArray(trade.reviews) ? trade.reviews : [];
     if (!reviews.length) return '';
     const hasNew = reviews.some(r => r.isNew);
@@ -274,6 +304,7 @@ function shareReviewsButtonHtml(trade) {
 }
 
 function shareToggleButtonHtml(trade) {
+    if (!shareFeatureOn) return '';
     if (!shareableTrade(trade)) {
         return `<button type="button" class="trade-text-btn" disabled title="Add a screenshot to share this trade">Add to shares</button>`;
     }
@@ -283,6 +314,7 @@ function shareToggleButtonHtml(trade) {
 
 // Small label on trades that are part of the active share
 function sharedLabelHtml(trade) {
+    if (!shareFeatureOn) return '';
     const a = shareState.active;
     if (!a || a.expiresAt <= Date.now() || !a.tradeIds.includes(trade.id)) return '';
     return '<span class="shared-label">Shared</span>';
@@ -292,6 +324,7 @@ function sharedLabelHtml(trade) {
 function updateShareBanner() {
     const banner = document.getElementById('share-active-banner');
     if (!banner) return;
+    if (!shareFeatureOn) { banner.hidden = true; return; }
     retireExpiredShare();
     const a = shareState.active;
     if (!a || !dirHandle || !fileConnected) {
@@ -356,6 +389,7 @@ function isShareViewOpen() {
 }
 
 function openShareView() {
+    if (!shareFeatureOn) return;
     document.querySelectorAll('.main-content .view').forEach(v => v.classList.remove('active'));
     document.getElementById('view-share').classList.add('active');
     document.querySelectorAll('.sidebar-nav .btn-icon').forEach(b => b.classList.remove('active'));
@@ -776,7 +810,7 @@ async function cancelActiveShare() {
 
 // Copy new reviews from the share service into the trades of the journal
 async function syncReviews(force = false, minGapMs = 60 * 1000) {
-    if (!dirHandle || !fileConnected) return;
+    if (!shareFeatureOn || !dirHandle || !fileConnected) return;
     if (!force && Date.now() - lastShareSync < minGapMs) return;
     lastShareSync = Date.now();
     retireExpiredShare();
@@ -914,6 +948,15 @@ async function removeReview(trade, localId) {
 // ---------- start ----------
 
 document.addEventListener('DOMContentLoaded', () => {
+    ['btn-your-shares', 'btn-share-day'].forEach(id => {
+        const el = document.getElementById(id);
+        if (el) el.hidden = !shareFeatureOn;
+    });
+    if (shareFeatureOn && !SHARE_FEATURE_ENABLED) {
+        let shown = false;
+        try { shown = sessionStorage.getItem('vws-share-test-notice') === '1'; sessionStorage.setItem('vws-share-test-notice', '1'); } catch (e) {}
+        if (!shown) setTimeout(() => showToast('Sharing is on in this browser only (test mode). Open the app with ?share=off to hide it again.'), 800);
+    }
     setupShareCardClicks();
     const btnShares = document.getElementById('btn-your-shares');
     if (btnShares) btnShares.addEventListener('click', openShareView);
