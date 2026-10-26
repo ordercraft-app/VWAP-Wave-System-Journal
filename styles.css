@@ -1345,3 +1345,6 @@ html.share-off #view-share { display: none !important; }
     box-shadow: 0 1px 4px rgba(0, 0, 0, 0.08);
 }
 .card-image-area:hover .img-enlarge-hint { opacity: 1; }
+
+/* Phone/tablet notice: the email link sits under the button, centred */
+a.gate-link { text-align: center; width: fit-content; }

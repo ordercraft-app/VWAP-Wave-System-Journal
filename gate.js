@@ -3,7 +3,8 @@
 // popup. Three versions:
 //   new         - first visit: connect a folder (settings file optional)
 //   reconnect   - folder known, but Chrome needs permission again
-//   unsupported - browser can't access folders (Safari, Firefox, mobile)
+//   unsupported - browser can't access folders (Safari, Firefox)
+//   mobile      - phone or tablet: the app is made for a desktop or laptop
 
 let gateVariant = null;
 
@@ -16,7 +17,22 @@ function gateSupported() {
     return typeof window.showDirectoryPicker === 'function';
 }
 
+// Phones and tablets. Newer Chrome on Android can open folders too, so the
+// folder check alone no longer catches them; the app is still built for a
+// desktop or laptop (wide layout, screenshots of the chart window).
+function isMobileDevice() {
+    try {
+        if (navigator.userAgentData && navigator.userAgentData.mobile) return true;
+    } catch (e) { /* not available in this browser */ }
+    const ua = navigator.userAgent || '';
+    if (/Android|iPhone|iPad|iPod|Mobile|Silk|Kindle|Windows Phone/i.test(ua)) return true;
+    // iPads report themselves as a Mac; a Mac has no touch screen
+    if (/Macintosh/.test(ua) && navigator.maxTouchPoints > 1) return true;
+    return false;
+}
+
 function updateConnectionGate() {
+    if (isMobileDevice()) return showConnectionGate('mobile');
     const connected = !!dirHandle && fileConnected;
     if (connected) return hideConnectionGate();
     const variant = !gateSupported() ? 'unsupported' : (dirHandle ? 'reconnect' : 'new');
@@ -46,6 +62,17 @@ function gateIcon(name) {
 function gateContent(variant) {
     const privacy = `
         <div class="gate-note">${gateIcon('lock')}<span>Everything stays in this folder on your own computer. No account, no cloud.</span></div>`;
+
+    if (variant === 'mobile') {
+        return `
+            <div class="gate-icon">${gateIcon('monitor')}</div>
+            <p class="gate-eyebrow">VWAP Wave System Journal</p>
+            <h2 id="connect-gate-title">Open the journal on your computer</h2>
+            <p class="gate-lead">The journal is made for a desktop or laptop. It saves your trades in a folder on your computer and takes screenshots of your chart window. Open it there in <strong>Google Chrome</strong> or <strong>Microsoft Edge</strong>.</p>
+            <div class="gate-url">${escapeHTML(gateAppLink().replace(/^https?:\/\//, '').replace(/\/$/, ''))}</div>
+            <button type="button" id="btn-gate-copy" class="btn-primary gate-primary">Copy link</button>
+            <a id="btn-gate-mail" class="gate-link" href="${gateMailLink()}">Email me the link</a>`;
+    }
 
     if (variant === 'unsupported') {
         return `
@@ -90,6 +117,16 @@ function gateContent(variant) {
             <p>In Chrome, open the menu (three dots, top right), choose <strong>Cast, save and share</strong> and then <strong>Install page as app...</strong></p>
             <img src="install-guide.png" alt="Chrome menu with Install page as app" class="gate-img">
         </details>`;
+}
+
+function gateAppLink() {
+    return window.location.origin + window.location.pathname.replace(/[^/]*$/, '');
+}
+
+function gateMailLink() {
+    const subject = 'VWAP Wave System Journal';
+    const body = `Open the journal on my computer in Chrome or Edge: ${gateAppLink()}`;
+    return `mailto:?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`;
 }
 
 function showConnectionGate(variant) {
@@ -149,6 +186,22 @@ async function gatePickFolder() {
 }
 
 function bindGateButtons() {
+    const copy = document.getElementById('btn-gate-copy');
+    if (copy) copy.addEventListener('click', async () => {
+        const link = gateAppLink();
+        let ok = false;
+        try { await navigator.clipboard.writeText(link); ok = true; } catch (e) {
+            const tmp = document.createElement('textarea');
+            tmp.value = link;
+            document.body.appendChild(tmp);
+            tmp.select();
+            try { ok = document.execCommand('copy'); } catch (err) { ok = false; }
+            tmp.remove();
+        }
+        copy.textContent = ok ? 'Link copied' : 'Copy the address above';
+        setTimeout(() => { copy.textContent = 'Copy link'; }, 2500);
+    });
+
     const connect = document.getElementById('btn-initial-load');
     if (connect) connect.addEventListener('click', gatePickFolder);
 
