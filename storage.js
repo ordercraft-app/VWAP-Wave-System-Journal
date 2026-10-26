@@ -199,6 +199,16 @@ function ensureSettingsShape() {
     });
 }
 
+// New default target "Scalp points" (5, 10, 20, 40), placed first, before VWAP.
+// Added once to existing journals; if the user removes it later it stays removed.
+function addTargetScalpPoints() {
+    const sets = appData.settings;
+    const target = sets.target;
+    if (!target || typeof target !== 'object' || Array.isArray(target)) return;
+    if (Object.keys(target).some(k => k.trim().toLowerCase() === 'scalp points')) return;
+    sets.target = { 'Scalp points': { sub1: ['5', '10', '20', '40'], sub2: [] }, ...target };
+}
+
 function migrateSettings() {
     ensureSettingsShape();
     const sets = appData.settings;
@@ -227,6 +237,10 @@ function migrateSettings() {
     if (!sets.migrations.defaultCustomCharts) {
         addDefaultCustomCharts();
         sets.migrations.defaultCustomCharts = true;
+    }
+    if (!sets.migrations.targetScalpPoints) {
+        addTargetScalpPoints();
+        sets.migrations.targetScalpPoints = true;
     }
 }
 

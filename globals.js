@@ -213,6 +213,15 @@ function getDefaultSettings() {
             ]
         },
         "target": {
+            "Scalp points": {
+                "sub1": [
+                    "5",
+                    "10",
+                    "20",
+                    "40"
+                ],
+                "sub2": []
+            },
             "VWAP": {
                 "sub1": [
                     "Globex",
