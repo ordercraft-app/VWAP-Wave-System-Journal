@@ -426,9 +426,11 @@ async function renderDashboard() {
                     <div class="row-chevron-wrapper" style="padding: 4px 8px; margin-left: -8px; border-radius: 4px; cursor: pointer; display: flex; align-items: center; justify-content: center;" title="Expand details"><svg class="row-chevron" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="transition: transform 0.2s; color: var(--text-muted);"><polyline points="9 18 15 12 9 6"></polyline></svg></div>
                     ${rowImageHtml}
                     <div class="row-col row-col-id" style="flex-direction: row; align-items: center; gap: 8px;">
-                        <span class="row-primary">${escapeHTML(trade.number || '-')}</span>
-                        ${trade.symbol ? `<span class="symbol-tag" style="margin:0;">${escapeHTML(trade.symbol)}</span>` : ''}
-                        ${shareReviewsButtonHtml(trade)}
+                        <span class="row-id-main">
+                            <span class="row-primary">${escapeHTML(trade.number || '-')}</span>
+                            ${trade.symbol ? `<span class="symbol-tag" style="margin:0;">${escapeHTML(trade.symbol)}</span>` : ''}
+                        </span>
+                        <span class="row-reviews-slot">${shareReviewsButtonHtml(trade)}</span>
                     </div>
                     <div class="row-col row-col-setup">
                         <span class="row-primary" title="${escapeHTML(trade.setup || '-')}">${escapeHTML(trade.setup || '-')}</span>

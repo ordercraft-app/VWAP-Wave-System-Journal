@@ -1297,3 +1297,8 @@ span.flatpickr-weekday {
 .share-name-row label { font-size: 13px; font-weight: 600; white-space: nowrap; }
 .share-name-row input { max-width: 320px; }
 .share-blocked[hidden] { display: none; }
+
+/* List view: fixed space for the reviews button, so rows line up with or without reviews */
+.row-id-main { display: flex; align-items: center; gap: 8px; width: 80px; flex-shrink: 0; }
+.row-reviews-slot { display: flex; align-items: center; width: 96px; flex-shrink: 0; }
+.row-col-res .badge { min-width: 46px; }
