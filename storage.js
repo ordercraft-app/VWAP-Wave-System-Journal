@@ -403,9 +403,17 @@ function openImageViewer(src) {
 }
 
 function setupImageViewer() {
-    imageViewerClose.addEventListener('click', () => imageViewerModal.classList.remove('active'));
+    const closeViewer = () => imageViewerModal.classList.remove('active');
+    imageViewerClose.addEventListener('click', closeViewer);
+    // Click anywhere (also on the image itself) to close
     imageViewerModal.addEventListener('click', (e) => {
-        if(e.target === imageViewerModal) imageViewerModal.classList.remove('active');
+        if (e.target === imageViewerModal || e.target === enlargedImage) closeViewer();
     });
+    document.addEventListener('keydown', (e) => {
+        if (e.key === 'Escape' && imageViewerModal.classList.contains('active')) {
+            e.stopPropagation();
+            closeViewer();
+        }
+    }, true);
 }
 
