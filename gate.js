@@ -62,6 +62,24 @@ function bindLanding() {
     });
     const mail = document.getElementById('landing-mail');
     if (mail) mail.href = gateMailLink();
+    setupLandingReveal(landing);
+}
+
+// Sections fade in on load and while scrolling, like the views in the app
+function setupLandingReveal(landing) {
+    if (window.matchMedia('(prefers-reduced-motion: reduce)').matches || !('IntersectionObserver' in window)) return;
+    const items = landing.querySelectorAll('.lp-hero > *, .lp-hero-shot, .lp-context > *, .lp-tile, .lp-start > h2, .lp-three > li, .lp-install, .lp-launch-panel, .lp-faq > h2, .lp-faq-item, .lp-footer');
+    items.forEach(el => el.classList.add('lp-reveal'));
+    landing.classList.add('lp-js');
+    const observer = new IntersectionObserver(entries => {
+        const visible = entries.filter(e => e.isIntersecting).map(e => e.target);
+        visible.forEach((el, i) => {
+            el.style.setProperty('--i', Math.min(i, 6));
+            el.classList.add('lp-in');
+            observer.unobserve(el);
+        });
+    }, { root: landing, rootMargin: '0px 0px -6% 0px', threshold: 0.08 });
+    items.forEach(el => observer.observe(el));
 }
 
 document.addEventListener('DOMContentLoaded', bindLanding);

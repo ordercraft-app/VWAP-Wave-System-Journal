@@ -93,15 +93,12 @@
 
             <div class="lp-hero-shot lp-wrap">
                 <div class="lp-hero-frame">
-                    <picture>
-                        <source media="(max-width: 699px)" srcset="landing/dashboard-mobile.webp" width="1100" height="839">
-                        <img src="landing/dashboard.webp" width="2000" height="1250" alt="The journal dashboard: a weekly calendar with wins and losses per day, and trade cards with chart, location, setup, evidence and psychology" fetchpriority="high">
-                    </picture>
+<img src="landing/dashboard.webp" width="2000" height="1250" alt="The journal dashboard: a weekly calendar with wins and losses per day, and trade cards with chart, location, setup, evidence and psychology" fetchpriority="high">
                 </div>
             </div>
 
             <section class="lp-context lp-wrap" aria-labelledby="lp-context-title">
-                <p class="lp-eyebrow">Not about profit and loss</p>
+                <p class="lp-eyebrow">Not about P&amp;L</p>
                 <h2 id="lp-context-title">Every trade is logged the way the VWAP Wave System is built.</h2>
                 <div class="lp-flow">
                     <ol class="lp-flow-group" aria-label="Always part of a trade">
@@ -132,14 +129,16 @@
                         <img class="lp-v-setup" src="landing/block-setup.webp" width="300" height="298" alt="" loading="lazy">
                     </div>
                 </article>
-                <article class="lp-tile">
-                    <h3>A chart on every trade</h3>
-                    <p>Paste, drop or upload a screenshot, or capture your charting window in one click.</p>
+                <article class="lp-tile lp-tile-chart">
+                    <span class="lp-tag">One-click screenshot</span>
+                    <h3>Easily add a screenshot to every trade</h3>
+                    <p>Connect your charting window once. After that, one click captures your chart and adds it to the trade. Pasting, dropping or uploading a screenshot works too.</p>
                     <div class="lp-visual lp-v-chart" aria-hidden="true">
                         <img src="landing/trade-chart.webp" width="612" height="572" alt="" loading="lazy">
                     </div>
                 </article>
                 <article class="lp-tile lp-span-2">
+                    <span class="lp-tag">Add custom charts</span>
                     <h3>Track your progress</h3>
                     <p>11 built-in charts show how well you apply the VWAP Wave System: execution growth, results, setups and performance per day. Add your own custom charts for any question.</p>
                     <div class="lp-visual lp-v-progress" aria-hidden="true">
@@ -210,7 +209,7 @@
                             <button type="button" id="landing-connect" class="lp-btn lp-btn-primary lp-btn-lg">Connect Folder</button>
                             <p id="landing-error" class="lp-error" role="alert"></p>
                             <details class="lp-details">
-                                <summary>Already have a settings file?</summary>
+                                <summary><span>Already have a settings file?</span><svg class="lp-chev" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><polyline points="6 9 12 15 18 9"></polyline></svg></summary>
                                 <p>Put your <code>settings.json</code> in the folder before you connect it, and the journal uses your own lists.</p>
                             </details>
                         </div>
@@ -234,17 +233,43 @@
 
             <section id="lp-faq" class="lp-faq lp-wrap" aria-labelledby="lp-faq-title">
                 <h2 id="lp-faq-title">Questions</h2>
-                <details><summary>Is the journal free?</summary><p>Yes. There is no subscription and no account.</p></details>
-                <details><summary>Where are my trades stored?</summary><p>In a folder on your own computer that you choose. Nothing is sent to a server.</p></details>
-                <details><summary>Which browsers can I use?</summary><p>Google Chrome or Microsoft Edge on a desktop or laptop. Safari, Firefox and phones cannot open a folder on your computer.</p></details>
-                <details><summary>Can I use my own lists of setups and locations?</summary><p>Yes. Every list is editable in Settings, and you can start from a settings file shared by your trading group.</p></details>
+<div class="lp-faq-list">
+                <details class="lp-faq-item">
+                    <summary><span>Is the journal free?</span><svg class="lp-chev" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><polyline points="6 9 12 15 18 9"></polyline></svg></summary>
+                    <div class="lp-faq-answer"><p>Yes. There is no subscription and no account.</p></div>
+                </details>
+                <details class="lp-faq-item">
+                    <summary><span>Where are my trades stored?</span><svg class="lp-chev" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><polyline points="6 9 12 15 18 9"></polyline></svg></summary>
+                    <div class="lp-faq-answer"><p>In a folder on your own computer that you choose. Nothing is sent to a server.</p></div>
+                </details>
+                <details class="lp-faq-item">
+                    <summary><span>Which browsers can I use?</span><svg class="lp-chev" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><polyline points="6 9 12 15 18 9"></polyline></svg></summary>
+                    <div class="lp-faq-answer"><p>Google Chrome or Microsoft Edge on a desktop or laptop. Safari, Firefox and phones cannot open a folder on your computer.</p></div>
+                </details>
+                <details class="lp-faq-item">
+                    <summary><span>Can I use my own lists of setups and locations?</span><svg class="lp-chev" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><polyline points="6 9 12 15 18 9"></polyline></svg></summary>
+                    <div class="lp-faq-answer"><p>Yes. Every list is editable in Settings, and you can start from a settings file shared by your trading group.</p></div>
+                </details>
+                </div>
             </section>
         </main>
 
         <footer class="lp-wrap">
             <div class="lp-footer">
-                <span>Made by Order Craft</span>
-                <a href="mailto:hello.ordercraft@gmail.com">hello.ordercraft@gmail.com</a>
+                <div class="lp-footer-brand">
+                    <img src="ordercraft-logo.jpg" width="40" height="40" alt="Order Craft logo" loading="lazy">
+                    <div>
+                        <span class="lp-footer-name">Made by Order Craft</span>
+                        <a href="mailto:hello.ordercraft@gmail.com">hello.ordercraft@gmail.com</a>
+                    </div>
+                </div>
+                <a class="lp-footer-brand lp-footer-link" href="https://marketplace.elgato.com/@ordercraft" target="_blank" rel="noopener noreferrer">
+                    <img src="elgato-logo.jpg" width="40" height="40" alt="Elgato Stream Deck logo" loading="lazy">
+                    <div>
+                        <span class="lp-footer-name">Stream Deck DOM Scalping Icons</span>
+                        <span>Get them on the Elgato Marketplace</span>
+                    </div>
+                </a>
             </div>
         </footer>
     </div>
