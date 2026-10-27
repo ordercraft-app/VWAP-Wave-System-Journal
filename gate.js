@@ -10,8 +10,61 @@ let gateVariant = null;
 
 function isGateOpen() {
     const gate = document.getElementById('connect-gate');
-    return !!gate && gate.classList.contains('active');
+    return (!!gate && gate.classList.contains('active')) || isLandingOpen();
 }
+
+// ----- Welcome page (static HTML in index.html) -----
+// Shown to new visitors (and on unsupported browsers and phones) instead of the small popup.
+function isLandingOpen() {
+    const landing = document.getElementById('landing');
+    return !!landing && !landing.hidden && !document.documentElement.classList.contains('has-journal');
+}
+
+function showLanding(variant) {
+    const landing = document.getElementById('landing');
+    if (!landing) return showConnectionGate(variant);
+    landing.dataset.variant = variant;
+    landing.hidden = false;
+    document.documentElement.classList.remove('has-journal');
+    gateVariant = variant;
+    setAppInert(true);
+}
+
+function hideLanding() {
+    const landing = document.getElementById('landing');
+    if (landing) landing.hidden = true;
+}
+
+function rememberJournal(on) {
+    try {
+        if (on) localStorage.setItem('vws-has-journal', '1');
+        else localStorage.removeItem('vws-has-journal');
+    } catch (e) { /* storage blocked: the welcome page may flash briefly */ }
+}
+
+function bindLanding() {
+    const landing = document.getElementById('landing');
+    if (!landing) return;
+    // In-page links scroll inside the welcome page, without changing the address
+    landing.querySelectorAll('[data-lp-scroll]').forEach(a => a.addEventListener('click', e => {
+        const target = document.querySelector(a.getAttribute('href'));
+        if (!target) return;
+        e.preventDefault();
+        target.scrollIntoView({ behavior: window.matchMedia('(prefers-reduced-motion: reduce)').matches ? 'auto' : 'smooth', block: 'start' });
+    }));
+    const connect = document.getElementById('landing-connect');
+    if (connect) connect.addEventListener('click', gatePickFolder);
+    const copy = document.getElementById('landing-copy');
+    if (copy) copy.addEventListener('click', async () => {
+        const ok = await gateCopyLink();
+        copy.textContent = ok ? 'Link copied' : 'Copy failed';
+        setTimeout(() => { copy.textContent = 'Copy link'; }, 2500);
+    });
+    const mail = document.getElementById('landing-mail');
+    if (mail) mail.href = gateMailLink();
+}
+
+document.addEventListener('DOMContentLoaded', bindLanding);
 
 function gateSupported() {
     return typeof window.showDirectoryPicker === 'function';
@@ -32,18 +85,31 @@ function isMobileDevice() {
 }
 
 function updateConnectionGate() {
-    if (isMobileDevice()) return showConnectionGate('mobile');
-    const connected = !!dirHandle && fileConnected;
-    if (connected) return hideConnectionGate();
-    const variant = !gateSupported() ? 'unsupported' : (dirHandle ? 'reconnect' : 'new');
-    showConnectionGate(variant);
+    // Returning user: wait until the saved folder has been checked, so the welcome page doesn't flash
+    if (!window.vwsStartupDone && document.documentElement.classList.contains('has-journal')) return;
+    const mobile = isMobileDevice();
+    if (!mobile && !!dirHandle && fileConnected) {
+        // Journal open: no welcome page, no popup
+        rememberJournal(true);
+        hideLanding();
+        return hideConnectionGate();
+    }
+    const variant = mobile ? 'mobile' : (!gateSupported() ? 'unsupported' : (dirHandle ? 'reconnect' : 'new'));
+    if (variant === 'reconnect') {
+        // Returning user: only the small popup to allow access again
+        hideLanding();
+        return showConnectionGate('reconnect');
+    }
+    if (variant === 'new') rememberJournal(false);
+    hideConnectionGate();
+    showLanding(variant);
 }
 
 // Everything except the gate (and toasts) becomes unreachable: no clicks,
 // no keyboard focus, hidden from screen readers.
 function setAppInert(on) {
     document.querySelectorAll('body > *').forEach(el => {
-        if (el.id === 'connect-gate' || el.id === 'toast-container' || el.tagName === 'SCRIPT') return;
+        if (el.id === 'connect-gate' || el.id === 'landing' || el.id === 'toast-container' || el.tagName === 'SCRIPT') return;
         if (on) el.setAttribute('inert', '');
         else el.removeAttribute('inert');
     });
@@ -165,9 +231,25 @@ function hideConnectionGate() {
     gateVariant = null;
 }
 
+async function gateCopyLink() {
+    const link = gateAppLink();
+    try { await navigator.clipboard.writeText(link); return true; } catch (e) {
+        const tmp = document.createElement('textarea');
+        tmp.value = link;
+        document.body.appendChild(tmp);
+        tmp.select();
+        let ok = false;
+        try { ok = document.execCommand('copy'); } catch (err) { ok = false; }
+        tmp.remove();
+        return ok;
+    }
+}
+
 function gateShowError(msg) {
-    const el = document.getElementById('gate-error');
-    if (el) el.textContent = msg;
+    ['gate-error', 'landing-error'].forEach(id => {
+        const el = document.getElementById(id);
+        if (el) el.textContent = msg;
+    });
 }
 
 async function gatePickFolder() {

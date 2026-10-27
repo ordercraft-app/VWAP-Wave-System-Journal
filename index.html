@@ -50,6 +50,11 @@
     }
     </script>
     <link rel="stylesheet" href="styles.css">
+    <link rel="stylesheet" href="landing.css">
+    <script>
+        // Returning users: hide the welcome page before the first paint (gate.js decides for real)
+        try { if (localStorage.getItem('vws-has-journal') === '1') document.documentElement.classList.add('has-journal'); } catch (e) {}
+    </script>
     
         <!-- Libraries are stored in this repo (vendor/), at a fixed version, so nothing
          outside your own site can change the code that runs in the journal. -->
@@ -59,20 +64,191 @@
     <script src="vendor/flatpickr-4.6.13/flatpickr.min.js"></script>
 </head>
 <body>
-    <!-- Shown to visitors and crawlers without JavaScript (most AI crawlers) -->
-    <noscript>
-        <section class="noscript-intro">
-            <h1>The journal built for learning the VWAP Wave System</h1>
-            <p>Log every trade with its VWAP Wave System context: location, setup, evidence and psychology. Then track your progress.</p>
-            <ul>
-                <li><strong>Private by design.</strong> Everything is saved in a folder on your own computer. No cloud, no account.</li>
-                <li><strong>A chart on every trade.</strong> Paste, drop or capture your charting app window in one click.</li>
-                <li><strong>Track your progress.</strong> 11 built-in charts plus your own custom charts.</li>
-            </ul>
-            <p>Works in Google Chrome or Microsoft Edge on a desktop or laptop. Please turn on JavaScript to use the journal.</p>
-            <p>Made by Order Craft.</p>
-        </section>
-    </noscript>
+    <!-- Welcome page for new visitors. Static HTML, so search engines and AI assistants can read it.
+         gate.js shows it when no journal folder is connected yet, and hides it once the journal is open. -->
+    <div id="landing" class="landing" data-variant="new">
+        <header class="lp-nav">
+            <div class="lp-wrap lp-nav-inner">
+                <a class="lp-brand" href="./">
+                    <img src="favicon.png" alt="" width="32" height="32">
+                    <span>VWAP Wave System Journal</span>
+                </a>
+                <nav class="lp-nav-links" aria-label="Welcome page">
+                    <a href="#lp-features" data-lp-scroll>Features</a>
+                    <a href="#lp-start" data-lp-scroll>How it works</a>
+                    <a href="#lp-faq" data-lp-scroll>FAQ</a>
+                </nav>
+                <a class="lp-btn lp-btn-ghost lp-btn-sm" href="#lp-start" data-lp-scroll>Get started</a>
+            </div>
+        </header>
+
+        <main>
+            <section class="lp-hero lp-wrap">
+                <p class="lp-pill"><span aria-hidden="true"></span>Free trading journal</p>
+                <h1>The journal built for learning the <span class="lp-accent">VWAP Wave System</span>.</h1>
+                <p class="lp-lead">Log every trade with its VWAP Wave System context: location, setup, evidence and psychology. Then track your progress.</p>
+                <a class="lp-btn lp-btn-primary lp-btn-lg" href="#lp-start" data-lp-scroll>Get started</a>
+                <p class="lp-small">No account. Your trades stay on your computer. Works in Chrome and Edge on desktop.</p>
+            </section>
+
+            <div class="lp-hero-shot lp-wrap">
+                <div class="lp-hero-frame">
+                    <picture>
+                        <source media="(max-width: 699px)" srcset="landing/dashboard-mobile.webp" width="1100" height="839">
+                        <img src="landing/dashboard.webp" width="2000" height="1250" alt="The journal dashboard: a weekly calendar with wins and losses per day, and trade cards with chart, location, setup, evidence and psychology" fetchpriority="high">
+                    </picture>
+                </div>
+            </div>
+
+            <section class="lp-context lp-wrap" aria-labelledby="lp-context-title">
+                <p class="lp-eyebrow">Not about profit and loss</p>
+                <h2 id="lp-context-title">Every trade is logged the way the VWAP Wave System is built.</h2>
+                <div class="lp-flow">
+                    <ol class="lp-flow-group" aria-label="Always part of a trade">
+                        <li><span class="lp-chip">Location</span></li>
+                        <li><span class="lp-chip">Market condition</span></li>
+                        <li><span class="lp-chip">Setup</span></li>
+                    </ol>
+                    <span class="lp-flow-join" aria-hidden="true"></span>
+                    <ol class="lp-flow-group" aria-label="Optional, can be switched off">
+                        <li><span class="lp-chip lp-chip-opt">Evidence <span class="lp-toggle is-on" aria-hidden="true"></span><span class="lp-sr">optional, on</span></span></li>
+                        <li><span class="lp-chip lp-chip-opt">Invalidation <span class="lp-toggle is-on" aria-hidden="true"></span><span class="lp-sr">optional, on</span></span></li>
+                        <li><span class="lp-chip lp-chip-opt">Target <span class="lp-toggle is-on" aria-hidden="true"></span><span class="lp-sr">optional, on</span></span></li>
+                        <li><span class="lp-chip lp-chip-opt is-off"><s>Psychology</s> <span class="lp-toggle" aria-hidden="true"></span><span class="lp-sr">optional, off</span></span></li>
+                    </ol>
+                </div>
+                <div class="lp-legend">
+                    <span><span class="lp-key" aria-hidden="true"></span>Always part of a trade</span>
+                    <span><span class="lp-key lp-key-opt" aria-hidden="true"></span>Optional: switch it off in Settings if you don't use it</span>
+                </div>
+            </section>
+
+            <section id="lp-features" class="lp-bento lp-wrap" aria-label="Features">
+                <article class="lp-tile lp-span-2">
+                    <h3>Every trade with its VWAP Wave System context</h3>
+                    <p>Location, market condition, setup, evidence, invalidation, target and psychology, with one click each. The form follows the levels of the system, from VWAP to the band.</p>
+                    <div class="lp-visual lp-v-context" aria-hidden="true">
+                        <img class="lp-v-form" src="landing/form-location.webp" width="800" height="252" alt="" loading="lazy">
+                        <img class="lp-v-setup" src="landing/block-setup.webp" width="300" height="298" alt="" loading="lazy">
+                    </div>
+                </article>
+                <article class="lp-tile">
+                    <h3>A chart on every trade</h3>
+                    <p>Paste, drop or upload a screenshot, or capture your charting window in one click.</p>
+                    <div class="lp-visual lp-v-chart" aria-hidden="true">
+                        <img src="landing/trade-chart.webp" width="612" height="572" alt="" loading="lazy">
+                    </div>
+                </article>
+                <article class="lp-tile lp-span-2">
+                    <h3>Track your progress</h3>
+                    <p>11 built-in charts show how well you apply the VWAP Wave System: execution growth, results, setups and performance per day. Add your own custom charts for any question.</p>
+                    <div class="lp-visual lp-v-progress" aria-hidden="true">
+                        <img class="lp-v-growth" src="landing/chart-growth.webp" width="1200" height="246" alt="" loading="lazy">
+                        <img class="lp-v-winloss" src="landing/chart-winloss.webp" width="600" height="510" alt="" loading="lazy">
+                        <img class="lp-v-day" src="landing/chart-by-day.webp" width="600" height="510" alt="" loading="lazy">
+                        <img class="lp-v-setups" src="landing/chart-setups.webp" width="600" height="373" alt="" loading="lazy">
+                    </div>
+                </article>
+                <article class="lp-tile">
+                    <h3>Adjust it to how you trade</h3>
+                    <p>Edit every list in Settings, switch sections on or off, and share your setup with your trading group as one settings file.</p>
+                    <div class="lp-visual lp-v-settings" aria-hidden="true">
+                        <img src="landing/settings-setup.webp" width="1100" height="480" alt="" loading="lazy">
+                    </div>
+                </article>
+                <article class="lp-tile lp-tile-private">
+                    <h3>Private by design</h3>
+                    <p>Everything is saved in a folder on your own computer. No account, no cloud. To back up, copy the folder.</p>
+                    <ul class="lp-files" aria-label="Files in your journal folder">
+                        <li><code>vwap-journal.json</code><span>All your trades</span></li>
+                        <li><code>settings.json</code><span>Your lists</span></li>
+                        <li><code>img/</code><span>Your screenshots</span></li>
+                    </ul>
+                </article>
+                <article class="lp-tile lp-span-2">
+                    <h3>Your week at a glance</h3>
+                    <p>Wins, losses and break-evens per day, and every trade of the day as a card with its chart and context.</p>
+                    <div class="lp-visual lp-v-week" aria-hidden="true">
+                        <img src="landing/calendar.webp" width="1300" height="96" alt="" loading="lazy">
+                        <img src="landing/trade-card.webp" width="1300" height="322" alt="" loading="lazy">
+                    </div>
+                </article>
+            </section>
+
+            <section id="lp-start" class="lp-start lp-wrap" aria-labelledby="lp-start-title">
+                <h2 id="lp-start-title">Three steps to your first trade</h2>
+                <ol class="lp-three">
+                    <li><span class="lp-num">01</span><h3>Create an empty folder</h3><p>For example <strong>VWAP Journal</strong>, anywhere on your computer.</p></li>
+                    <li><span class="lp-num">02</span><h3>Connect the folder</h3><p>Click <strong>Connect Folder</strong> below, select the folder and allow access.</p></li>
+                    <li><span class="lp-num">03</span><h3>Log your first trade</h3><p>Click <strong>Add Trade</strong> and pick the context of your trade.</p></li>
+                </ol>
+                <div class="lp-install">
+                    <div class="lp-install-text">
+                        <h3>Install as a desktop app (optional)</h3>
+                        <p>In Chrome, open the menu (three dots, top right), choose <strong>Cast, save and share</strong> and then <strong>Install page as app...</strong> The journal then opens in its own window, next to your charts.</p>
+                    </div>
+                    <img src="install-guide.png" width="1140" height="824" alt="Chrome menu with Cast, save and share, and Install page as app" loading="lazy">
+                </div>
+            </section>
+
+            <section class="lp-launch lp-wrap" aria-labelledby="lp-launch-title">
+                <div class="lp-launch-panel">
+                    <div class="lp-picker" aria-hidden="true">
+                        <div class="lp-picker-bar"><span></span><span></span><span></span><em>Select a folder</em></div>
+                        <ul>
+                            <li><span class="lp-fi"></span>Documents</li>
+                            <li><span class="lp-fi"></span>Trading</li>
+                            <li class="is-selected"><span class="lp-fi"></span>VWAP Journal</li>
+                            <li><span class="lp-fi"></span>Screenshots</li>
+                        </ul>
+                        <div class="lp-picker-foot"><span>Cancel</span><span class="is-primary">Select</span></div>
+                    </div>
+                    <div class="lp-launch-text">
+                        <div class="lp-cta lp-cta-new">
+                            <h2 id="lp-launch-title">Select a folder and launch the app.</h2>
+                            <p>Choose an empty folder for a new journal, or the folder of your existing journal. The app opens right away and saves every trade there.</p>
+                            <button type="button" id="landing-connect" class="lp-btn lp-btn-primary lp-btn-lg">Connect Folder</button>
+                            <p id="landing-error" class="lp-error" role="alert"></p>
+                            <details class="lp-details">
+                                <summary>Already have a settings file?</summary>
+                                <p>Put your <code>settings.json</code> in the folder before you connect it, and the journal uses your own lists.</p>
+                            </details>
+                        </div>
+
+                        <div class="lp-cta lp-cta-unsupported">
+                            <h2>Open the journal in Chrome or Edge.</h2>
+                            <p>This browser can't open a folder on your computer. Open <strong>vwsjournal.com</strong> in <strong>Google Chrome</strong> or <strong>Microsoft Edge</strong> on a desktop or laptop.</p>
+                        </div>
+
+                        <div class="lp-cta lp-cta-mobile">
+                            <h2>Open the journal on your computer.</h2>
+                            <p>The journal is made for a desktop or laptop: it saves your trades in a folder on your computer and takes screenshots of your chart window. Open it there in <strong>Google Chrome</strong> or <strong>Microsoft Edge</strong>.</p>
+                            <div class="lp-cta-row">
+                                <button type="button" id="landing-copy" class="lp-btn lp-btn-primary">Copy link</button>
+                                <a id="landing-mail" class="lp-btn lp-btn-ghost" href="mailto:?subject=VWAP%20Wave%20System%20Journal&amp;body=https%3A%2F%2Fvwsjournal.com%2F">Email me the link</a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <section id="lp-faq" class="lp-faq lp-wrap" aria-labelledby="lp-faq-title">
+                <h2 id="lp-faq-title">Questions</h2>
+                <details><summary>Is the journal free?</summary><p>Yes. There is no subscription and no account.</p></details>
+                <details><summary>Where are my trades stored?</summary><p>In a folder on your own computer that you choose. Nothing is sent to a server.</p></details>
+                <details><summary>Which browsers can I use?</summary><p>Google Chrome or Microsoft Edge on a desktop or laptop. Safari, Firefox and phones cannot open a folder on your computer.</p></details>
+                <details><summary>Can I use my own lists of setups and locations?</summary><p>Yes. Every list is editable in Settings, and you can start from a settings file shared by your trading group.</p></details>
+            </section>
+        </main>
+
+        <footer class="lp-wrap">
+            <div class="lp-footer">
+                <span>Made by Order Craft</span>
+                <a href="mailto:hello.ordercraft@gmail.com">hello.ordercraft@gmail.com</a>
+            </div>
+        </footer>
+    </div>
+
     <div class="app-container">
         
         <!-- Sidebar Navigation -->

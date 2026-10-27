@@ -191,6 +191,8 @@ document.addEventListener('DOMContentLoaded', async () => {
     }
     
 
+    // From here on the gate may decide what to show (see updateConnectionGate)
+    window.vwsStartupDone = true;
     try {
         const savedHandle = await getHandleFromDB();
         if (savedHandle && savedHandle.kind === 'directory') {
