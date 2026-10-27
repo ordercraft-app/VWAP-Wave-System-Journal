@@ -150,7 +150,7 @@ function gateContent(variant) {
     if (variant === 'mobile') {
         return `
             <div class="gate-icon">${gateIcon('monitor')}</div>
-            <p class="gate-eyebrow">VWAP Wave System Journal</p>
+            <p class="gate-eyebrow">VWS Journal</p>
             <h2 id="connect-gate-title">Open the journal on your computer</h2>
             <p class="gate-lead">The journal is made for a desktop or laptop. It saves your trades in a folder on your computer and takes screenshots of your chart window. Open it there in <strong>Google Chrome</strong> or <strong>Microsoft Edge</strong>.</p>
             <div class="gate-url">${escapeHTML(gateAppLink().replace(/^https?:\/\//, '').replace(/\/$/, ''))}</div>
@@ -162,7 +162,7 @@ function gateContent(variant) {
         return `
             <div class="gate-icon">${gateIcon('monitor')}</div>
             <h2 id="connect-gate-title">Open this page in Chrome or Edge</h2>
-            <p class="gate-lead">The VWAP Wave System Journal saves your trades in a folder on your computer. That only works in Google Chrome or Microsoft Edge on a desktop or laptop, not in Safari, Firefox or on a phone.</p>
+            <p class="gate-lead">VWS Journal saves your trades in a folder on your computer. That only works in Google Chrome or Microsoft Edge on a desktop or laptop, not in Safari, Firefox or on a phone.</p>
             <div class="gate-url">vwsjournal.com</div>
             ${privacy}`;
     }
@@ -181,7 +181,7 @@ function gateContent(variant) {
 
     return `
         <div class="gate-icon">${gateIcon('folder')}</div>
-        <p class="gate-eyebrow">VWAP Wave System Journal</p>
+        <p class="gate-eyebrow">VWS Journal</p>
         <h2 id="connect-gate-title">Set up your journal</h2>
         <p class="gate-lead">Pick a folder on your computer. Every trade you log is saved there, so you're ready in under a minute.</p>
         <ol class="gate-steps">
@@ -208,7 +208,7 @@ function gateAppLink() {
 }
 
 function gateMailLink() {
-    const subject = 'VWAP Wave System Journal';
+    const subject = 'VWS Journal';
     const body = `Open the journal on my computer in Chrome or Edge: ${gateAppLink()}`;
     return `mailto:?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`;
 }

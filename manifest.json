@@ -1,7 +1,7 @@
 {
-  "name": "VWAP Wave System",
-  "short_name": "VWAP Journal",
-  "description": "A comprehensive trading journal for the VWAP Wave System.",
+  "name": "VWS Journal",
+  "short_name": "VWS Journal",
+  "description": "A trading journal for learning and applying your trading system.",
   "start_url": "/index.html",
   "display": "standalone",
   "background_color": "#010102",

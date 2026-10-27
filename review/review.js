@@ -130,7 +130,7 @@
                     <h2 class="review-block-title" data-count>${plural(count, 'review')}</h2>
                     <div data-reviews>${reviewsHtml(t.id)}</div>
                     <div class="review-form" data-form>
-                        <div class="review-verdicts" role="group" aria-label="Does this trade follow the VWAP Wave System?">
+                        <div class="review-verdicts" role="group" aria-label="Does this trade follow the system?">
                             <button type="button" class="verdict-btn follows" data-verdict="follows" aria-pressed="false">${VERDICTS.follows}</button>
                             <button type="button" class="verdict-btn not-follows" data-verdict="not_follows" aria-pressed="false">${VERDICTS.not_follows}</button>
                         </div>
@@ -150,11 +150,11 @@
         countdown.textContent = timeLeft(share.expiresAt);
         countdown.hidden = false;
         const sharedBy = String(share.sharedBy || '').trim().slice(0, MAX_NAME);
-        if (sharedBy) document.title = `Trades from ${sharedBy} - VWAP Wave System Journal`;
+        if (sharedBy) document.title = `Trades from ${sharedBy} - VWS Journal`;
         main.innerHTML = `
             <section class="review-intro">
                 <h1>${sharedBy ? `${esc(sharedBy)} shared ${plural(trades.length, 'trade')} for review` : `${plural(trades.length, 'trade')} shared for review`}</h1>
-                <p>Look at each trade and say whether it follows the VWAP Wave System. A short comment on why helps the trader most. Everyone with this link can see the reviews.</p>
+                <p>Look at each trade and say whether it follows the system. A short comment on why helps the trader most. Everyone with this link can see the reviews.</p>
             </section>
             <div class="review-name-row">
                 <label for="reviewer-name">Your name</label>

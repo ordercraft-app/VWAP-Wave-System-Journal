@@ -1,8 +1,8 @@
-# VWAP Wave System Journal
+# VWS Journal
 
-**The journal built for learning the VWAP Wave System.**
+**The journal built for learning your preferred system.**
 
-Log every trade with its VWAP Wave System context: market condition, location, setup, direction, evidence, invalidation, target and psychology. Then track your progress in applying the system. The focus is not on profit and loss, but on learning to execute the system well.
+Log every trade with your system context: market condition, location, setup, direction, evidence, invalidation, target and psychology. Then track your progress in applying the system. The focus is not on profit and loss, but on learning to execute the system well.
 
 **Open the journal: [vwsjournal.com](https://vwsjournal.com)**
 
@@ -87,10 +87,20 @@ The journal is a static web app: plain HTML, CSS and JavaScript, hosted on GitHu
 | `settings.json` | Default settings |
 | `vendor/` | Chart.js 4.5.1 and Flatpickr 4.6.13, stored in the repo at a fixed version |
 
+### Running it locally
+
+Serve the folder with any static web server and open it in Chrome or Edge, for example:
+
+```bash
+python3 -m http.server 8000
+```
+
+Then go to `http://localhost:8000`. Folder access works on `localhost` as well.
+
 ## Support
 
 Questions, ideas or a bug? Mail **hello.ordercraft@gmail.com**.
 
 ## Made by Order Craft
 
-Order Craft makes tools for traders who want to get better at the VWAP Wave System, including [Stream Deck icons for DOM scalping](https://marketplace.elgato.com/@ordercraft).
+Order Craft makes tools for traders who want to get better at their trading system, including [Stream Deck icons for DOM scalping](https://marketplace.elgato.com/@ordercraft).
