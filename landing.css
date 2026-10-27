@@ -134,7 +134,16 @@
 .lp-three p { font-size: 15px; line-height: 1.6; color: var(--lp-muted); }
 .lp-three strong, .lp-install strong, .lp-cta strong { color: var(--lp-text); font-weight: 600; }
 .lp-install { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1.1fr); gap: 32px; align-items: center; padding: 28px; border-radius: 22px; background: var(--lp-surface); border: 1px solid var(--lp-line); }
-.lp-install-text { display: flex; flex-direction: column; gap: 10px; }
+.lp-install-text { display: flex; flex-direction: column; gap: 12px; }
+.lp-optional { display: inline-flex; align-items: center; height: 22px; padding: 0 9px; margin-left: 6px; border-radius: 100px; border: 1px solid var(--lp-line-strong); font-size: 11px; font-weight: 600; letter-spacing: 0.3px; color: var(--lp-faint); vertical-align: 3px; }
+.lp-install-steps { list-style: none; padding: 0; margin-top: 10px; display: flex; flex-direction: column; gap: 14px; position: relative; }
+.lp-install-steps::before { content: ''; position: absolute; left: 13px; top: 14px; bottom: 14px; width: 1px; background: var(--lp-line-strong); }
+.lp-install-steps li { position: relative; display: flex; flex-wrap: wrap; align-items: center; gap: 8px 10px; font-size: 15px; color: var(--lp-muted); }
+.lp-istep { flex: 0 0 28px; height: 28px; border-radius: 50%; display: inline-flex; align-items: center; justify-content: center; background: var(--lp-bg); border: 1px solid var(--lp-accent); color: var(--lp-accent-text); font-size: 13px; font-weight: 600; margin-right: 4px; position: relative; z-index: 1; }
+.lp-menu-key { display: inline-flex; align-items: center; justify-content: center; width: 30px; height: 30px; border-radius: 50%; background: #23262c; color: var(--lp-text); font-size: 18px; font-weight: 600; line-height: 1; }
+.lp-menu-item { display: inline-flex; align-items: center; height: 32px; padding: 0 12px; border-radius: 8px; background: #23262c; border: 1px solid var(--lp-line-strong); color: var(--lp-text); font-size: 14px; font-weight: 500; white-space: nowrap; }
+.lp-menu-item.is-active { background: rgba(56, 106, 245, 0.18); border-color: rgba(56, 106, 245, 0.55); }
+.lp-menu-btn { display: inline-flex; align-items: center; height: 32px; padding: 0 16px; border-radius: 100px; background: var(--lp-accent); color: #ffffff; font-size: 14px; font-weight: 600; }
 .lp-install h3 { font-size: 20px; font-weight: 600; }
 .lp-install p { font-size: 15px; line-height: 1.6; color: var(--lp-muted); }
 .lp-install img { width: 100%; max-width: 480px; justify-self: end; border-radius: 12px; }

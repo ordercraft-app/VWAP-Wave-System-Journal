@@ -206,7 +206,27 @@ function addTargetScalpPoints() {
     const target = sets.target;
     if (!target || typeof target !== 'object' || Array.isArray(target)) return;
     if (Object.keys(target).some(k => k.trim().toLowerCase() === 'scalp points')) return;
-    sets.target = { 'Scalp points': { sub1: ['5', '10', '20', '40'], sub2: [] }, ...target };
+    sets.target = { 'Scalp points': { sub1: ['5', '10', '20', '30', '40', '50'], sub2: [] }, ...target };
+}
+
+// Scalp points got 30 and 50 (5, 10, 20, 30, 40, 50). Added once to journals that have Scalp points.
+function addScalpPoints3050() {
+    const target = appData.settings.target;
+    const key = target && Object.keys(target).find(k => k.trim().toLowerCase() === 'scalp points');
+    if (!key || !target[key] || !Array.isArray(target[key].sub1)) return;
+    const list = target[key].sub1;
+    ['30', '50'].forEach(v => { if (!list.includes(v)) list.push(v); });
+    // Keep the points in order when the list only holds numbers
+    if (list.every(v => /^\d+(\.\d+)?$/.test(String(v).trim()))) list.sort((a, b) => Number(a) - Number(b));
+}
+
+// New default under Invalidation > Levels: "Stitching bands". Added once.
+function addInvalidationStitchingBands() {
+    const inv = appData.settings.invalidation;
+    if (!inv || typeof inv !== 'object' || Array.isArray(inv)) return;
+    const key = Object.keys(inv).find(k => k.trim().toLowerCase() === 'levels');
+    if (!key || !Array.isArray(inv[key])) return;
+    if (!inv[key].some(v => String(v).trim().toLowerCase() === 'stitching bands')) inv[key].push('Stitching bands');
 }
 
 function migrateSettings() {
@@ -241,6 +261,14 @@ function migrateSettings() {
     if (!sets.migrations.targetScalpPoints) {
         addTargetScalpPoints();
         sets.migrations.targetScalpPoints = true;
+    }
+    if (!sets.migrations.scalpPoints3050) {
+        addScalpPoints3050();
+        sets.migrations.scalpPoints3050 = true;
+    }
+    if (!sets.migrations.invalidationStitchingBands) {
+        addInvalidationStitchingBands();
+        sets.migrations.invalidationStitchingBands = true;
     }
 }
 

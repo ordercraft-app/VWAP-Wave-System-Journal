@@ -203,7 +203,8 @@ function getDefaultSettings() {
             "Levels": [
                 "Acceptance beyond key level",
                 "Failed return to value",
-                "Failed Higher timeframe level"
+                "Failed Higher timeframe level",
+                "Stitching bands"
             ],
             "Orderflow": [
                 "Failed Delta divergence"
@@ -218,7 +219,9 @@ function getDefaultSettings() {
                     "5",
                     "10",
                     "20",
-                    "40"
+                    "30",
+                    "40",
+                    "50"
                 ],
                 "sub2": []
             },
