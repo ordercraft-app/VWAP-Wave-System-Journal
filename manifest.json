@@ -4,18 +4,19 @@
   "description": "A trading journal for learning and applying your trading system.",
   "start_url": "/index.html",
   "display": "standalone",
-  "background_color": "#010102",
-  "theme_color": "#5e6ad2",
+  "background_color": "#07090d",
+  "theme_color": "#07090d",
   "icons": [
     {
       "src": "favicon.png",
-      "sizes": "192x192",
+      "sizes": "32x32",
       "type": "image/png"
     },
     {
       "src": "appicon.png",
       "sizes": "512x512",
-      "type": "image/png"
+      "type": "image/png",
+      "purpose": "any"
     }
   ]
 }

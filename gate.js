@@ -22,6 +22,7 @@ function isLandingOpen() {
 
 function showLanding(variant) {
     const landing = document.getElementById('landing');
+    if (window.vwsSeoTitle) document.title = window.vwsSeoTitle;
     if (!landing) return showConnectionGate(variant);
     landing.dataset.variant = variant;
     landing.hidden = false;
@@ -107,7 +108,9 @@ function updateConnectionGate() {
     if (!window.vwsStartupDone && document.documentElement.classList.contains('has-journal')) return;
     const mobile = isMobileDevice();
     if (!mobile && !!dirHandle && fileConnected) {
-        // Journal open: no welcome page, no popup
+        // Journal open: no welcome page, no popup. Short title for the tab / installed app window.
+        if (!window.vwsSeoTitle) window.vwsSeoTitle = document.title;
+        document.title = 'VWS Journal';
         rememberJournal(true);
         hideLanding();
         return hideConnectionGate();

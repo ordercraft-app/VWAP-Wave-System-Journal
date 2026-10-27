@@ -1,4 +1,4 @@
-# VWAP Wave System Journal
+# VWS Journal
 # Search engines and AI assistants are welcome to read this site.
 User-agent: *
 Allow: /
