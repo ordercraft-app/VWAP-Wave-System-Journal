@@ -78,7 +78,7 @@ function setupLandingReveal(landing) {
             el.classList.add('lp-in');
             observer.unobserve(el);
         });
-    }, { root: landing, rootMargin: '0px 0px -6% 0px', threshold: 0.08 });
+    }, { root: landing, rootMargin: '0px 0px -10% 0px', threshold: 0.12 });
     items.forEach(el => observer.observe(el));
 }
 

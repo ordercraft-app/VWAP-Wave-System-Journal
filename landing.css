@@ -109,16 +109,16 @@
 .lp-v-context .lp-v-form { width: 84%; max-width: 720px; transform: rotate(-2deg); margin-bottom: -60px; }
 .lp-v-context .lp-v-setup { position: absolute; right: 0; top: 0; width: 34%; max-width: 230px; transform: rotate(5deg); }
 
-.lp-v-chart { height: 300px; margin-left: 8px; margin-right: -56px; }
-.lp-v-chart img { transform: rotate(-5deg); }
+.lp-v-chart { height: 330px; margin-left: 8px; margin-right: -56px; }
+.lp-v-chart img { width: 84%; margin: 104px 0 0 4%; transform: rotate(-4deg); }
 
 /* The "Instant Chart Captures" popup from the app, on top of the chart */
-.lp-capture-toast { position: absolute; left: -8px; bottom: 28px; z-index: 2; width: min(300px, 84%); padding: 16px 16px 18px; border-radius: 16px; background: var(--lp-surface-2); border: 1px solid var(--lp-line); box-shadow: 0 24px 60px rgba(0, 0, 0, 0.6); overflow: hidden; transform: rotate(2deg); }
+.lp-capture-toast { position: absolute; top: 4px; right: 72px; z-index: 2; width: min(290px, 80%); padding: 16px 16px 18px; border-radius: 16px; background: var(--lp-surface-2); border: 1px solid var(--lp-line); box-shadow: 0 24px 60px rgba(0, 0, 0, 0.6); overflow: hidden; transform: rotate(2deg); }
 .lp-capture-close { position: absolute; top: 10px; right: 13px; font-size: 18px; line-height: 1; color: var(--lp-faint); }
 .lp-capture-head { display: flex; align-items: center; gap: 10px; margin-bottom: 8px; padding-right: 20px; }
 .lp-capture-icon { width: 30px; height: 30px; flex: 0 0 30px; border-radius: 50%; display: inline-flex; align-items: center; justify-content: center; background: var(--lp-accent-soft); color: var(--lp-accent); }
 .lp-capture-title { font-size: 14px; font-weight: 600; color: var(--lp-text); }
-.lp-capture-text { font-size: 12.5px; line-height: 1.5; color: var(--lp-muted); margin-bottom: 14px; }
+.landing .lp-capture-text { font-size: 12.5px; line-height: 1.5; color: var(--lp-muted); margin: 0 0 20px; }
 .lp-capture-btn { display: flex; align-items: center; justify-content: center; height: 34px; border-radius: 100px; background: var(--lp-accent); color: #ffffff; font-size: 13px; font-weight: 600; }
 .lp-capture-progress { position: absolute; left: 0; bottom: 0; height: 3px; width: 62%; background: var(--lp-accent); }
 
@@ -234,7 +234,8 @@ details[open] > summary .lp-chev { transform: rotate(180deg); }
     .lp-tile-private h3 { grid-column: 1; grid-row: 2; }
     .lp-tile-private > p { grid-column: 1; grid-row: 3; }
     .lp-tile-private .lp-files { grid-column: 2; grid-row: 1 / span 3; margin-top: 0; padding-top: 0; align-self: center; }
-    .lp-v-chart { height: 280px; margin-right: -40px; }
+    .lp-v-chart { height: 320px; margin-right: -40px; }
+    .lp-capture-toast { right: 56px; }
     .lp-v-settings { margin-right: -110px; }
     .lp-v-settings .lp-v-set-a { display: none; }
     .lp-v-settings .lp-v-set-b { margin: 0; transform: rotate(-3deg); }
@@ -272,10 +273,10 @@ details[open] > summary .lp-chev { transform: rotate(180deg); }
     .lp-v-context { min-height: 0; }
     .lp-v-context .lp-v-form { width: 92%; margin-bottom: 0; }
     .lp-v-context .lp-v-setup { width: 40%; top: auto; bottom: -16px; }
-    .lp-v-chart { margin: 0 -24px -24px 0; height: 250px; overflow: hidden; border-radius: 12px 0 0 0; }
-    .lp-capture-toast { left: 0; bottom: 20px; width: min(280px, 86%); padding: 14px 14px 16px; transform: none; }
-    .lp-capture-text { font-size: 12px; margin-bottom: 12px; }
-    .lp-v-chart img { transform: none; border-radius: 12px 0 0 0; }
+    .lp-v-chart { margin: 0 -24px -24px 0; height: 340px; overflow: hidden; border-radius: 12px 0 0 0; }
+    .lp-v-chart img { width: 92%; margin: 96px 0 0 0; transform: none; }
+    .lp-capture-toast { top: 0; right: 36px; width: min(270px, 84%); padding: 14px 14px 16px; transform: rotate(2deg); }
+    .landing .lp-capture-text { font-size: 12px; margin-bottom: 18px; }
     .lp-v-progress { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 10px; }
     .lp-v-progress .lp-v-setups { grid-column: 1 / -1; }
     .lp-v-settings { margin-right: -90px; }
@@ -292,8 +293,9 @@ details[open] > summary .lp-chev { transform: rotate(180deg); }
 }
 
 /* Fade in on load and while scrolling (same motion as the app). Only with JavaScript on. */
+@keyframes lpReveal { from { opacity: 0; transform: translateY(28px); } to { opacity: 1; transform: none; } }
 .landing.lp-js .lp-reveal { opacity: 0; }
-.landing.lp-js .lp-reveal.lp-in { animation: fadeSlideUp 650ms var(--ease-out-soft, cubic-bezier(0.22, 1, 0.36, 1)) both; animation-delay: calc(var(--i, 0) * 70ms); }
+.landing.lp-js .lp-reveal.lp-in { animation: lpReveal 1100ms cubic-bezier(0.16, 1, 0.3, 1) both; animation-delay: calc(var(--i, 0) * 120ms); }
 
 @media (prefers-reduced-motion: reduce) {
     .landing { scroll-behavior: auto; }

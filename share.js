@@ -541,7 +541,7 @@ async function renderShareView() {
                 <label for="share-owner-name">Your name</label>
                 <input type="text" id="share-owner-name" class="linear-input" maxlength="${SHARE_MAX_NAME}" placeholder="Shown to reviewers" value="${escapeHTML(shareState.ownerName)}" autocomplete="name">
             </div>
-            <p class="help-text share-always">Always shared: date, symbol, direction, setup, location, market condition, result and screenshot.</p>
+            <p class="help-text share-always">Always shared: date, symbol, market condition, location, setup, direction, result and screenshot.</p>
             ${togglesHtml ? `<p class="share-also-label">Also share</p><div class="share-toggles">${togglesHtml}</div>` : ''}
         </section>
         <section class="share-submit">
