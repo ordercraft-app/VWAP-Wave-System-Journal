@@ -28,7 +28,7 @@ Private by design: no account, no subscription, no cloud. Your journal lives in 
 
 ## Getting started
 
-1. Create an empty folder on your computer, for example `VWAP Journal`.
+1. Create an empty folder on your computer, for example `VWS Journal`.
 2. Open [vwsjournal.com](https://vwsjournal.com) in Chrome or Edge.
 3. Click **Connect Folder**, select the folder and allow access.
 4. Click **Add Trade** and log your first trade.

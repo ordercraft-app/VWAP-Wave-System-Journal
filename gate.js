@@ -195,7 +195,7 @@ function gateContent(variant) {
         <h2 id="connect-gate-title">Set up your journal</h2>
         <p class="gate-lead">Pick a folder on your computer. Every trade you log is saved there, so you're ready in under a minute.</p>
         <ol class="gate-steps">
-            <li>Create an empty folder, for example <strong>VWAP Journal</strong>.</li>
+            <li>Create an empty folder, for example <strong>VWS Journal</strong>.</li>
             <li>Click <strong>Connect Folder</strong>, select that folder and allow access.</li>
         </ol>
         <button type="button" id="btn-initial-load" class="btn-primary gate-primary">Connect Folder</button>
