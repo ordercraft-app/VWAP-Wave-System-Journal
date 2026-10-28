@@ -1,6 +1,6 @@
 # VWS Journal
 
-**The journal built for learning your preferred system.**
+**The journal built for learning your favourite trading system.**
 
 Log every trade with your system context: market condition, location, setup, direction, evidence, invalidation, target and psychology. Then track your progress in applying the system. The focus is not on profit and loss, but on learning to execute the system well.
 
