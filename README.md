@@ -87,16 +87,6 @@ The journal is a static web app: plain HTML, CSS and JavaScript, hosted on GitHu
 | `settings.json` | Default settings |
 | `vendor/` | Chart.js 4.5.1 and Flatpickr 4.6.13, stored in the repo at a fixed version |
 
-### Running it locally
-
-Serve the folder with any static web server and open it in Chrome or Edge, for example:
-
-```bash
-python3 -m http.server 8000
-```
-
-Then go to `http://localhost:8000`. Folder access works on `localhost` as well.
-
 ## Support
 
 Questions, ideas or a bug? Mail **hello.ordercraft@gmail.com**.
