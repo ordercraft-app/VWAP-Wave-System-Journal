@@ -72,6 +72,13 @@ function setupLandingReveal(landing) {
     const items = landing.querySelectorAll('.lp-hero > *, .lp-hero-shot, .lp-context > *, .lp-tile, .lp-start > h2, .lp-three > li, .lp-install, .lp-launch-panel, .lp-faq > h2, .lp-faq-item, .lp-footer');
     items.forEach(el => el.classList.add('lp-reveal'));
     landing.classList.add('lp-js');
+    // The hero text and the app screenshot below it show right away on page load,
+    // even when the screenshot is still (partly) below the fold
+    const onLoad = landing.querySelectorAll('.lp-hero > *, .lp-hero-shot');
+    onLoad.forEach((el, i) => {
+        el.style.setProperty('--i', Math.min(i, 6));
+        el.classList.add('lp-in');
+    });
     const observer = new IntersectionObserver(entries => {
         const visible = entries.filter(e => e.isIntersecting).map(e => e.target);
         visible.forEach((el, i) => {
@@ -80,7 +87,7 @@ function setupLandingReveal(landing) {
             observer.unobserve(el);
         });
     }, { root: landing, rootMargin: '0px 0px -10% 0px', threshold: 0.12 });
-    items.forEach(el => observer.observe(el));
+    items.forEach(el => { if (!el.classList.contains('lp-in')) observer.observe(el); });
 }
 
 document.addEventListener('DOMContentLoaded', bindLanding);
