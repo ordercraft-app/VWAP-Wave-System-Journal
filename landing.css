@@ -52,6 +52,9 @@
 .lp-nav-inner { display: flex; align-items: center; gap: 24px; height: 68px; }
 .lp-brand { display: inline-flex; align-items: center; gap: 12px; text-decoration: none; font-size: 15px; font-weight: 600; margin-right: auto; white-space: nowrap; min-width: 0; }
 .lp-brand img { width: 32px; height: 32px; border-radius: 8px; }
+.lp-brand-text { display: flex; flex-direction: column; gap: 2px; }
+.lp-brand-small { font-size: 10px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.5px; line-height: 1; color: var(--lp-muted); }
+.lp-brand-main { font-size: 16px; font-weight: 600; line-height: 1; color: var(--lp-text); }
 .lp-nav-links { display: flex; gap: 28px; font-size: 14px; color: var(--lp-muted); }
 .lp-nav-links a { text-decoration: none; }
 .lp-nav-links a:hover { color: var(--lp-text); }
@@ -247,7 +250,6 @@ details[open] > summary .lp-chev { transform: rotate(180deg); }
 /* ----- Mobile ----- */
 @media (max-width: 699px) {
     .lp-nav-inner { height: 60px; gap: 12px; }
-    .lp-brand span { font-size: 14px; }
     .lp-hero { gap: 20px; }
     .lp-hero h1 { letter-spacing: -0.025em; }
     .lp-hero .lp-btn-lg { width: 100%; max-width: 340px; }

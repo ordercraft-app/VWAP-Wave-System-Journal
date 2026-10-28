@@ -12,7 +12,7 @@ Private by design: no account, no subscription, no cloud. Your journal lives in 
 
 ## Features
 
-- **Every trade with its system context.** Pick symbol, market condition, location, setup, direction, evidence, invalidation, target, psychology and result with one click each. The form remembers your last symbol and market condition.
+- **Log every trade with its system context.** Pick symbol, market condition, location, setup, direction, evidence, invalidation, target, psychology and result with one click each. The form remembers your last symbol and market condition.
 - **Chart screenshots.** Paste, drop or upload a screenshot, or connect your charting window once and capture it with one click (**Auto-Capture**).
 - **Weekly calendar.** See wins, losses and break-evens per day at a glance and jump between days and weeks.
 - **Card and list view.** Full trade cards with the screenshot, or a compact list you can expand per trade.
