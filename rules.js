@@ -927,6 +927,203 @@ function rulesRenderStats(trades) {
 
 const RULES_CHART_IDS = ['rulesTrendChart', 'rulesFollowChart', 'rulesBrokenChart', 'rulesPhaseChart'];
 
+// Charts on Stats > Rules. The 3 numbers at the top are fixed (like on Overview);
+// these can be reordered (drag) and switched off in Settings > Chart > Rules.
+// Saved in settings.rulesChartOrder / settings.rulesChartVisibility (only once changed).
+const RULES_CHARTS = [
+    { key: 'trend', label: 'Discipline vs Results', title: 'Discipline vs Results', span: 3 },
+    { key: 'follow', label: 'Win Rate: Rules Followed vs Broken', title: 'Win rate: rules followed vs broken' },
+    { key: 'broken', label: 'Top 5 Broken Rules', title: 'Top 5 broken rules' },
+    { key: 'phase', label: 'Rules Followed per Phase', title: 'Rules followed per phase' },
+    { key: 'setups', label: 'Setup Discipline', title: 'Setup discipline', span: 3 }
+];
+
+function rulesChartOrder() {
+    const keys = RULES_CHARTS.map(c => c.key);
+    const saved = Array.isArray(appData.settings.rulesChartOrder) ? appData.settings.rulesChartOrder : [];
+    const order = saved.filter((k, i) => keys.includes(k) && saved.indexOf(k) === i);
+    keys.forEach(k => { if (!order.includes(k)) order.push(k); });
+    return order;
+}
+
+function rulesChartVisible(key) {
+    const v = appData.settings.rulesChartVisibility;
+    return !(v && v[key] === false);
+}
+
+function rulesChartCardsHtml(per, hasTrend) {
+    return rulesChartOrder().map(key => {
+        const c = RULES_CHARTS.find(x => x.key === key);
+        if (!c || !rulesChartVisible(key)) return '';
+        if (key === 'trend' && !hasTrend) return ''; // too little data for a line: hide the card
+        const span = c.span === 3 ? ' chart-span-3' : '';
+        const body = key === 'setups' ? '<div id="rules-setup-table"></div>'
+            : `<div class="chart-wrapper"><canvas id="${{ trend: 'rulesTrendChart', follow: 'rulesFollowChart', broken: 'rulesBrokenChart', phase: 'rulesPhaseChart' }[key]}"></canvas></div>`;
+        const head = key === 'trend'
+            ? `<div class="rules-card-head"><h3 class="card-title">${c.title}</h3><span class="rules-card-note">per ${per}</span></div>`
+            : `<h3 class="card-title">${c.title}</h3>`;
+        return `<div class="stat-card${span}" data-chart-key="${key}">${head}${body}</div>`;
+    }).join('');
+}
+
+// Drag & drop the chart cards, same as on Overview (charts.js); saves rulesChartOrder
+let rulesDraggedCard = null;
+function rulesSetupGridDrag(grid) {
+    if (!grid) return;
+    grid.querySelectorAll('.stat-card[data-chart-key]').forEach(card => {
+        card.draggable = true;
+        card.classList.add('is-orderable');
+        if (typeof addCardDragHandle === 'function') addCardDragHandle(card);
+    });
+    grid.addEventListener('dragstart', e => {
+        const card = e.target.closest && e.target.closest('.stat-card.is-orderable');
+        if (!card || e.target.closest('button, a, input, select, textarea')) return;
+        rulesDraggedCard = card;
+        e.dataTransfer.effectAllowed = 'move';
+        try { e.dataTransfer.setData('text/plain', card.dataset.chartKey); } catch (err) {}
+        requestAnimationFrame(() => card.classList.add('is-dragging'));
+    });
+    grid.addEventListener('dragover', e => {
+        if (!rulesDraggedCard) return;
+        e.preventDefault();
+        e.dataTransfer.dropEffect = 'move';
+        const target = e.target.closest('.stat-card.is-orderable');
+        if (!target || target === rulesDraggedCard) return;
+        const r = target.getBoundingClientRect();
+        const wide = r.width > grid.clientWidth * 0.7;
+        const before = wide ? e.clientY < r.top + r.height / 2 : e.clientX < r.left + r.width / 2;
+        const ref = before ? target : target.nextSibling;
+        if (ref !== rulesDraggedCard && rulesDraggedCard.nextSibling !== ref) grid.insertBefore(rulesDraggedCard, ref);
+    });
+    grid.addEventListener('drop', e => { if (rulesDraggedCard) e.preventDefault(); });
+    grid.addEventListener('dragend', async () => {
+        if (!rulesDraggedCard) return;
+        rulesDraggedCard.classList.remove('is-dragging');
+        rulesDraggedCard = null;
+        const shown = [...grid.querySelectorAll('.stat-card.is-orderable')].map(c => c.dataset.chartKey);
+        const old = rulesChartOrder();
+        // Hidden charts keep their place relative to the others
+        const next = [...shown];
+        old.forEach((k, i) => { if (!next.includes(k)) next.splice(Math.min(i, next.length), 0, k); });
+        if (JSON.stringify(old) !== JSON.stringify(next)) {
+            appData.settings.rulesChartOrder = next;
+            RULES_CHART_IDS.forEach(id => { if (chartInstances[id]) { try { chartInstances[id].resize(); } catch (err) {} } });
+            await autoSave();
+        }
+    });
+}
+
+// ---------- Settings > Chart: Stats | Rules sub-tabs ----------
+
+let rulesChartSettingsTab = 'stats';
+
+// Called at the top of the Chart tab in Settings. Shows the sub-tabs while the
+// rules are on. Returns true when it rendered the Rules list (Stats code is skipped).
+function rulesChartSettingsTabs(container, onChange) {
+    if (!rulesActive()) { rulesChartSettingsTab = 'stats'; return false; }
+    const tabs = document.createElement('div');
+    tabs.className = 'settings-tabs chart-sub-tabs';
+    const mk = (key, label) => {
+        const b = document.createElement('button');
+        b.className = `settings-tab-btn ${rulesChartSettingsTab === key ? 'active' : ''}`;
+        b.textContent = label;
+        b.onclick = () => {
+            if (rulesChartSettingsTab === key) return;
+            rulesChartSettingsTab = key;
+            renderSettingsUI();
+            animateItems(settingsContainer.querySelectorAll(':scope > .info-banner, .chart-toggle-row'), 'enter');
+        };
+        tabs.appendChild(b);
+        return b;
+    };
+    const bStats = mk('stats', 'Stats');
+    const bRules = mk('rules', 'Rules');
+    container.appendChild(tabs);
+    slidePillIndicator(tabs, rulesChartSettingsTab === 'rules' ? bRules : bStats, 'chartSubTabs');
+    if (rulesChartSettingsTab !== 'rules') return false;
+    renderRulesChartSettings(container, onChange);
+    return true;
+}
+
+// Same rows as the Stats list: drag handle, name, Enable / Disable
+function renderRulesChartSettings(container, onChange) {
+    const sets = appData.settings;
+    const banner = document.createElement('div');
+    banner.className = 'info-banner';
+    banner.innerHTML = `<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"></circle><line x1="12" y1="16" x2="12" y2="12"></line><line x1="12" y1="8" x2="12.01" y2="8"></line></svg><span><strong>Tip:</strong> Drag a chart by its <span class="inline-drag-icon">${DRAG_ICON_SVG}</span> handle to change the order on the Stats page (Rules tab).</span>`;
+    container.appendChild(banner);
+
+    const wrap = document.createElement('div');
+    wrap.style.display = 'flex';
+    wrap.style.flexDirection = 'column';
+    wrap.style.gap = '8px';
+    let dragged = null;
+
+    rulesChartOrder().forEach(key => {
+        const c = RULES_CHARTS.find(x => x.key === key);
+        const row = document.createElement('div');
+        row.className = 'chart-toggle-row';
+        row.ondragstart = (e) => {
+            dragged = key;
+            e.dataTransfer.effectAllowed = 'move';
+            setTimeout(() => row.classList.add('dragging-row'), 0);
+        };
+        row.ondragend = () => {
+            dragged = null;
+            row.draggable = false;
+            row.classList.remove('dragging-row');
+            wrap.querySelectorAll('.chart-toggle-row').forEach(r => r.classList.remove('row-drag-over'));
+        };
+        row.ondragover = (e) => {
+            e.preventDefault();
+            if (dragged && dragged !== key) row.classList.add('row-drag-over');
+        };
+        row.ondragleave = () => row.classList.remove('row-drag-over');
+        row.ondrop = (e) => {
+            e.preventDefault();
+            row.classList.remove('row-drag-over');
+            if (!dragged || dragged === key) return;
+            const order = rulesChartOrder();
+            const dropIdx = order.indexOf(key);
+            order.splice(order.indexOf(dragged), 1);
+            order.splice(dropIdx, 0, dragged);
+            sets.rulesChartOrder = order;
+            onChange();
+            renderSettingsUI();
+        };
+
+        const left = document.createElement('div');
+        left.className = 'chart-toggle-left';
+        const handle = document.createElement('div');
+        handle.innerHTML = DRAG_ICON_SVG;
+        handle.className = 'row-drag-handle';
+        handle.title = 'Drag to reorder chart';
+        handle.onmousedown = () => { row.draggable = true; };
+        handle.onmouseup = () => { row.draggable = false; };
+        handle.onmouseleave = () => { if (!dragged) row.draggable = false; };
+        const label = document.createElement('span');
+        label.className = 'chart-toggle-label';
+        label.textContent = c.label;
+        left.appendChild(handle);
+        left.appendChild(label);
+
+        const on = rulesChartVisible(key);
+        const btn = document.createElement('button');
+        btn.className = on ? 'btn-secondary btn-sm' : 'btn-primary btn-sm';
+        btn.textContent = on ? 'Disable' : 'Enable';
+        btn.onclick = () => {
+            if (!sets.rulesChartVisibility || typeof sets.rulesChartVisibility !== 'object') sets.rulesChartVisibility = {};
+            sets.rulesChartVisibility[key] = !on;
+            onChange();
+            renderSettingsUI();
+        };
+        row.appendChild(left);
+        row.appendChild(btn);
+        wrap.appendChild(row);
+    });
+    container.appendChild(wrap);
+}
+
 function rulesSortChrono(trades) {
     return [...trades].sort((a, b) => (a.date || '').localeCompare(b.date || '') || ((parseInt(a.number, 10) || 0) - (parseInt(b.number, 10) || 0)));
 }
@@ -988,16 +1185,8 @@ function rulesDrawStats(el, trades) {
             <div class="stat-card kpi-card"><h3>Trades all rules followed</h3><div class="kpi-value">${allOk.length}<span class="kpi-of"> / ${rated.length}</span></div><div class="kpi-sub">${Math.round(rulesPct(allOk.length, rated.length))}% of rated trades</div></div>
             <div class="stat-card kpi-card"><h3>Clean Streak</h3><div class="kpi-value">${streak}</div><div class="kpi-sub">all rules followed in a row · best ${best}</div></div>
         </div>
-        <div class="rules-stats-grid">
-            <div class="stat-card chart-span-3">
-                <div class="rules-card-head"><h3 class="card-title">Discipline vs Results</h3><span class="rules-card-note">per ${per}</span></div>
-                ${buckets.length > 1 ? '<div class="chart-wrapper"><canvas id="rulesTrendChart"></canvas></div>' : '<div class="rules-chart-empty">Not enough data for a trend. Pick a longer period.</div>'}
-            </div>
-            <div class="stat-card"><h3 class="card-title">Win rate: rules followed vs broken</h3><div class="chart-wrapper"><canvas id="rulesFollowChart"></canvas></div></div>
-            <div class="stat-card"><h3 class="card-title">Top 5 broken rules</h3><div class="chart-wrapper"><canvas id="rulesBrokenChart"></canvas></div></div>
-            <div class="stat-card"><h3 class="card-title">Rules followed per phase</h3><div class="chart-wrapper"><canvas id="rulesPhaseChart"></canvas></div></div>
-            <div class="stat-card chart-span-3"><h3 class="card-title">Setup discipline</h3><div id="rules-setup-table"></div></div>
-        </div>`;
+        <div class="rules-stats-grid" id="rules-stats-grid">${rulesChartCardsHtml(per, buckets.length > 1)}</div>`;
+    rulesSetupGridDrag(document.getElementById('rules-stats-grid'));
 
     const isLight = document.documentElement.getAttribute('data-theme') === 'light';
     const colors = { win: '#44BD1E', loss: '#ee354e', accent: '#386af5', grey: isLight ? '#C1C8D1' : '#2b2c30' };
@@ -1008,7 +1197,7 @@ function rulesDrawStats(el, trades) {
     if (buckets.length > 1) {
         const discipline = buckets.map(b => rulesPct(b.ok, b.rated));
         const winRate = buckets.map(b => Number(getWinRateData(b.trades).winRate));
-        chartInstances.rulesTrendChart = new Chart(document.getElementById('rulesTrendChart'), {
+        if (document.getElementById('rulesTrendChart')) chartInstances.rulesTrendChart = new Chart(document.getElementById('rulesTrendChart'), {
             type: 'line',
             data: {
                 labels: buckets.map(b => b.label),
@@ -1029,7 +1218,7 @@ function rulesDrawStats(el, trades) {
     // 2. Win rate followed vs broken
     const followedTrades = allOk.map(x => x.t);
     const brokenTrades = ratedScores.filter(x => x.s.no > 0).map(x => x.t);
-    chartInstances.rulesFollowChart = new Chart(document.getElementById('rulesFollowChart'), {
+    if (document.getElementById('rulesFollowChart')) chartInstances.rulesFollowChart = new Chart(document.getElementById('rulesFollowChart'), {
         type: 'bar',
         data: {
             labels: [`All followed · ${followedTrades.length}`, `Rule broken · ${brokenTrades.length}`],
@@ -1043,7 +1232,7 @@ function rulesDrawStats(el, trades) {
     ratedScores.forEach(x => x.s.broken.forEach(c => { const k = String(c.key || '').trim() || 'Unnamed rule'; brokenCount[k] = (brokenCount[k] || 0) + 1; }));
     const topBroken = Object.entries(brokenCount).sort((a, b) => b[1] - a[1]).slice(0, TOP_CHART_SLOTS);
     const padded = padChartSlots(topBroken.map(x => x[0]), topBroken.map(x => x[1]));
-    chartInstances.rulesBrokenChart = new Chart(document.getElementById('rulesBrokenChart'), {
+    if (document.getElementById('rulesBrokenChart')) chartInstances.rulesBrokenChart = new Chart(document.getElementById('rulesBrokenChart'), {
         type: 'bar',
         data: { labels: padded.labels, datasets: [{ label: 'Times broken', data: padded.values, backgroundColor: colors.loss, borderRadius: round, borderSkipped: false }] },
         options: { clip: false, maintainAspectRatio: false, indexAxis: 'y', scales: { x: { display: false, beginAtZero: true }, y: { afterFit: alignTopChartRows } }, plugins: { legend: { display: false } } }
@@ -1058,7 +1247,7 @@ function rulesDrawStats(el, trades) {
         }));
         return n ? rulesPct(ok, n) : null;
     });
-    chartInstances.rulesPhaseChart = new Chart(document.getElementById('rulesPhaseChart'), {
+    if (document.getElementById('rulesPhaseChart')) chartInstances.rulesPhaseChart = new Chart(document.getElementById('rulesPhaseChart'), {
         type: 'bar',
         data: { labels: RULE_PHASES, datasets: [{ label: 'Rules followed', data: phaseVals, backgroundColor: colors.accent, borderRadius: round, borderSkipped: false, maxBarThickness: 40 }] },
         options: { maintainAspectRatio: false, scales: { y: { display: false, min: 0, max: 100 } }, plugins: { legend: { display: false }, tooltip: pctTip } }
@@ -1074,7 +1263,8 @@ function rulesDrawStats(el, trades) {
     const setupRows = Object.entries(bySetup)
         .map(([name, v]) => ({ name, score: rulesPct(v.ok, v.rated), win: getWinRateData(v.trades).winRate, n: v.trades.length }))
         .sort((a, b) => b.n - a.n || b.score - a.score);
-    document.getElementById('rules-setup-table').innerHTML = `
+    const setupTable = document.getElementById('rules-setup-table');
+    if (setupTable) setupTable.innerHTML = `
         <div class="rules-setup-table">
             <div class="rules-setup-row is-head"><span>Setup</span><span>Rules followed</span><span>Score</span><span>Win rate</span><span>Trades</span></div>
             ${setupRows.map(r => `

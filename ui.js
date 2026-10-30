@@ -1278,6 +1278,8 @@ function renderSettingsContent() {
         };
         // --- End Auto-Screenshot Settings Block ---
     } else {
+        // Rules on: sub-tabs Stats | Rules (rules.js); the Rules list is drawn there
+        if (typeof rulesChartSettingsTabs === 'function' && rulesChartSettingsTabs(settingsContainer, onSettingsChange)) return;
         const chartsConfig = [
             { key: 'growth', label: 'Execution Growth' },
             { key: 'winLoss', label: 'Overall Win/Loss Ratio' },
