@@ -9,6 +9,9 @@
 //   settings.rules = { "_all": [{ id, phase, key, detail }], "<setup>": [...] }
 //   settings.features.rules = true | false
 //   trade.ruleChecks = [{ id, phase, key, detail, ok: true | false | null }]
+//   settings.advancedRules = { unlocked: true, defaults: { "<setup>": [[phase, key, detail]] } }
+//     (only after a valid code: the default rules for the advanced setups are not
+//     in this file, they come from api.vwsjournal.com/unlock)
 
 // ---------- Release switch ----------
 // false = rules are hidden for everyone and nothing is added to settings.json.
@@ -73,37 +76,14 @@ const DEFAULT_RULES = {
         ['Context', 'Trend day', 'discovery, sloped VWAP'],
         ['Location', 'First pullback', 'to VWAP, IB mid or POC'],
         ['Entry', 'Strength', 'away from VWAP']
-    ],
-    'Madonna': [
-        ['Context', 'IB complete', 'new high and low set'],
-        ['Location', 'First touch', 'new IB high or low today'],
-        ['Entry', 'Rejection', 'back into the IB']
-    ],
-    'VWAP/POC Scalps in Balance': [
-        ['Context', 'Balance', 'price inside value'],
-        ['Location', 'Centre', 'at VWAP or POC'],
-        ['Entry', 'Confirmation', 'reclaim or rejection at the level'],
-        ['Risk', 'Tight stop', 'small size']
-    ],
-    'Late Entry Continuation': [
-        ['Context', 'Strong trend', 'no pullbacks to the bands'],
-        ['Context', 'New distribution', 'building in trend direction'],
-        ['Location', 'Its edge', 'of the new distribution'],
-        ['Risk', 'Tight stop', 'just beyond structure']
-    ],
-    'Inside HTF Balance Fades': [
-        ['Context', 'Inside HTF value', 'multi-day, weekly or monthly'],
-        ['Location', 'HTF edge', 'weekly, monthly or composite'],
-        ['Entry', 'Rejection', 'no push through'],
-        ['Risk', 'Wide stop', 'reduced size']
-    ],
-    'IB Extension Fades': [
-        ['Context', 'IB broken', 'and held'],
-        ['Context', 'Flat VWAP', 'not accelerating'],
-        ['Location', 'Extension', '50 % or 100 % of IB'],
-        ['Entry', 'Stall', 'or rejection at the extension']
     ]
 };
+
+// The advanced setups: their default rules unlock with a code. The code is
+// checked by api.vwsjournal.com, which then sends the rules. Neither the code
+// nor these rules are in the app. Rules people add themselves are never locked.
+const RULES_ADVANCED = ['Madonna', 'VWAP/POC Scalps in Balance', 'Late Entry Continuation', 'Inside HTF Balance Fades', 'IB Extension Fades'];
+const RULES_UNLOCK_API = 'https://api.vwsjournal.com/unlock'; // share-API Worker, route POST /unlock
 
 // ---------- Helpers ----------
 
@@ -146,14 +126,263 @@ function rulesNeedsSetup() {
 function rulesBuildDefaults() {
     const out = {};
     const own = rulesSetupNames();
-    Object.keys(DEFAULT_RULES).forEach(name => {
+    const lists = rulesDefaultLists();
+    Object.keys(lists).forEach(name => {
         const target = name === RULES_ALL ? RULES_ALL : own.find(s => String(s).trim().toLowerCase() === name.toLowerCase());
         if (!target) return;
-        out[target] = DEFAULT_RULES[name].map(([phase, key, detail]) => ({
+        out[target] = lists[name].map(([phase, key, detail]) => ({
             id: `d-${rulesSlug(name === RULES_ALL ? 'all' : name)}-${rulesSlug(key)}`, phase, key, detail
         }));
     });
     return out;
+}
+
+// Built-in defaults plus, once unlocked, the advanced setup defaults
+function rulesDefaultLists() {
+    const out = { ...DEFAULT_RULES };
+    if (rulesAdvancedUnlocked()) {
+        const d = appData.settings.advancedRules.defaults;
+        Object.keys(d).forEach(name => { if (Array.isArray(d[name])) out[name] = d[name]; });
+    }
+    return out;
+}
+
+// ---------- Advanced setup rules (unlock code) ----------
+
+function rulesAdvancedUnlocked() {
+    const a = appData.settings && appData.settings.advancedRules;
+    return rulesIsObject(a) && a.unlocked === true && rulesIsObject(a.defaults);
+}
+
+function rulesIsAdvancedSetup(name) {
+    const n = String(name || '').trim().toLowerCase();
+    return !!n && RULES_ADVANCED.some(a => a.toLowerCase() === n);
+}
+
+// A setup whose default rules still need the code
+function rulesAdvancedLocked(name) {
+    return rulesIsAdvancedSetup(name) && !rulesAdvancedUnlocked();
+}
+
+// Without the code, the default rules of the advanced setups are taken out of
+// settings.json (rules people added themselves have other ids and stay).
+// Trades keep their own copy of the rules they were rated on.
+function rulesRemoveAdvancedDefaults() {
+    const rules = appData.settings.rules;
+    if (!rulesIsObject(rules)) return;
+    const prefixes = RULES_ADVANCED.map(n => `d-${rulesSlug(n)}-`);
+    Object.keys(rules).forEach(k => {
+        if (!Array.isArray(rules[k])) return;
+        rules[k] = rules[k].filter(r => !(r && typeof r.id === 'string' && prefixes.some(p => r.id.startsWith(p))));
+    });
+}
+
+// Only keeps what we expect from the server: known setups, [phase, key, detail]
+function rulesCleanAdvancedDefaults(raw) {
+    if (!rulesIsObject(raw)) return null;
+    const out = {};
+    Object.keys(raw).forEach(name => {
+        const canon = RULES_ADVANCED.find(a => a.toLowerCase() === String(name).trim().toLowerCase());
+        if (!canon || !Array.isArray(raw[name])) return;
+        const list = raw[name].map(r => Array.isArray(r) ? r : (r && typeof r === 'object' ? [r.phase, r.key, r.detail] : null))
+            .filter(r => r && RULE_PHASES.includes(r[0]) && typeof r[1] === 'string' && r[1].trim())
+            .map(([phase, key, detail]) => [phase, key.trim().slice(0, 40), String(detail || '').trim().slice(0, 60)]);
+        if (list.length) out[canon] = list;
+    });
+    return Object.keys(out).length ? out : null;
+}
+
+// Asks api.vwsjournal.com to check the code. Only the code is sent.
+// Result: { status: 'ok', defaults } | { status: 'invalid' } | { status: 'limit' } | { status: 'network' }
+async function rulesUnlockRequest(code) {
+    const ctrl = typeof AbortController === 'function' ? new AbortController() : null;
+    const timer = ctrl ? setTimeout(() => ctrl.abort(), 12000) : null;
+    try {
+        const res = await fetch(RULES_UNLOCK_API, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ code }),
+            signal: ctrl ? ctrl.signal : undefined
+        });
+        if (res.status === 401 || res.status === 403) return { status: 'invalid' };
+        if (res.status === 429) return { status: 'limit' };
+        if (!res.ok) return { status: 'network' };
+        const data = await res.json();
+        const defaults = rulesCleanAdvancedDefaults(data && data.rules);
+        return defaults ? { status: 'ok', defaults } : { status: 'network' };
+    } catch (e) {
+        return { status: 'network' };
+    } finally {
+        if (timer) clearTimeout(timer);
+    }
+}
+
+// Adds the advanced setup defaults to the setups this user has (once) and saves
+async function rulesApplyAdvancedUnlock(defaults) {
+    const sets = appData.settings;
+    sets.advancedRules = { unlocked: true, defaults };
+    rulesEnsureShape();
+    const own = rulesSetupNames();
+    Object.keys(defaults).forEach(name => {
+        const target = own.find(s => s.trim().toLowerCase() === name.toLowerCase());
+        if (!target) return;
+        const key = rulesScopeKey(target) || target;
+        const arr = Array.isArray(sets.rules[key]) ? sets.rules[key] : [];
+        const add = defaults[name]
+            .map(([phase, k, detail]) => ({ id: `d-${rulesSlug(name)}-${rulesSlug(k)}`, phase, key: k, detail }))
+            .filter(r => !arr.some(x => x.id === r.id));
+        sets.rules[key] = [...add, ...arr];
+    });
+    if (typeof autoSave === 'function') await autoSave();
+}
+
+// Runs the check and returns the status; on success the rules are added and saved
+async function rulesTryUnlock(code) {
+    const c = String(code || '').trim();
+    if (!c) return 'empty';
+    const r = await rulesUnlockRequest(c);
+    if (r.status !== 'ok') return r.status;
+    await rulesApplyAdvancedUnlock(r.defaults);
+    return 'ok';
+}
+
+const RULES_UNLOCK_MSG = {
+    empty: ['is-error', 'Enter your code first.'],
+    invalid: ['is-error', 'That code doesn’t work. Check the spelling and try again.'],
+    limit: ['is-warn', 'Too many tries. Wait an hour and try again.'],
+    network: ['is-warn', 'Couldn’t check the code. Check your connection and try again.']
+};
+const RULES_SPINNER = '<span class="rules-spin" aria-hidden="true"></span>';
+
+// Shared by the row in Settings and the popup: busy state, messages, result
+async function rulesRunUnlock(input, button, msg, label) {
+    input.classList.remove('is-error');
+    msg.className = 'rules-unlock-msg';
+    msg.textContent = '';
+    input.disabled = true;
+    button.disabled = true;
+    button.innerHTML = `${RULES_SPINNER}Checking…`;
+    const status = await rulesTryUnlock(input.value);
+    input.disabled = false;
+    button.disabled = false;
+    button.textContent = label;
+    if (status === 'ok') {
+        showToast('Advanced setup rules unlocked', 'success');
+        return true;
+    }
+    const [cls, text] = RULES_UNLOCK_MSG[status] || RULES_UNLOCK_MSG.network;
+    msg.className = `rules-unlock-msg ${cls}`;
+    msg.textContent = text;
+    if (cls === 'is-error') input.classList.add('is-error');
+    input.focus();
+    return false;
+}
+
+// Popup from the Rules tab in Add Trade ("Enter code")
+function rulesOpenUnlockDialog() {
+    if (document.getElementById('app-dialog')) return;
+    const previousFocus = document.activeElement;
+    const overlay = document.createElement('div');
+    overlay.id = 'app-dialog';
+    overlay.className = 'app-dialog-overlay';
+    overlay.innerHTML = `
+        <div class="app-dialog" role="dialog" aria-modal="true" aria-labelledby="app-dialog-title" aria-describedby="app-dialog-text">
+            <span class="app-dialog-icon is-neutral">${RULES_ICON_LOCK.replace('width="12" height="12"', 'width="18" height="18"')}</span>
+            <div class="app-dialog-copy">
+                <h2 id="app-dialog-title">Unlock advanced setup rules</h2>
+                <p id="app-dialog-text">Enter your code to add the default rules for the ${RULES_ADVANCED.length} advanced setups. Rules you made yourself stay as they are.</p>
+                <div class="rules-unlock-field">
+                    <input type="text" class="linear-input" placeholder="Enter code" aria-label="Code" autocomplete="off" autocapitalize="off" spellcheck="false" maxlength="60">
+                    <span class="rules-unlock-msg" role="status"></span>
+                </div>
+            </div>
+            <div class="app-dialog-actions">
+                <button type="button" class="btn-secondary" data-dialog="cancel">Cancel</button>
+                <button type="button" class="btn-primary rules-unlock-btn" data-dialog="ok">Unlock</button>
+            </div>
+        </div>`;
+    const input = overlay.querySelector('input');
+    const ok = overlay.querySelector('[data-dialog="ok"]');
+    const msg = overlay.querySelector('.rules-unlock-msg');
+    let busy = false;
+    const close = () => {
+        document.removeEventListener('keydown', onKey, true);
+        overlay.remove();
+        if (previousFocus && typeof previousFocus.focus === 'function' && document.contains(previousFocus)) {
+            try { previousFocus.focus({ preventScroll: true }); } catch (e) {}
+        }
+    };
+    const submit = async () => {
+        if (busy) return;
+        busy = true;
+        const done = await rulesRunUnlock(input, ok, msg, 'Unlock');
+        busy = false;
+        if (!done) return;
+        close();
+        if (typeof tfMarkDirty === 'function') rulesFormSync();
+        const settingsView = document.getElementById('view-settings');
+        if (settingsView && settingsView.classList.contains('active') && typeof renderSettingsUI === 'function') renderSettingsUI();
+    };
+    // Captures keys while open, so the app's shortcuts don't fire; typing still works
+    const onKey = (e) => {
+        e.stopPropagation();
+        if (e.key === 'Escape') { e.preventDefault(); if (!busy) close(); return; }
+        if (e.key === 'Enter') { e.preventDefault(); submit(); return; }
+        if (e.key === 'Tab') {
+            const items = [input, ...overlay.querySelectorAll('button')].filter(el => !el.disabled);
+            const i = items.indexOf(document.activeElement);
+            e.preventDefault();
+            items[(i + (e.shiftKey ? -1 : 1) + items.length) % items.length].focus();
+            return;
+        }
+        if (e.altKey || e.ctrlKey || e.metaKey) { if (!['a', 'c', 'v', 'x', 'z'].includes(e.key.toLowerCase())) e.preventDefault(); }
+    };
+    overlay.addEventListener('mousedown', e => { if (e.target === overlay && !busy) close(); });
+    overlay.querySelector('[data-dialog="cancel"]').addEventListener('click', () => { if (!busy) close(); });
+    ok.addEventListener('click', submit);
+    document.addEventListener('keydown', onKey, true);
+    document.body.appendChild(overlay);
+    input.focus();
+}
+
+// Small card under the rules in Add Trade when the setup's defaults are locked
+function rulesLockCardHtml(setup) {
+    return `
+        <div class="rules-lock-card">
+            <span class="rules-lock-icon">${RULES_ICON_LOCK.replace('width="12" height="12"', 'width="16" height="16"')}</span>
+            <span class="rules-lock-text"><strong>${escapeHTML(setup)} has default rules too</strong><span>They unlock with a code. Rules you add yourself always show here.</span></span>
+            <button type="button" class="btn-secondary btn-sm" data-rules-act="unlock">Enter code</button>
+        </div>`;
+}
+
+// Settings > Rules: the code row (or the "Unlocked" badge)
+function rulesUnlockRowEl() {
+    const row = document.createElement('div');
+    row.className = 'rules-layout-row rules-unlock-row';
+    if (rulesAdvancedUnlocked()) {
+        row.innerHTML = `<div class="rules-layout-text"><span class="rules-layout-title">Advanced setup rules</span><span class="rules-layout-note">Unlocked. The default rules for the ${RULES_ADVANCED.length} advanced setups are in your list.</span></div><span class="rules-unlocked">${RULES_ICON_CHECK}Unlocked</span>`;
+        return row;
+    }
+    row.innerHTML = `
+        <div class="rules-layout-text"><span class="rules-layout-title">Advanced setup rules</span><span class="rules-layout-note">Have a code? It adds the default rules for the ${RULES_ADVANCED.length} advanced setups.</span><span class="rules-unlock-msg" role="status"></span></div>
+        <div class="rules-unlock-form">
+            <input type="text" class="linear-input rules-unlock-input" placeholder="Enter code" aria-label="Code for the advanced setup rules" autocomplete="off" autocapitalize="off" spellcheck="false" maxlength="60">
+            <button type="button" class="btn-primary btn-sm rules-unlock-btn">Unlock</button>
+        </div>`;
+    const input = row.querySelector('input');
+    const btn = row.querySelector('button');
+    const msg = row.querySelector('.rules-unlock-msg');
+    let busy = false;
+    const submit = async () => {
+        if (busy) return;
+        busy = true;
+        const done = await rulesRunUnlock(input, btn, msg, 'Unlock');
+        busy = false;
+        if (done) renderSettingsUI();
+    };
+    btn.onclick = submit;
+    input.onkeydown = (e) => { if (e.key === 'Enter') { e.preventDefault(); submit(); } };
+    return row;
 }
 
 // Repairs a hand-edited or older rules object
@@ -187,6 +416,7 @@ function rulesMigrate() {
     if (!sets.features || typeof sets.features !== 'object') sets.features = {};
     if (typeof sets.features.rules !== 'boolean') sets.features.rules = true;
     rulesEnsureShape();
+    if (!rulesAdvancedUnlocked()) rulesRemoveAdvancedDefaults();
 }
 
 // The list that holds a setup's own rules (exact name first, then case-insensitive)
@@ -486,8 +716,9 @@ function rulesRenderPanel() {
     }
 
     const list = rulesFormList();
+    const lock = rulesAdvancedLocked(st.setup) ? rulesLockCardHtml(st.setup) : '';
     if (!list.length) {
-        html += `
+        html += lock || `
             <div class="rules-empty">
                 <strong>No rules for this setup yet</strong>
                 <span>Add rules in Settings &gt; Rules. Rules for all setups show up here too.</span>
@@ -496,11 +727,11 @@ function rulesRenderPanel() {
         return;
     }
 
-    html += rulesListHtml(list, 'Rules');
+    html += rulesListHtml(list, 'Rules', lock);
     panel.innerHTML = html;
 }
 
-function rulesListHtml(list, label) {
+function rulesListHtml(list, label, extra = '') {
     let html = '';
     const c = rulesFormCounts(list);
     const collapsed = c.ok === c.total && !rulesForm.open;
@@ -549,7 +780,7 @@ function rulesListHtml(list, label) {
             html += '</div>';
         });
     }
-    html += `</div><p class="rules-tip">Tip: click All followed, then only mark the exceptions. Keys 1–9 toggle a rule. Skipped rules don't count.</p>`;
+    html += `</div>${extra}<p class="rules-tip">Tip: click All followed, then only mark the exceptions. Keys 1–9 toggle a rule. Skipped rules don't count.</p>`;
     return html;
 }
 
@@ -562,11 +793,12 @@ function rulesRenderInline(panel) {
         return;
     }
     const list = rulesFormList();
+    const lock = rulesAdvancedLocked(st.setup) ? rulesLockCardHtml(st.setup) : '';
     if (!list.length) {
-        panel.innerHTML = `<div class="rules-head"><span class="rules-label">${label}</span></div><div class="rules-inline-note">No rules for this setup yet. Add them in Settings &gt; Rules.</div>`;
+        panel.innerHTML = `<div class="rules-head"><span class="rules-label">${label}</span></div>${lock || '<div class="rules-inline-note">No rules for this setup yet. Add them in Settings &gt; Rules.</div>'}`;
         return;
     }
-    panel.innerHTML = rulesListHtml(list, label);
+    panel.innerHTML = rulesListHtml(list, label, lock);
 }
 
 
@@ -582,6 +814,7 @@ function rulesPanelClick(e) {
     }
     if (act === 'enlarge') { openImageViewer(el.src); return; }
     if (act === 'open') { rulesForm.open = true; rulesRenderPanel(); return; }
+    if (act === 'unlock') { rulesOpenUnlockDialog(); return; }
     const list = rulesFormList();
     if (act === 'all') {
         list.forEach(r => { rulesForm.checks[r.id] = true; });
@@ -702,6 +935,7 @@ function renderRulesSettings(container, onChange) {
         });
         row.appendChild(picks);
         card.appendChild(row);
+        card.appendChild(rulesUnlockRowEl());
     }
 
     if (!enabled) {
@@ -731,7 +965,8 @@ function renderRulesSettings(container, onChange) {
         b.type = 'button';
         b.className = 'chip rules-scope-chip' + (s === scope ? ' is-selected' : '');
         b.setAttribute('aria-pressed', s === scope ? 'true' : 'false');
-        b.innerHTML = `${escapeHTML(s === RULES_ALL ? 'All setups' : s)}<span class="rules-chip-count">${count}</span>`;
+        const lock = s !== RULES_ALL && rulesAdvancedLocked(s) ? `<span class="rules-chip-lock" title="Default rules unlock with a code">${RULES_ICON_LOCK}</span>` : '';
+        b.innerHTML = `${escapeHTML(s === RULES_ALL ? 'All setups' : s)}${lock}<span class="rules-chip-count">${count}</span>`;
         b.onclick = () => { rulesSettingsScope = s; renderSettingsUI(); };
         chips.appendChild(b);
     });
@@ -740,7 +975,9 @@ function renderRulesSettings(container, onChange) {
     note.className = 'rules-scope-note';
     note.textContent = scope === RULES_ALL
         ? 'These rules are checked on every trade, whatever the setup.'
-        : `Shown together with the rules for all setups when you pick ${scope}. Setups come from the Setup list on the Journal tab.`;
+        : rulesAdvancedLocked(scope)
+            ? `${scope} has default rules too: they unlock with a code. You can always add your own rules.`
+            : `Shown together with the rules for all setups when you pick ${scope}. Setups come from the Setup list on the Journal tab.`;
     scopeWrap.appendChild(note);
     card.appendChild(scopeWrap);
 
