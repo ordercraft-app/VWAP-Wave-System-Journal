@@ -1032,7 +1032,7 @@ function rulesDrawStats(el, trades) {
 // feature is on (same chart key, so order and visibility stay as they were).
 // Grade belongs to Location, so this chart doesn't depend on the rules switch.
 const RULES_GRADES = ['C', 'C+', 'B', 'B+', 'A', 'A+'];
-const RULES_GRADE_MIN_TRADES = 3; // fewer trades in a grade: no bar
+const RULES_GRADE_MIN_TRADES = 3; // fewer trades in a grade: faded bar (small sample)
 
 function rulesDrawGradeChart(canvasId, trades, color) {
     const canvas = document.getElementById(canvasId);
@@ -1044,19 +1044,23 @@ function rulesDrawGradeChart(canvasId, trades, color) {
     const byGrade = {};
     RULES_GRADES.forEach(g => { byGrade[g] = []; });
     trades.forEach(t => { const g = rulesGrade(t.locations); if (g) byGrade[g.grade].push(t); });
-    const enough = g => byGrade[g].length >= RULES_GRADE_MIN_TRADES;
+    const count = g => byGrade[g].length;
+    const enough = g => count(g) >= RULES_GRADE_MIN_TRADES;
+    const faded = color + '59'; // same colour at 35 % for small samples
 
     destroyChart(canvasId);
     chartInstances[canvasId] = new Chart(canvas, {
         type: 'bar',
         data: {
-            labels: RULES_GRADES.map(g => [g, enough(g) ? String(byGrade[g].length) : (byGrade[g].length ? 'few' : '–')]),
-            datasets: [{ label: 'Win Rate %', data: RULES_GRADES.map(g => enough(g) ? Number(getWinRateData(byGrade[g]).winRate) : null), backgroundColor: color, borderRadius: { topLeft: 12, topRight: 12, bottomLeft: 12, bottomRight: 12 }, borderSkipped: false, maxBarThickness: 40 }]
+            labels: RULES_GRADES.map(g => [g, count(g) ? String(count(g)) : '–']),
+            // Every grade with trades gets a bar; fewer than 3 trades shows faded.
+            // minBarLength keeps a 0 % grade visible as a small stub.
+            datasets: [{ label: 'Win Rate %', data: RULES_GRADES.map(g => count(g) ? Number(getWinRateData(byGrade[g]).winRate) : null), backgroundColor: RULES_GRADES.map(g => enough(g) ? color : faded), borderRadius: { topLeft: 12, topRight: 12, bottomLeft: 12, bottomRight: 12 }, borderSkipped: false, maxBarThickness: 40, minBarLength: 6 }]
         },
         options: {
             maintainAspectRatio: false,
             scales: { y: { display: false, beginAtZero: true, max: 100 }, x: { ticks: { callback(v) { return this.getLabelForValue(v); } } } },
-            plugins: { legend: { display: false }, tooltip: { callbacks: { title: items => `Grade ${RULES_GRADES[items[0].dataIndex]}`, label: c => `Win rate: ${c.parsed.y}% (${byGrade[RULES_GRADES[c.dataIndex]].length} trades)` } } }
+            plugins: { legend: { display: false }, tooltip: { callbacks: { title: items => `Grade ${RULES_GRADES[items[0].dataIndex]}`, label: c => { const n = count(RULES_GRADES[c.dataIndex]); return `Win rate: ${c.parsed.y}% (${n} ${n === 1 ? 'trade' : 'trades'}${n < RULES_GRADE_MIN_TRADES ? ', small sample' : ''})`; } } } }
         }
     });
 }
