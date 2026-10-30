@@ -1503,3 +1503,16 @@ a.gate-link { text-align: center; width: fit-content; }
 .rules-layout-title { font-size: 13px; font-weight: 500; color: var(--text-main); }
 .rules-layout-note { font-size: 12px; color: var(--text-muted); }
 .chart-sub-tabs { margin-top: -8px; }
+.rules-layout-picks { display: inline-flex; gap: 14px; flex: none; }
+.rules-layout-pick { display: inline-flex; flex-direction: column; align-items: center; gap: 6px; padding: 0; border: none; border-radius: 8px; background: transparent; color: var(--text-muted); cursor: pointer; }
+.rules-layout-pick:focus-visible { outline: 2px solid var(--accent); outline-offset: 3px; }
+.rlp-thumb { display: flex; flex-direction: column; gap: 3px; width: 56px; height: 42px; box-sizing: border-box; padding: 7px; border-radius: 7px; border: 1.5px solid var(--border-color); background: var(--bg-panel); transition: border-color 0.15s; }
+.rules-layout-pick:hover .rlp-thumb { border-color: var(--border-hover); }
+.rules-layout-pick.is-active .rlp-thumb { border-color: var(--accent); }
+.rlp-tabs { display: flex; gap: 3px; }
+.rlp-tabs > span { width: 16px; height: 5px; border-radius: 3px; background: var(--border-hover); }
+.rlp-bar { display: block; height: 4px; border-radius: 2px; background: var(--border-color); }
+.rlp-block { display: block; height: 8px; border-radius: 2px; background: var(--border-hover); }
+.rules-layout-pick.is-active .rlp-accent, .rules-layout-pick.is-active .rlp-block { background: var(--accent); }
+.rlp-label { font-size: 11px; font-weight: 500; }
+.rules-layout-pick.is-active .rlp-label { color: var(--text-main); }

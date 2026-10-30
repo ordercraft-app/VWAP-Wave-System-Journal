@@ -671,20 +671,35 @@ function renderRulesSettings(container, onChange) {
     container.appendChild(card);
 
     if (enabled) {
-        // Tab (default) or inline in the Add Trade form
-        const asTab = !rulesInline();
+        // Tab (default) or inline in the Add Trade form: two small previews to pick from
+        const current = rulesInline() ? 'inline' : 'tab';
         const row = document.createElement('div');
         row.className = 'rules-layout-row';
-        row.innerHTML = `<div class="rules-layout-text"><span class="rules-layout-title">Show rules as a tab in Add Trade</span><span class="rules-layout-note">${asTab ? 'On: Add Trade has two tabs, Trade and Rules.' : 'Off: the rules show inline in the trade form, right under Direction.'}</span></div>`;
-        const btn = document.createElement('button');
-        btn.className = asTab ? 'btn-secondary btn-sm' : 'btn-primary btn-sm';
-        btn.textContent = asTab ? 'Disable' : 'Enable';
-        btn.onclick = () => {
-            sets.rulesLayout = asTab ? 'inline' : 'tab';
-            onChange();
-            renderSettingsUI();
-        };
-        row.appendChild(btn);
+        row.innerHTML = `<div class="rules-layout-text"><span class="rules-layout-title">Rules layout in Add Trade</span><span class="rules-layout-note">Own tab: Trade and Rules tabs at the top. In the form: a Rules section below Direction.</span></div>`;
+        const picks = document.createElement('div');
+        picks.className = 'rules-layout-picks';
+        picks.setAttribute('role', 'radiogroup');
+        picks.setAttribute('aria-label', 'Rules layout in Add Trade');
+        [['tab', 'Own tab'], ['inline', 'In the form']].forEach(([value, label]) => {
+            const on = current === value;
+            const b = document.createElement('button');
+            b.type = 'button';
+            b.className = 'rules-layout-pick' + (on ? ' is-active' : '');
+            b.setAttribute('role', 'radio');
+            b.setAttribute('aria-checked', on ? 'true' : 'false');
+            const preview = value === 'tab'
+                ? '<span class="rlp-tabs"><span></span><span class="rlp-accent"></span></span><span class="rlp-bar"></span><span class="rlp-bar"></span><span class="rlp-bar"></span>'
+                : '<span class="rlp-bar"></span><span class="rlp-bar"></span><span class="rlp-block"></span><span class="rlp-bar"></span>';
+            b.innerHTML = `<span class="rlp-thumb" aria-hidden="true">${preview}</span><span class="rlp-label">${label}</span>`;
+            b.onclick = () => {
+                if (on) return;
+                sets.rulesLayout = value;
+                onChange();
+                renderSettingsUI();
+            };
+            picks.appendChild(b);
+        });
+        row.appendChild(picks);
         card.appendChild(row);
     }
 
