@@ -578,6 +578,11 @@ function renderStatsDashboard() {
 
     // 10. Confluence Rate
     handleChartRender('confluenceChart', 'confluence', () => {
+        // Win Rate by Grade replaces this chart (rules.js)
+        if (typeof rulesGradeOn === 'function' && rulesGradeOn() && typeof rulesDrawGradeChart === 'function') {
+            rulesDrawGradeChart('confluenceChart', trades, colors.win);
+            return;
+        }
         const confGroups = { '1': [], '2': [], '3+': [] };
         trades.forEach(t => {
             if (t.result === 'WIN' || t.result === 'LOST') {
@@ -661,4 +666,7 @@ function renderStatsDashboard() {
 
     // 12. Custom charts (customcharts.js), drawn on the same filtered trades
     if (typeof ccRenderStatsCards === 'function') ccRenderStatsCards(trades);
+
+    // 13. Rules tab (rules.js), same filtered trades
+    if (typeof rulesRenderStats === 'function') rulesRenderStats(trades);
 }

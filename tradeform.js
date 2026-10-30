@@ -71,6 +71,8 @@ function tfInit(trade = null) {
     tfClearAllMissing();
     tfRenderAll();
     tfUpdateSaveState();
+    // Rules tab + grade (rules.js)
+    if (typeof rulesFormInit === 'function') rulesFormInit(trade);
 }
 
 // Symbol and market condition rarely change within a session:
@@ -177,6 +179,7 @@ function tfClearAllMissing() {
 function tfMarkDirty() {
     isFormDirty = true;
     tfUpdateSaveState();
+    if (typeof rulesFormSync === 'function') rulesFormSync();
 }
 
 function tfChip({ id, label, selected = false, tone = '', legacy = false, hasPicks = false, extraClass = '', onClick }) {

@@ -270,6 +270,8 @@ function migrateSettings() {
         addInvalidationStitchingBands();
         sets.migrations.invalidationStitchingBands = true;
     }
+    // Rule check per setup (rules.js): does nothing while the feature is hidden
+    if (typeof rulesMigrate === 'function') rulesMigrate();
 }
 
 async function loadDataFromFile() {

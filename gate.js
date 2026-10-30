@@ -202,11 +202,6 @@ function gateContent(variant) {
         <p class="gate-error" id="gate-error" role="alert"></p>
         ${privacy}
         <details class="gate-more">
-            <summary>Already have a settings file?</summary>
-            <p>Put your <code>settings.json</code> in the folder before you connect it, and the journal uses your own lists. Want a fresh copy of the default settings to start from?</p>
-            <button type="button" id="btn-download-template" class="btn-secondary btn-sm">Download Settings File</button>
-        </details>
-        <details class="gate-more">
             <summary>Install as a desktop app (optional)</summary>
             <p>In Chrome, open the menu (three dots, top right), choose <strong>Cast, save and share</strong> and then <strong>Install page as app...</strong></p>
             <img src="install-guide.png" alt="Chrome menu with Install page as app" class="gate-img">
@@ -332,19 +327,6 @@ function bindGateButtons() {
             console.error('Reconnecting failed:', err);
             gateShowError('The folder could not be opened. Choose it again with "Use a different folder".');
         }
-    });
-
-    const download = document.getElementById('btn-download-template');
-    if (download) download.addEventListener('click', () => {
-        const blob = new Blob([JSON.stringify(getDefaultSettings(), null, 2)], { type: 'application/json' });
-        const url = URL.createObjectURL(blob);
-        const a = document.createElement('a');
-        a.href = url;
-        a.download = 'settings.json';
-        document.body.appendChild(a);
-        a.click();
-        a.remove();
-        URL.revokeObjectURL(url);
     });
 }
 

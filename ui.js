@@ -460,6 +460,7 @@ async function renderDashboard() {
                     <div class="row-col-res" style="margin-left: auto; display: flex; align-items: center; gap: 10px;">
                         ${sharedLabelHtml(trade)}
                         ${shareToggleButtonHtml(trade)}
+                        ${typeof rulesCardBadgesHtml === 'function' ? rulesCardBadgesHtml(trade) : ''}
                         <span class="badge ${resultClass}">${escapeHTML(trade.result || '-')}</span>
                     </div>
                 </div>
@@ -510,6 +511,7 @@ async function renderDashboard() {
                             </div>
                         </div>
                         ` : ''}
+                        ${typeof rulesCardGroupHtml === 'function' ? rulesCardGroupHtml(trade) : ''}
                     </div>
                 </div>
             `;
@@ -527,6 +529,7 @@ async function renderDashboard() {
                         <div class="card-header-actions">
                             ${sharedLabelHtml(trade)}
                             ${shareToggleButtonHtml(trade)}
+                            ${typeof rulesCardBadgesHtml === 'function' ? rulesCardBadgesHtml(trade) : ''}
                             <span class="badge ${resultClass}">${escapeHTML(trade.result || '-')}</span>
                         </div>
                     </div>
@@ -576,6 +579,7 @@ async function renderDashboard() {
                             </div>
                         </div>
                         ` : ''}
+                        ${typeof rulesCardGroupHtml === 'function' ? rulesCardGroupHtml(trade) : ''}
                     </div>
                 </div>
             `;
@@ -755,7 +759,9 @@ btnSaveTrade.addEventListener('click', async (e) => {
         ...tfGetData(),
         notes: document.getElementById('t-notes').value,
         screenshot: finalImageName,
-        reviews: previousTrade && Array.isArray(previousTrade.reviews) ? previousTrade.reviews : undefined
+        reviews: previousTrade && Array.isArray(previousTrade.reviews) ? previousTrade.reviews : undefined,
+        // Rule check (rules.js); without the feature an existing copy is kept as is
+        ruleChecks: typeof rulesGetTradeChecks === 'function' ? rulesGetTradeChecks(previousTrade) : (previousTrade ? previousTrade.ruleChecks : undefined)
     };
 
     const existingIndex = appData.trades.findIndex(t => t.id === tradeId);
@@ -855,6 +861,8 @@ function createPillBox(dataArray, onChange) {
                 const newVal = textNode.textContent.trim();
                 if (newVal && newVal !== item && !dataArray.includes(newVal)) {
                     dataArray[index] = newVal;
+                    // A renamed setup keeps its rules (rules.js)
+                    if (typeof rulesOnListRename === 'function') rulesOnListRename(dataArray, item, newVal);
                     onChange();
                     render();
                 } else if (!newVal) {
@@ -1177,11 +1185,25 @@ function renderSettingsContent() {
     tabScreenshot.textContent = 'Screenshot';
     tabScreenshot.onclick = () => switchSettingsTab('screenshot');
     
+    // Rules tab (rules.js), only while the rules feature is switched on
+    const showRulesTab = typeof rulesFeatureOn !== 'undefined' && rulesFeatureOn;
+    let tabRules = null;
+    if (showRulesTab) {
+        tabRules = document.createElement('button');
+        tabRules.className = `settings-tab-btn ${currentSettingsTab === 'rules' ? 'active' : ''}`;
+        tabRules.textContent = 'Rules';
+        tabRules.onclick = () => switchSettingsTab('rules');
+    } else if (currentSettingsTab === 'rules') {
+        currentSettingsTab = 'journal';
+        tabJournal.classList.add('active');
+    }
+
     tabsDiv.appendChild(tabJournal);
+    if (tabRules) tabsDiv.appendChild(tabRules);
     tabsDiv.appendChild(tabChart);
     tabsDiv.appendChild(tabScreenshot);
     settingsContainer.appendChild(tabsDiv);
-    slidePillIndicator(tabsDiv, { journal: tabJournal, chart: tabChart, screenshot: tabScreenshot }[currentSettingsTab], 'settingsTabs');
+    slidePillIndicator(tabsDiv, { journal: tabJournal, rules: tabRules, chart: tabChart, screenshot: tabScreenshot }[currentSettingsTab], 'settingsTabs');
     
     const onSettingsChange = async () => { await autoSave(); };
 
@@ -1205,6 +1227,9 @@ function renderSettingsContent() {
 
                 
 
+        } else if (currentSettingsTab === 'rules' && showRulesTab) {
+        // --- Rules (rules.js) ---
+        renderRulesSettings(settingsContainer, onSettingsChange);
         } else if (currentSettingsTab === 'screenshot') {
         // --- Auto-Screenshot Settings Block (Browser API) ---
         const screenshotContainer = document.createElement('div');
@@ -1272,7 +1297,7 @@ function renderSettingsContent() {
             { key: 'setup', label: 'Top 5 Setup Effectiveness' },
             { key: 'invalidation', label: 'Top 5 Invalidation Losses', depends: 'invalidation' },
             { key: 'psychology', label: 'Top 5 Psychology', depends: 'psychology' },
-            { key: 'confluence', label: 'Confluence Amount vs Win Rate' },
+            { key: 'confluence', label: (typeof rulesGradeOn === 'function' && rulesGradeOn()) ? 'Win Rate by Grade' : 'Confluence Amount vs Win Rate' },
             { key: 'symbol', label: 'Performance by Symbol' },
             { key: 'marketCond', label: 'Market Condition Analysis' },
             { key: 'location', label: 'Location Effectiveness Heatmap' }
