@@ -669,27 +669,16 @@ async function openTradeModal(tradeId = null) {
             newAutoShotBtn.disabled = true;
 
             try {
-                if (!hiddenVideoElement.videoWidth) throw new Error("Video stream not ready");
-                
-                const canvas = document.createElement('canvas');
-                canvas.width = hiddenVideoElement.videoWidth;
-                canvas.height = hiddenVideoElement.videoHeight;
-                const ctx = canvas.getContext('2d');
-                ctx.drawImage(hiddenVideoElement, 0, 0, canvas.width, canvas.height);
-                
-                canvas.toBlob(async (blob) => {
-                    if(!blob) throw new Error("Canvas to Blob failed");
-                    const file = new File([blob], `${symbol}_screenshot_${Date.now()}.webp`, { type: 'image/webp' });
-                    
-                    await handleImageFile(file);
-                    showToast('Screenshot captured!', 'success');
-                    
-                    newAutoShotBtn.innerHTML = originalText;
-                    newAutoShotBtn.disabled = false;
-                }, 'image/webp', 0.9);
-                
+                const canvas = await captureConnectedWindow();
+                const blob = await new Promise(resolve => canvas.toBlob(resolve, 'image/webp', 0.9));
+                if (!blob) throw new Error('Could not create the image');
+                const file = new File([blob], `${symbol}_screenshot_${Date.now()}.webp`, { type: 'image/webp' });
+                await handleImageFile(file);
+                showToast('Screenshot captured!', 'success');
             } catch (error) {
-                alert(`Capture failed: ${error.message}`);
+                console.error('Auto-Capture failed:', error);
+                showToast(`Capture failed: ${error.message}`, 'error');
+            } finally {
                 newAutoShotBtn.innerHTML = originalText;
                 newAutoShotBtn.disabled = false;
             }
@@ -1465,6 +1454,70 @@ function updateModalCaptureButtons() {
         connectBtn.disabled = false;
         updateModalCaptureButtons();
     };
+}
+
+// --- Auto-Capture: one frame from the connected window ---
+// First straight from the stream (ImageCapture), so it doesn't depend on the
+// hidden video element: in a normal Chrome tab that element can stay unpainted,
+// which gave black screenshots. Falls back to the video element after making
+// sure it plays and has a fresh frame. A fully black result is reported.
+async function captureConnectedWindow() {
+    const track = activeMediaStream && activeMediaStream.getVideoTracks()[0];
+    if (!track || track.readyState !== 'live') throw new Error('No window connected. Click Connect Window first.');
+
+    let canvas = null;
+    if (typeof ImageCapture === 'function') {
+        try {
+            const frame = await new ImageCapture(track).grabFrame();
+            canvas = frameToCanvas(frame, frame.width, frame.height);
+            if (frame.close) frame.close();
+            if (isCanvasBlack(canvas)) canvas = null;
+        } catch (e) {
+            console.warn('grabFrame failed, using the video element instead', e);
+            canvas = null;
+        }
+    }
+    if (!canvas) {
+        await waitForVideoFrame(hiddenVideoElement);
+        if (!hiddenVideoElement.videoWidth) throw new Error('Video stream not ready');
+        canvas = frameToCanvas(hiddenVideoElement, hiddenVideoElement.videoWidth, hiddenVideoElement.videoHeight);
+    }
+    if (isCanvasBlack(canvas)) throw new Error('The image came out black. Disconnect and connect the window again, and keep that window open (not minimized).');
+    return canvas;
+}
+
+function frameToCanvas(source, width, height) {
+    const canvas = document.createElement('canvas');
+    canvas.width = width;
+    canvas.height = height;
+    canvas.getContext('2d').drawImage(source, 0, 0, width, height);
+    return canvas;
+}
+
+// Make sure the (hidden) video element plays and has painted a frame
+async function waitForVideoFrame(video) {
+    if (video.paused) { try { await video.play(); } catch (e) { /* stays paused */ } }
+    if (typeof video.requestVideoFrameCallback === 'function') {
+        await new Promise(resolve => {
+            const timer = setTimeout(resolve, 600);
+            video.requestVideoFrameCallback(() => { clearTimeout(timer); resolve(); });
+        });
+    }
+}
+
+// True when every sampled pixel is (almost) black
+function isCanvasBlack(canvas) {
+    const size = 48;
+    const small = document.createElement('canvas');
+    small.width = size;
+    small.height = size;
+    const ctx = small.getContext('2d', { willReadFrequently: true });
+    ctx.drawImage(canvas, 0, 0, size, size);
+    const data = ctx.getImageData(0, 0, size, size).data;
+    for (let i = 0; i < data.length; i += 4) {
+        if (data[i + 3] > 0 && (data[i] > 6 || data[i + 1] > 6 || data[i + 2] > 6)) return false;
+    }
+    return true;
 }
 
 async function connectScreenshotWindow() {
