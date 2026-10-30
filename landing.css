@@ -247,16 +247,10 @@ details[open] > summary .lp-chev { transform: rotate(180deg); }
         mask-image: linear-gradient(180deg, #000 0%, #000 55%, rgba(0, 0, 0, 0.35) 85%, transparent 100%); }
     .lp-context { padding-top: 56px; }
     .lp-bento { grid-template-columns: repeat(2, minmax(0, 1fr)); grid-auto-flow: row dense; gap: 16px; }
-    .lp-span-2, .lp-tile-private { grid-column: 1 / -1; }
+    .lp-span-2 { grid-column: 1 / -1; }
     .lp-flow { flex-direction: column; gap: 10px; }
     .lp-flow-join { display: none; }
     .lp-tile { min-height: 400px; padding: 28px; }
-    .lp-tile-private { min-height: 0; display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); column-gap: 32px; row-gap: 10px; }
-    .lp-tile-private { grid-template-rows: auto auto 1fr; }
-    .lp-tile-private .lp-tag { grid-column: 1; grid-row: 1; }
-    .lp-tile-private h3 { grid-column: 1; grid-row: 2; }
-    .lp-tile-private > p { grid-column: 1; grid-row: 3; }
-    .lp-tile-private .lp-files { grid-column: 2; grid-row: 1 / span 3; margin-top: 0; padding-top: 0; align-self: center; }
     .lp-v-chart { height: 320px; margin-right: -40px; }
     .lp-capture-toast { right: 56px; }
     .lp-v-settings { margin-right: -110px; }
