@@ -1362,11 +1362,13 @@ a.gate-link { text-align: center; width: fit-content; }
 
 .rules-label { font-size: 11px; text-transform: uppercase; letter-spacing: 0.5px; color: var(--text-muted); }
 
-/* Grade badge: A green, B blue, C orange */
-.rules-grade { display: inline-flex; align-items: center; justify-content: center; min-width: 34px; height: 26px; padding: 0 8px; box-sizing: border-box; border-radius: 8px; font-size: 13px; font-weight: 600; color: #FFFFFF; text-transform: none; letter-spacing: 0; background: var(--text-muted); }
-.rules-grade.grade-a { background: var(--success); }
-.rules-grade.grade-b { background: var(--accent); }
-.rules-grade.grade-c { background: var(--warning); }
+/* Grade badge: A green, B mid grey, C dark grey (solid, so it reads apart from the tinted badges) */
+:root { --grade-b-bg: #5C616B; --grade-b-text: #FFFFFF; --grade-c-bg: #2B2C30; --grade-c-text: #B7BAC1; --grade-c-border: #3B434C; }
+[data-theme="light"] { --grade-b-bg: #6E727A; --grade-b-text: #FFFFFF; --grade-c-bg: #E2E4E9; --grade-c-text: #6E727A; --grade-c-border: #D9DBE1; }
+.rules-grade { display: inline-flex; align-items: center; justify-content: center; min-width: 34px; height: 26px; padding: 0 8px; box-sizing: border-box; border: 1px solid transparent; border-radius: 8px; font-size: 13px; font-weight: 600; color: #FFFFFF; text-transform: none; letter-spacing: 0; background: var(--text-muted); }
+.rules-grade.grade-a { background: var(--success); color: #FFFFFF; }
+.rules-grade.grade-b { background: var(--grade-b-bg); color: var(--grade-b-text); }
+.rules-grade.grade-c { background: var(--grade-c-bg); color: var(--grade-c-text); border-color: var(--grade-c-border); }
 .rules-grade.is-small { min-width: 30px; height: 22px; padding: 0 7px; border-radius: 4px; font-size: 11px; }
 .rules-grade-wrap { display: inline-flex; align-items: center; gap: 8px; margin-left: auto; text-transform: none; letter-spacing: 0; }
 .rules-grade-wrap:empty { display: none; }
