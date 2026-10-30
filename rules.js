@@ -606,6 +606,7 @@ function rulesPanelClick(e) {
 // Number keys 1–9 cycle a rule: not rated → followed → not followed → not rated
 document.addEventListener('keydown', e => {
     if (!rulesActive() || (!rulesInline() && rulesForm.tab !== 'rules')) return;
+    if (document.getElementById('app-dialog')) return; // a confirmation popup is open
     const modal = document.getElementById('trade-modal');
     if (!modal || !modal.classList.contains('active')) return;
 
@@ -865,8 +866,8 @@ function renderRulesSettings(container, onChange) {
     restore.type = 'button';
     restore.className = 'btn-secondary btn-sm';
     restore.textContent = 'Restore default rules';
-    restore.onclick = () => {
-        if (!confirm('Replace all your rules with the default rules? Trades you already logged keep their rules.')) return;
+    restore.onclick = async () => {
+        if (!(await appConfirm({ title: 'Restore the default rules?', message: 'All your rules are replaced by the default rules. Trades you already logged keep their own rules.', confirmText: 'Restore defaults', tone: 'primary', icon: 'undo' }))) return;
         sets.rules = rulesBuildDefaults();
         rulesEnsureShape();
         onChange();

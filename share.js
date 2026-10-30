@@ -788,7 +788,7 @@ async function createShare() {
 async function cancelActiveShare() {
     const active = shareState.active;
     if (!active) return;
-    const ok = confirm('Cancel this share?\n\nThe link stops working and the shared screenshots and reviews are deleted online. Reviews you already received stay in your journal.');
+    const ok = await appConfirm({ title: 'Cancel this share?', message: 'The link stops working and the shared screenshots and reviews are deleted online. Reviews you already received stay in your journal.', cancelText: 'Keep share', confirmText: 'Cancel share', icon: 'trash' });
     if (!ok) return;
     await syncReviews(true);
     try {
@@ -923,7 +923,7 @@ function openReviewsDialog(tradeId) {
 }
 
 async function removeReview(trade, localId) {
-    if (!confirm('Remove this review from your journal?')) return;
+    if (!(await appConfirm({ title: 'Remove this review?', message: 'It is removed from this trade in your journal.', confirmText: 'Remove', icon: 'trash' }))) return;
     const review = trade.reviews.find(r => r.id === localId);
     trade.reviews = trade.reviews.filter(r => r.id !== localId);
     if (!shareState.removedReviewIds.includes(localId)) shareState.removedReviewIds.push(localId);

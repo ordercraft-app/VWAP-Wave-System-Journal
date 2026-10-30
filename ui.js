@@ -695,11 +695,14 @@ async function openTradeModal(tradeId = null) {
     }, 10);
 }
 
-function closeModal() {
+async function closeModal() {
     if (isFormDirty) {
-        if (!confirm('You have unsaved changes. Are you sure you want to close?')) {
-            return;
-        }
+        const discard = await appConfirm({
+            title: 'Discard your changes?',
+            message: 'You changed this trade but didn’t save it. If you close now, those changes are lost.',
+            cancelText: 'Keep editing', confirmText: 'Discard', icon: 'warn'
+        });
+        if (!discard) return;
     }
     tradeModal.classList.remove('active');
     isFormDirty = false;
@@ -713,7 +716,12 @@ tradeModal.addEventListener('mousedown', (e) => {
 
 btnSaveTrade.addEventListener('click', async (e) => {
     e.preventDefault();
-    if(!document.getElementById('t-date').value) return alert('Date is required');
+    if (!document.getElementById('t-date').value) {
+        const hint = document.getElementById('tf-save-hint');
+        if (hint) hint.textContent = 'Still needed: Date';
+        showToast('Still needed: Date', 'error');
+        return;
+    }
 
     const missing = tfValidate();
     if (missing.length) {
@@ -771,9 +779,16 @@ btnSaveTrade.addEventListener('click', async (e) => {
 
 btnDeleteTrade.addEventListener('click', async (e) => {
     e.preventDefault();
-    if(confirm('Are you sure you want to delete this trade?')) {
-        const tradeId = document.getElementById('trade-id').value;
-        const trade = appData.trades.find(t => t.id === tradeId);
+    const tradeId = document.getElementById('trade-id').value;
+    const trade = appData.trades.find(t => t.id === tradeId);
+    const d = trade && trade.date ? parseLocalDate(trade.date) : null;
+    const what = trade ? [trade.number ? `Trade ${trade.number}` : 'This trade', trade.symbol, trade.setup].filter(Boolean).join(' · ') + (d ? ` (${d.toLocaleDateString('en-GB', { day: 'numeric', month: 'short', year: 'numeric' })})` : '') : 'This trade';
+    const ok = await appConfirm({
+        title: 'Delete this trade?',
+        message: `${what}${trade && trade.screenshot ? ' and its screenshot are' : ' is'} removed from your journal. This can’t be undone.`,
+        confirmText: 'Delete trade', icon: 'trash'
+    });
+    if (ok) {
         
         if(trade && trade.screenshot) {
             await deleteImageFromDir(trade.screenshot);
@@ -1021,8 +1036,8 @@ function renderComplexSetting(title, configObj, type, onChange, toggleKey = null
             const delLvl1Btn = document.createElement('button');
             delLvl1Btn.innerHTML = '&times;';
             delLvl1Btn.className = 'btn-icon delete-level-1';
-            delLvl1Btn.onclick = () => {
-                if(confirm(`Delete category "${key}"?`)) {
+            delLvl1Btn.onclick = async () => {
+                if (await appConfirm({ title: `Delete the category “${key}”?`, message: 'The category and its options are removed from your lists. Trades you already logged keep what they had.', confirmText: 'Delete', icon: 'trash' })) {
                     delete configObj[key];
                     onChange();
                     renderItems();
@@ -1416,6 +1431,72 @@ function renderSettingsContent() {
     }
 }
 
+
+// --- App confirmation popup (replaces the browser's confirm()) ---
+// appConfirm({ title, message, confirmText, cancelText, tone, icon }) → Promise<boolean>
+// tone: 'danger' (red outline button, default) or 'primary' (blue).
+// icon: 'warn', 'trash' or 'undo'. Esc / Cancel / click outside = false, Enter = true.
+const APP_DIALOG_ICONS = {
+    warn: '<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="10"></circle><line x1="12" y1="8" x2="12" y2="12"></line><line x1="12" y1="16" x2="12.01" y2="16"></line></svg>',
+    trash: '<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polyline points="3 6 5 6 21 6"></polyline><path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6"></path><path d="M10 11v6"></path><path d="M14 11v6"></path><path d="M9 6V4a1 1 0 0 1 1-1h4a1 1 0 0 1 1 1v2"></path></svg>',
+    undo: '<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polyline points="1 4 1 10 7 10"></polyline><path d="M3.5 15a9 9 0 1 0 2.1-9.4L1 10"></path></svg>'
+};
+
+function appConfirm(opts = {}) {
+    const old = document.getElementById('app-dialog');
+    if (old) return Promise.resolve(false); // one at a time
+    const tone = opts.tone === 'primary' ? 'primary' : 'danger';
+    const icon = APP_DIALOG_ICONS[opts.icon] ? opts.icon : (tone === 'danger' ? 'trash' : 'warn');
+    const iconTone = opts.icon === 'warn' ? 'is-neutral' : tone === 'primary' ? 'is-primary' : 'is-danger';
+
+    return new Promise(resolve => {
+        const previousFocus = document.activeElement;
+        const overlay = document.createElement('div');
+        overlay.id = 'app-dialog';
+        overlay.className = 'app-dialog-overlay';
+        overlay.innerHTML = `
+            <div class="app-dialog" role="alertdialog" aria-modal="true" aria-labelledby="app-dialog-title" aria-describedby="app-dialog-text">
+                <span class="app-dialog-icon ${iconTone}">${APP_DIALOG_ICONS[icon]}</span>
+                <div class="app-dialog-copy">
+                    <h2 id="app-dialog-title">${escapeHTML(opts.title || 'Are you sure?')}</h2>
+                    ${opts.message ? `<p id="app-dialog-text">${escapeHTML(opts.message)}</p>` : ''}
+                </div>
+                <div class="app-dialog-actions">
+                    <button type="button" class="btn-secondary" data-dialog="cancel">${escapeHTML(opts.cancelText || 'Cancel')}</button>
+                    <button type="button" class="${tone === 'primary' ? 'btn-primary' : 'btn-danger'}" data-dialog="ok">${escapeHTML(opts.confirmText || 'OK')}</button>
+                </div>
+            </div>`;
+
+        const close = (result) => {
+            document.removeEventListener('keydown', onKey, true);
+            overlay.remove();
+            if (previousFocus && typeof previousFocus.focus === 'function' && document.contains(previousFocus)) {
+                try { previousFocus.focus({ preventScroll: true }); } catch (e) {}
+            }
+            resolve(result);
+        };
+        // Captures every key while open, so app shortcuts and other Esc handlers don't fire
+        const onKey = (e) => {
+            e.stopPropagation();
+            if (e.key === 'Escape') { e.preventDefault(); close(false); return; }
+            if (e.key === 'Enter') { e.preventDefault(); close(true); return; }
+            if (e.key === 'Tab') {
+                const buttons = [...overlay.querySelectorAll('button')];
+                const i = buttons.indexOf(document.activeElement);
+                e.preventDefault();
+                buttons[(i + (e.shiftKey ? -1 : 1) + buttons.length) % buttons.length].focus();
+                return;
+            }
+            if (e.altKey || e.ctrlKey || e.metaKey || e.key.length === 1) e.preventDefault();
+        };
+        overlay.addEventListener('mousedown', e => { if (e.target === overlay) close(false); });
+        overlay.querySelector('[data-dialog="cancel"]').addEventListener('click', () => close(false));
+        overlay.querySelector('[data-dialog="ok"]').addEventListener('click', () => close(true));
+        document.addEventListener('keydown', onKey, true);
+        document.body.appendChild(overlay);
+        overlay.querySelector('[data-dialog="cancel"]').focus(); // safe default for mouse users; Enter still confirms
+    });
+}
 
 function getToastContainer() {
     let container = document.getElementById('toast-container');

@@ -689,8 +689,8 @@ function openCustomChartModal(id = null) {
     }, 50);
 }
 
-function ccClose() {
-    if (ccDirty && !confirm('You have unsaved changes. Are you sure you want to close?')) return;
+async function ccClose() {
+    if (ccDirty && !(await appConfirm({ title: 'Discard this chart?', message: 'Your changes to this chart aren’t saved yet.', cancelText: 'Keep editing', confirmText: 'Discard', icon: 'warn' }))) return;
     destroyChart('cc-preview');
     document.getElementById('cc-modal').classList.remove('active');
     ccDirty = false;
@@ -979,7 +979,7 @@ async function ccSave() {
 
 async function ccDelete() {
     const c = ccState;
-    if (!confirm(`Delete the chart "${ccTitle(c)}"?`)) return;
+    if (!(await appConfirm({ title: `Delete “${ccTitle(c)}”?`, message: 'The chart is removed from the Stats page. Your trades don’t change.', confirmText: 'Delete chart', icon: 'trash' }))) return;
     const key = ccKey(c.id);
     appData.settings.customCharts = ccGetCharts().filter(x => x.id !== c.id);
     if (Array.isArray(appData.settings.chartOrder)) appData.settings.chartOrder = appData.settings.chartOrder.filter(k => k !== key);

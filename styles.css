@@ -1516,3 +1516,19 @@ a.gate-link { text-align: center; width: fit-content; }
 .rules-layout-pick.is-active .rlp-accent, .rules-layout-pick.is-active .rlp-block { background: var(--accent); }
 .rlp-label { font-size: 11px; font-weight: 500; }
 .rules-layout-pick.is-active .rlp-label { color: var(--text-main); }
+
+/* ---------- App confirmation popup (appConfirm in ui.js) ---------- */
+.app-dialog-overlay { position: fixed; inset: 0; z-index: 400; display: flex; align-items: center; justify-content: center; padding: 16px; background: var(--modal-overlay); backdrop-filter: blur(2px); animation: app-dialog-fade 0.15s ease-out; }
+.app-dialog { width: 400px; max-width: 100%; box-sizing: border-box; padding: 24px; border-radius: 16px; background: var(--bg-panel); border: 1px solid var(--border-color); box-shadow: 0 24px 60px var(--shadow-md); display: flex; flex-direction: column; gap: 14px; animation: app-dialog-pop 0.18s ease-out; }
+.app-dialog-icon { width: 38px; height: 38px; border-radius: 50%; display: flex; align-items: center; justify-content: center; flex: none; }
+.app-dialog-icon.is-danger { background: color-mix(in srgb, var(--danger) 12%, transparent); color: var(--danger); }
+.app-dialog-icon.is-neutral { background: var(--bg-hover); color: var(--text-muted); }
+.app-dialog-icon.is-primary { background: color-mix(in srgb, var(--accent) 14%, transparent); color: var(--accent); }
+.app-dialog-copy { display: flex; flex-direction: column; gap: 6px; }
+.app-dialog-copy h2 { margin: 0; font-size: 16px; font-weight: 600; color: var(--text-main); letter-spacing: 0; }
+.app-dialog-copy p { margin: 0; font-size: 13px; line-height: 1.55; color: var(--text-muted); }
+.app-dialog-actions { display: flex; justify-content: flex-end; gap: 10px; margin-top: 4px; }
+.app-dialog-actions button:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+@keyframes app-dialog-fade { from { opacity: 0; } to { opacity: 1; } }
+@keyframes app-dialog-pop { from { opacity: 0; transform: translateY(6px) scale(0.98); } to { opacity: 1; transform: none; } }
+@media (prefers-reduced-motion: reduce) { .app-dialog-overlay, .app-dialog { animation: none; } }
