@@ -85,6 +85,7 @@
 .lp-flow { display: flex; flex-wrap: wrap; justify-content: center; align-items: center; gap: 10px 8px; margin-top: 8px; }
 .lp-flow-group { list-style: none; padding: 0; display: flex; flex-wrap: wrap; justify-content: center; align-items: center; gap: 10px 8px; }
 .lp-flow-group li { display: flex; align-items: center; gap: 8px; }
+.lp-flow-rules { flex-basis: 100%; }
 .lp-flow-group li:not(:last-child)::after, .lp-flow-join::before { content: '→'; color: #4b5260; font-size: 15px; }
 .lp-chip { display: inline-flex; align-items: center; gap: 10px; height: 42px; padding: 0 18px; border-radius: 100px; background: var(--lp-surface-2); border: 1px solid var(--lp-line-strong); font-size: 14px; font-weight: 500; white-space: nowrap; }
 .lp-chip-opt { background: transparent; border: 1px dashed rgba(143, 169, 255, 0.55); padding-right: 10px; }
@@ -97,6 +98,12 @@
 .lp-legend > span { display: inline-flex; align-items: center; gap: 10px; }
 .lp-key { width: 26px; height: 14px; border-radius: 100px; background: var(--lp-surface-2); border: 1px solid var(--lp-line-strong); }
 .lp-key-opt { background: transparent; border: 1px dashed rgba(143, 169, 255, 0.55); }
+
+/* Grade and rules in the context row */
+.lp-mini-grade { display: inline-flex; align-items: center; justify-content: center; min-width: 28px; height: 22px; padding: 0 6px; border-radius: 5px; background: #44BD1E; color: #ffffff; font-size: 12px; font-weight: 600; }
+.lp-chip-check { border-color: rgba(68, 189, 30, 0.55); background: rgba(68, 189, 30, 0.08); }
+.lp-mini-score { display: inline-flex; align-items: center; height: 22px; padding: 0 8px; border-radius: 5px; background: rgba(245, 166, 35, 0.15); color: #F5A623; font-size: 12px; font-weight: 600; }
+.lp-key-check { background: rgba(68, 189, 30, 0.08); border-color: rgba(68, 189, 30, 0.55); }
 
 /* Bento grid */
 .lp-bento { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 20px; padding-bottom: clamp(72px, 10vw, 112px); }
@@ -111,6 +118,19 @@
 .lp-v-context { min-height: 260px; }
 .lp-v-context .lp-v-form { width: 84%; max-width: 720px; transform: rotate(-2deg); margin-bottom: -60px; }
 .lp-v-context .lp-v-setup { position: absolute; right: 0; top: 0; width: 34%; max-width: 230px; transform: rotate(5deg); }
+
+.lp-v-context .lp-v-rules-mini { position: absolute; right: -40px; bottom: -120px; width: 300px; height: auto; border: 1px solid rgba(255, 255, 255, 0.12); }
+
+/* Rules and grade tiles */
+.lp-v-rules { max-height: 330px; overflow: hidden; -webkit-mask-image: linear-gradient(#000 75%, transparent); mask-image: linear-gradient(#000 75%, transparent); }
+.lp-v-rules img { display: block; width: 100%; height: auto; }
+.lp-v-grade { display: flex; flex-direction: column; gap: 18px; }
+.lp-v-grade img { display: block; width: 150%; max-width: none; height: auto; }
+.lp-grades { display: flex; flex-wrap: wrap; gap: 8px; }
+.lp-grades span { display: inline-flex; align-items: center; justify-content: center; min-width: 38px; height: 30px; padding: 0 8px; border-radius: 7px; font-size: 14px; font-weight: 600; }
+.lp-g-a { background: #44BD1E; color: #ffffff; }
+.lp-g-b { background: #5C616B; color: #ffffff; }
+.lp-g-c { background: #2B2C30; color: #B7BAC1; border: 1px solid #3B434C; }
 
 .lp-v-chart { height: 330px; margin-left: 8px; margin-right: -56px; }
 .lp-v-chart img { width: 84%; margin: 104px 0 0 4%; transform: rotate(-4deg); }
@@ -275,6 +295,7 @@ details[open] > summary .lp-chev { transform: rotate(180deg); }
     .lp-v-context { min-height: 0; }
     .lp-v-context .lp-v-form { width: 92%; margin-bottom: 0; }
     .lp-v-context .lp-v-setup { width: 40%; top: auto; bottom: -16px; }
+    .lp-v-context .lp-v-rules-mini { display: none; }
     .lp-v-chart { margin: 0 -24px -24px 0; height: 340px; overflow: hidden; border-radius: 12px 0 0 0; }
     .lp-v-chart img { width: 92%; margin: 96px 0 0 0; transform: none; }
     .lp-capture-toast { top: 0; right: 36px; width: min(270px, 84%); padding: 14px 14px 16px; transform: rotate(2deg); }

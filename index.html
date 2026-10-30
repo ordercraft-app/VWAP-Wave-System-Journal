@@ -106,7 +106,7 @@
                 <div class="lp-flow">
                     <ol class="lp-flow-group" aria-label="Always part of a trade">
                         <li><span class="lp-chip">Market condition</span></li>
-                        <li><span class="lp-chip">Location</span></li>
+                        <li><span class="lp-chip">Location <span class="lp-mini-grade" aria-hidden="true">A+</span></span></li>
                         <li><span class="lp-chip">Setup</span></li>
                         <li><span class="lp-chip">Direction</span></li>
                     </ol>
@@ -117,10 +117,15 @@
                         <li><span class="lp-chip lp-chip-opt">Target <span class="lp-toggle is-on" aria-hidden="true"></span><span class="lp-sr">optional, on</span></span></li>
                         <li><span class="lp-chip lp-chip-opt is-off"><s>Psychology</s> <span class="lp-toggle" aria-hidden="true"></span><span class="lp-sr">optional, off</span></span></li>
                     </ol>
+                    <ol class="lp-flow-group lp-flow-rules" aria-label="Checked per trade">
+                        <li><span class="lp-chip lp-chip-check">Rules <span class="lp-mini-score" aria-hidden="true">5/6</span></span></li>
+                    </ol>
                 </div>
                 <div class="lp-legend">
                     <span><span class="lp-key" aria-hidden="true"></span>Always part of a trade</span>
                     <span><span class="lp-key lp-key-opt" aria-hidden="true"></span>Optional: switch it off in Settings if you don't use it</span>
+                    <span><span class="lp-mini-grade" aria-hidden="true">A+</span>Grade from your locations, automatic</span>
+                    <span><span class="lp-key lp-key-check" aria-hidden="true"></span>Rules of your setup, ticked off per trade</span>
                 </div>
             </section>
 
@@ -128,10 +133,11 @@
                 <article class="lp-tile lp-span-2">
                     <span class="lp-tag">Log a trade in seconds</span>
                     <h3>Log every trade with its system context</h3>
-                    <p>Market condition, location, setup, direction, evidence, invalidation, target and psychology, with one click each. The form follows the levels of the system, from VWAP to the band.</p>
+                    <p>Market condition, location, setup, direction, evidence, invalidation, target and psychology, with one click each. Then tick off the rules of your setup. Every trade gets a grade from its locations.</p>
                     <div class="lp-visual lp-v-context" aria-hidden="true">
                         <img class="lp-v-form" src="landing/form-location.webp" width="800" height="252" alt="" loading="lazy">
                         <img class="lp-v-setup" src="landing/block-setup.webp" width="300" height="298" alt="" loading="lazy">
+                        <img class="lp-v-rules-mini" src="landing/rules-list.webp" width="1310" height="982" alt="" loading="lazy">
                     </div>
                 </article>
                 <article class="lp-tile lp-tile-chart">
@@ -152,12 +158,29 @@
                         </div>
                     </div>
                 </article>
+                <article class="lp-tile lp-tile-grade">
+                    <span class="lp-tag">Grade C to A+</span>
+                    <h3>Every trade gets a grade</h3>
+                    <p>The more locations line up, the higher the grade. A higher-timeframe level adds a plus. Nothing extra to fill in.</p>
+                    <div class="lp-visual lp-v-grade" aria-hidden="true">
+                        <span class="lp-grades"><span class="lp-g-a">A+</span><span class="lp-g-a">A</span><span class="lp-g-b">B+</span><span class="lp-g-b">B</span><span class="lp-g-c">C+</span><span class="lp-g-c">C</span></span>
+                        <img src="landing/location-grade.webp" width="1302" height="482" alt="" loading="lazy">
+                    </div>
+                </article>
+                <article class="lp-tile lp-span-2">
+                    <span class="lp-tag">Rules per setup</span>
+                    <h3>Check if you followed your rules</h3>
+                    <p>Every setup has a short list of rules: context, location, entry and risk. Tick them off when you log the trade and see which rule you break most.</p>
+                    <div class="lp-visual lp-v-rules" aria-hidden="true">
+                        <img src="landing/rules-list.webp" width="1310" height="982" alt="" loading="lazy">
+                    </div>
+                </article>
                 <article class="lp-tile lp-span-2">
                     <span class="lp-tag">Add custom charts</span>
                     <h3>Track your progress</h3>
-                    <p>11 built-in charts show how well you apply your system: execution growth, results, setups and performance per day. Add your own custom charts for any question.</p>
+                    <p>Built-in charts show how well you apply your system: execution growth, results, setups, win rate by grade, and how often you follow your rules. Add your own custom charts for any question.</p>
                     <div class="lp-visual lp-v-progress" aria-hidden="true">
-                        <img class="lp-v-growth" src="landing/chart-growth.webp" width="1200" height="246" alt="" loading="lazy">
+                        <img class="lp-v-growth" src="landing/chart-discipline.webp" width="1300" height="266" alt="" loading="lazy">
                         <img class="lp-v-winloss" src="landing/chart-winloss.webp" width="600" height="510" alt="" loading="lazy">
                         <img class="lp-v-day" src="landing/chart-by-day.webp" width="600" height="510" alt="" loading="lazy">
                         <img class="lp-v-setups" src="landing/chart-setups.webp" width="600" height="373" alt="" loading="lazy">
@@ -185,10 +208,10 @@
                 <article class="lp-tile lp-span-2">
                     <span class="lp-tag">Weekly calendar</span>
                     <h3>Your week at a glance</h3>
-                    <p>Wins, losses and break-evens per day, and every trade of the day as a card with its chart and context.</p>
+                    <p>Wins, losses and break-evens per day, and every trade of the day as a card with its chart, context, grade and rules.</p>
                     <div class="lp-visual lp-v-week" aria-hidden="true">
                         <img src="landing/calendar.webp" width="1300" height="96" alt="" loading="lazy">
-                        <img src="landing/trade-card.webp" width="1300" height="322" alt="" loading="lazy">
+                        <img src="landing/trade-card-rules.webp" width="1300" height="457" alt="" loading="lazy">
                     </div>
                 </article>
             </section>
@@ -622,6 +645,23 @@
                                     <li>A <strong>+</strong> is added when one of them is a higher-timeframe level, such as a Weekly or Monthly VWAP or a Composite profile.</li>
                                     <li>You see the grade next to Location when you add a trade, and on each trade card.</li>
                                     <li><strong>Win Rate by Grade</strong> on the Stats page shows how each grade performs. The number under each grade is the number of trades. A faded bar means fewer than 3 trades, so take it with a grain of salt.</li>
+                                </ul>
+                            </div>
+                        </div>
+
+                        <div class="faq-item">
+                            <div class="faq-question">
+                                <span>How do the rules work?</span>
+                                <svg class="faq-icon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 12 15 18 9"></polyline></svg>
+                            </div>
+                            <div class="faq-answer">
+                                <p>Every setup has a short list of <strong>rules</strong>, grouped in four phases: Context, Location, Entry and Risk. When you log a trade, you tick off which rules you followed.</p>
+                                <ul>
+                                    <li>Mark each rule with &check; (followed) or &times; (not followed), or click <strong>All followed</strong>. Rules you leave open don't count. With the rules open, the number keys <strong>1 to 9</strong> switch a rule between followed, not followed and open.</li>
+                                    <li>Each trade card shows <strong>Rules 5/6</strong>: green when you followed all rated rules, orange when you broke one. The broken rules are listed on the card.</li>
+                                    <li>The <strong>Rules</strong> tab on the Stats page shows how often you follow your rules, which rules you break most, and how that affects your win rate.</li>
+                                    <li>Edit the rules in <strong>Settings &gt; Rules</strong>. Rules under <strong>All setups</strong> count for every trade. There you also choose whether the rules get their own tab in Add Trade or a section below Direction, or switch the rules off.</li>
+                                    <li>Every trade keeps its own copy of the rules, so changing your rules later never changes trades you already logged.</li>
                                 </ul>
                             </div>
                         </div>
