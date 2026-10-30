@@ -1492,3 +1492,13 @@ a.gate-link { text-align: center; width: fit-content; }
     .rules-setup-row .rules-setup-bar, .rules-setup-row.is-head > span:nth-child(2) { display: none; }
 }
 .rule-btn svg, .rules-icon-btn svg { flex: none; }
+
+/* Rules inline in the trade form (Settings > Rules: tab off) */
+.rules-panel.is-inline { margin-top: 24px; }
+.rules-panel.is-inline .rules-head { margin-top: 0; min-height: 30px; }
+.rules-label-note { text-transform: none; letter-spacing: 0; }
+.rules-inline-note { padding: 14px 16px; border-radius: 14px; background: var(--bg-panel); font-size: 13px; color: var(--text-muted); }
+.rules-layout-row { display: flex; justify-content: space-between; align-items: center; gap: 16px; padding: 12px 16px; border-radius: 12px; background: var(--group-bg); border: 1px solid var(--group-border); }
+.rules-layout-text { display: flex; flex-direction: column; gap: 2px; }
+.rules-layout-title { font-size: 13px; font-weight: 500; color: var(--text-main); }
+.rules-layout-note { font-size: 12px; color: var(--text-muted); }

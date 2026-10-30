@@ -213,6 +213,12 @@ function rulesOnListRename(list, oldName, newName) {
     delete rules[oldName];
 }
 
+// Where the rules show in Add Trade: 'tab' (Trade | Rules tabs, default) or
+// 'inline' (a Rules section in the form, right under Direction).
+function rulesInline() {
+    return appData.settings.rulesLayout === 'inline';
+}
+
 // Rules for all setups + the setup's own rules, sorted by phase
 function rulesForSetup(setup) {
     const rules = rulesIsObject(appData.settings.rules) ? appData.settings.rules : {};
@@ -350,7 +356,7 @@ function rulesFormSync() {
     rulesUpdateGradeBadge();
     if (!rulesActive()) return;
     rulesUpdateTabBadge();
-    if (rulesForm.tab === 'rules') rulesRenderPanel();
+    if (rulesInline() || rulesForm.tab === 'rules') rulesRenderPanel();
 }
 
 function rulesEnsureFormDom() {
@@ -368,7 +374,13 @@ function rulesEnsureFormDom() {
         return;
     }
 
-    if (!tabs) {
+    const inline = rulesInline();
+    if (inline) {
+        rulesForm.tab = 'trade';
+        if (tabs) { tabs.remove(); tabs = null; }
+    }
+
+    if (!tabs && !inline) {
         tabs = document.createElement('div');
         tabs.id = 'tf-tabs';
         tabs.className = 'settings-tabs rules-form-tabs';
@@ -388,10 +400,18 @@ function rulesEnsureFormDom() {
         panel.className = 'rules-panel';
         panel.hidden = true;
         panel.addEventListener('click', rulesPanelClick);
+    }
+    // Inline: inside the form, right after Direction. Tab: after the form.
+    const direction = document.getElementById('tf-sec-direction');
+    if (inline && direction) {
+        if (direction.nextElementSibling !== panel) direction.after(panel);
+    } else if (form.nextElementSibling !== panel) {
         form.after(panel);
     }
+    panel.classList.toggle('is-inline', inline);
     form.hidden = rulesForm.tab === 'rules';
-    panel.hidden = rulesForm.tab !== 'rules';
+    panel.hidden = !inline && rulesForm.tab !== 'rules';
+    if (!tabs) return;
     tabs.querySelectorAll('[data-rules-tab]').forEach(b => {
         const on = b.dataset.rulesTab === rulesForm.tab;
         b.classList.toggle('active', on);
@@ -435,6 +455,7 @@ function rulesRenderPanel() {
     const panel = document.getElementById('rules-panel');
     if (!panel || !tfState) return;
     const st = tfState;
+    if (rulesInline()) return rulesRenderInline(panel);
     const ctx = [st.direction, st.symbol, st.result].filter(Boolean).map(escapeHTML).join(' · ');
 
     let html = `
@@ -475,6 +496,12 @@ function rulesRenderPanel() {
         return;
     }
 
+    html += rulesListHtml(list, 'Rules');
+    panel.innerHTML = html;
+}
+
+function rulesListHtml(list, label) {
+    let html = '';
     const c = rulesFormCounts(list);
     const collapsed = c.ok === c.total && !rulesForm.open;
     const scoreText = c.rated === 0 ? 'Not rated' : `${c.ok}/${c.rated} followed`;
@@ -482,7 +509,7 @@ function rulesRenderPanel() {
 
     html += `
         <div class="rules-head">
-            <span class="rules-label">Rules</span>
+            <span class="rules-label">${label}</span>
             <span class="rules-head-actions">
                 <span class="rules-score${scoreTone}">${scoreText}</span>
                 <button type="button" class="btn-secondary btn-sm rules-all-btn" data-rules-act="all">All followed</button>
@@ -523,8 +550,25 @@ function rulesRenderPanel() {
         });
     }
     html += `</div><p class="rules-tip">Tip: click All followed, then only mark the exceptions. Keys 1–9 toggle a rule. Skipped rules don't count.</p>`;
-    panel.innerHTML = html;
+    return html;
 }
+
+// Inline layout: a Rules section in the trade form, right under Direction
+function rulesRenderInline(panel) {
+    const st = tfState;
+    const label = `Rules${st.setup ? ` <span class="rules-label-note">· ${escapeHTML(st.setup)}</span>` : ''}`;
+    if (!st.setup && rulesNeedsSetup()) {
+        panel.innerHTML = `<div class="rules-head"><span class="rules-label">Rules</span></div><div class="rules-inline-note">Pick a setup above to see its rules, together with the rules for all setups.</div>`;
+        return;
+    }
+    const list = rulesFormList();
+    if (!list.length) {
+        panel.innerHTML = `<div class="rules-head"><span class="rules-label">${label}</span></div><div class="rules-inline-note">No rules for this setup yet. Add them in Settings &gt; Rules.</div>`;
+        return;
+    }
+    panel.innerHTML = rulesListHtml(list, label);
+}
+
 
 function rulesPanelClick(e) {
     const el = e.target.closest('[data-rules-act]');
@@ -561,12 +605,12 @@ function rulesPanelClick(e) {
 
 // Number keys 1–9 cycle a rule: not rated → followed → not followed → not rated
 document.addEventListener('keydown', e => {
-    if (!rulesActive() || rulesForm.tab !== 'rules') return;
+    if (!rulesActive() || (!rulesInline() && rulesForm.tab !== 'rules')) return;
     const modal = document.getElementById('trade-modal');
     if (!modal || !modal.classList.contains('active')) return;
 
     // Alt+S with required fields missing: go back to the Trade tab so the hints are visible
-    if (e.altKey && e.code === 'KeyS' && typeof tfMissing === 'function' && tfMissing().length) {
+    if (!rulesInline() && e.altKey && e.code === 'KeyS' && typeof tfMissing === 'function' && tfMissing().length) {
         rulesSetFormTab('trade');
         return;
     }
@@ -606,7 +650,7 @@ function renderRulesSettings(container, onChange) {
 
     const banner = document.createElement('div');
     banner.className = 'info-banner';
-    banner.innerHTML = `<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"></circle><line x1="12" y1="16" x2="12" y2="12"></line><line x1="12" y1="8" x2="12.01" y2="8"></line></svg><span><strong>Tip:</strong> Each rule has a short <strong>key</strong> (what you scan) and a <strong>detail</strong>. Rules are grouped by phase in the Rules tab of Add Trade. Editing a rule never changes trades you already logged.</span>`;
+    banner.innerHTML = `<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"></circle><line x1="12" y1="16" x2="12" y2="12"></line><line x1="12" y1="8" x2="12.01" y2="8"></line></svg><span><strong>Tip:</strong> Each rule has a short <strong>key</strong> (what you scan) and a <strong>detail</strong>. Rules are grouped by phase in Add Trade. Editing a rule never changes trades you already logged.</span>`;
     container.appendChild(banner);
 
     const card = document.createElement('div');
@@ -626,10 +670,28 @@ function renderRulesSettings(container, onChange) {
     card.appendChild(head);
     container.appendChild(card);
 
+    if (enabled) {
+        // Tab (default) or inline in the Add Trade form
+        const asTab = !rulesInline();
+        const row = document.createElement('div');
+        row.className = 'rules-layout-row';
+        row.innerHTML = `<div class="rules-layout-text"><span class="rules-layout-title">Show rules as a tab in Add Trade</span><span class="rules-layout-note">${asTab ? 'On: Add Trade has two tabs, Trade and Rules.' : 'Off: the rules show inline in the trade form, right under Direction.'}</span></div>`;
+        const btn = document.createElement('button');
+        btn.className = asTab ? 'btn-secondary btn-sm' : 'btn-primary btn-sm';
+        btn.textContent = asTab ? 'Disable' : 'Enable';
+        btn.onclick = () => {
+            sets.rulesLayout = asTab ? 'inline' : 'tab';
+            onChange();
+            renderSettingsUI();
+        };
+        row.appendChild(btn);
+        card.appendChild(row);
+    }
+
     if (!enabled) {
         const p = document.createElement('p');
         p.className = 'rules-off-note';
-        p.textContent = 'Rules are off. The Rules tab is hidden in Add Trade and rule stats are hidden on the Stats page. Your rules are kept.';
+        p.textContent = 'Rules are off. They are hidden in Add Trade and rule stats are hidden on the Stats page. Your rules are kept.';
         card.appendChild(p);
         return;
     }
