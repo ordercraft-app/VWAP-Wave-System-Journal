@@ -956,9 +956,7 @@ function renderRulesSettings(container, onChange) {
     const scopeWrap = document.createElement('div');
     scopeWrap.className = 'rules-scope';
     scopeWrap.innerHTML = '<span class="rules-label">Rules for</span>';
-    const chips = document.createElement('div');
-    chips.className = 'chip-row';
-    scopes.forEach(s => {
+    const scopeChip = s => {
         const k = s === RULES_ALL ? RULES_ALL : rulesScopeKey(s);
         const count = k && Array.isArray(sets.rules[k]) ? sets.rules[k].length : 0;
         const b = document.createElement('button');
@@ -966,11 +964,35 @@ function renderRulesSettings(container, onChange) {
         b.className = 'chip rules-scope-chip' + (s === scope ? ' is-selected' : '');
         b.setAttribute('aria-pressed', s === scope ? 'true' : 'false');
         const lock = s !== RULES_ALL && rulesAdvancedLocked(s) ? `<span class="rules-chip-lock" title="Default rules unlock with a code">${RULES_ICON_LOCK}</span>` : '';
-        b.innerHTML = `${escapeHTML(s === RULES_ALL ? 'All setups' : s)}${lock}<span class="rules-chip-count">${count}</span>`;
+        b.innerHTML = `${lock}<span class="rules-scope-name">${escapeHTML(s === RULES_ALL ? 'All setups' : s)}</span><span class="rules-chip-count">${count}</span>`;
         b.onclick = () => { rulesSettingsScope = s; renderSettingsUI(); };
-        chips.appendChild(b);
+        return b;
+    };
+    // One row per setup category, like the Setup list on the Journal tab
+    const groups = [{ label: 'Every trade', setups: [RULES_ALL], locked: false }];
+    const cfg = rulesIsObject(appData.settings.setup) ? appData.settings.setup : {};
+    const seen = new Set();
+    Object.keys(cfg).forEach(cat => {
+        const list = (Array.isArray(cfg[cat]) ? cfg[cat] : []).map(x => String(x))
+            .filter(x => setups.includes(x) && !seen.has(x));
+        list.forEach(x => seen.add(x));
+        if (list.length) groups.push({ label: cat, setups: list, locked: list.every(x => rulesAdvancedLocked(x)) });
     });
-    scopeWrap.appendChild(chips);
+    const box = document.createElement('div');
+    box.className = 'rules-scope-box';
+    groups.forEach(g => {
+        const row = document.createElement('div');
+        row.className = 'rules-scope-row';
+        const lab = document.createElement('span');
+        lab.className = 'rules-scope-cat';
+        lab.innerHTML = escapeHTML(g.label) + (g.locked ? `<span class="rules-chip-lock" title="Default rules unlock with a code">${RULES_ICON_LOCK}</span>` : '');
+        const chips = document.createElement('div');
+        chips.className = 'chip-row';
+        g.setups.forEach(s => chips.appendChild(scopeChip(s)));
+        row.append(lab, chips);
+        box.appendChild(row);
+    });
+    scopeWrap.appendChild(box);
     const note = document.createElement('span');
     note.className = 'rules-scope-note';
     note.textContent = scope === RULES_ALL

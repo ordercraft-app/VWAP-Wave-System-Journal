@@ -1559,3 +1559,17 @@ a.gate-link { text-align: center; width: fit-content; }
 @keyframes rules-spin { to { transform: rotate(360deg); } }
 @media (prefers-reduced-motion: reduce) { .rules-spin { animation-duration: 2.4s; } }
 @media (max-width: 760px) { .rules-unlock-row { flex-direction: column; align-items: stretch; } .rules-unlock-form { width: 100%; } .rules-unlock-input { flex: 1; width: auto; } }
+
+/* Settings > Rules: "Rules for" grouped per setup category */
+.rules-scope-box { padding: 14px; border-radius: 12px; background: var(--group-bg); border: 1px solid var(--group-border); display: flex; flex-direction: column; gap: 10px; }
+.rules-scope-row { display: grid; grid-template-columns: 140px minmax(0, 1fr); gap: 12px; align-items: start; }
+.rules-scope-cat { padding-top: 9px; font-size: 12px; color: var(--text-muted); display: flex; align-items: center; gap: 6px; min-width: 0; overflow-wrap: anywhere; }
+.rules-scope-cat .rules-chip-lock { margin-left: 0; }
+.rules-scope-chip .rules-chip-lock { margin-left: 0; margin-right: -2px; }
+@media (max-width: 600px) {
+    .rules-scope-box { padding: 12px; gap: 12px; }
+    .rules-scope-row { grid-template-columns: minmax(0, 1fr); gap: 6px; }
+    .rules-scope-cat { padding-top: 0; }
+    .rules-scope-box .rules-scope-chip { max-width: 100%; white-space: normal; text-align: left; }
+    .rules-scope-box .rules-scope-chip .rules-chip-lock, .rules-scope-box .rules-scope-chip .rules-chip-count { flex: none; }
+}
